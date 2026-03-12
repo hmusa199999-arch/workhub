@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from 'react';
+import React, { useState, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Briefcase, Bookmark, Send, User, TrendingUp, CheckCircle, Clock, XCircle,
@@ -20,7 +20,7 @@ const statusConfig: Record<ApplicationStatus, { label: string; color: string; ic
   rejected:         { label: 'مرفوض',                  color: 'bg-red-100 text-red-700',     icon: <XCircle className="w-3.5 h-3.5" /> },
 };
 
-const tabs = [
+const tabs: { id: 'overview' | 'applications' | 'saved' | 'profile'; label: string; icon: React.ReactNode }[] = [
   { id: 'overview',     label: 'نظرة عامة', icon: <TrendingUp className="w-4 h-4" /> },
   { id: 'applications', label: 'طلباتي',    icon: <Send className="w-4 h-4" /> },
   { id: 'saved',        label: 'محفوظة',    icon: <Bookmark className="w-4 h-4" /> },

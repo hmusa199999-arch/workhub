@@ -405,7 +405,7 @@ export default function CarPlates() {
         <div className="flex items-center justify-between mb-4">
           <p className="text-sm text-gray-500">{filtered.length > 0 ? `${filtered.length} رقم متاح` : 'لا توجد نتائج'}</p>
           {(selectedEmirate !== 'all' || selectedCategory !== 'الكل' || search) && (
-            <button onClick={() => { setSelectedEmirate('all'); setSelectedCategory('الكل'); setSelectedPrice(0); setSearch(''); }}
+            <button onClick={() => { setSelectedEmirate('all'); setSelectedCategory('الكل'); setMinPrice(''); setMaxPrice(''); setSearch(''); }}
               className="text-xs text-red-500 hover:underline">مسح الفلاتر</button>
           )}
         </div>

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { Flame, Loader2, Phone, CheckCircle, LockKeyhole, User as UserIcon } from 'lucide-react';
+import { Flame, Loader2, CheckCircle, LockKeyhole, User as UserIcon } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 export default function Register() {

@@ -192,9 +192,6 @@ export function registerUserInDB(user: {
   saveUsersDB([...db, newRecord]);
 }
 
-function getSeedUsers(): UserRecord[] {
-  return [];
-}
 
 // Seed some visits if empty
 export function seedVisitsIfEmpty() {

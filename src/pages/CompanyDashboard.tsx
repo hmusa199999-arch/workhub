@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Briefcase, Plus, Users, TrendingUp, Eye, ChevronLeft, CheckCircle, Building2, BarChart3, Save, X, Pencil, Phone, MapPin, Globe } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
@@ -8,11 +8,11 @@ import type { CompanyProfile, Application } from '../types';
 
 const inputCls = 'w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-red-500 text-sm bg-white';
 
-const tabs = [
-  { id: 'overview', label: 'نظرة عامة', icon: <TrendingUp className="w-4 h-4" /> },
-  { id: 'jobs', label: 'وظائفي', icon: <Briefcase className="w-4 h-4" /> },
-  { id: 'applicants', label: 'المتقدمون', icon: <Users className="w-4 h-4" /> },
-  { id: 'profile', label: 'ملف الشركة', icon: <Building2 className="w-4 h-4" /> },
+const tabs: { id: 'overview' | 'jobs' | 'applicants' | 'profile'; label: string; icon: React.ReactNode }[] = [
+  { id: 'overview',   label: 'نظرة عامة',  icon: <TrendingUp className="w-4 h-4" /> },
+  { id: 'jobs',       label: 'وظائفي',     icon: <Briefcase className="w-4 h-4" /> },
+  { id: 'applicants', label: 'المتقدمون',  icon: <Users className="w-4 h-4" /> },
+  { id: 'profile',    label: 'ملف الشركة', icon: <Building2 className="w-4 h-4" /> },
 ];
 
 export default function CompanyDashboard() {
