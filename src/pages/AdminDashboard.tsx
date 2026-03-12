@@ -248,7 +248,7 @@ export default function AdminDashboard() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `workhub_customers_${new Date().toISOString().slice(0, 10)}.csv`;
+    a.download = `work1m_customers_${new Date().toISOString().slice(0, 10)}.csv`;
     a.click();
     URL.revokeObjectURL(url);
   };
@@ -307,7 +307,7 @@ export default function AdminDashboard() {
             </div>
             <div>
               <div className="font-bold text-sm">لوحة الإدارة</div>
-              <div className="text-xs text-gray-500">وورك هب</div>
+              <div className="text-xs text-gray-500">work1m</div>
             </div>
           </div>
         </div>

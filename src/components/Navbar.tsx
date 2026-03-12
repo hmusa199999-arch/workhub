@@ -40,7 +40,7 @@ export default function Navbar() {
               <Flame className="w-5 h-5 text-white" />
             </div>
             <span className="text-xl font-black text-white tracking-tight">
-              وورك<span className="text-gradient-red">هب</span>
+              work<span className="text-red-500">1m</span>
             </span>
           </Link>
 

@@ -90,7 +90,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const adminUser: User = {
         id: adminMatch.id,
         name: adminMatch.name,
-        email: 'admin@workhub.ae',
+        email: 'admin@work1m.com',
         role: 'admin',
         createdAt: new Date().toISOString().split('T')[0],
         phone: adminMatch.phone,

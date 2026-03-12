@@ -13,7 +13,7 @@ export default function Footer() {
               <div className="w-9 h-9 bg-gradient-to-br from-red-600 to-red-800 rounded-xl flex items-center justify-center shadow-lg shadow-red-900/40">
                 <Briefcase className="w-5 h-5 text-white" />
               </div>
-              <span className="text-xl font-bold text-white">وورك<span className="text-red-400">هب</span></span>
+              <span className="text-xl font-bold text-white">work<span className="text-red-400">1m</span></span>
             </Link>
             <p className="text-sm text-gray-500 leading-relaxed mb-5">
               منصة التوظيف الرائدة التي تربط أفضل المواهب بأبرز الشركات في العالم العربي.
@@ -73,7 +73,7 @@ export default function Footer() {
         </div>
 
         <div className="mt-10 pt-8 border-t border-red-900/20 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-gray-600">
-          <p>© 2026 وورك هب. جميع الحقوق محفوظة.</p>
+          <p>© 2026 work1m. جميع الحقوق محفوظة.</p>
           <div className="flex items-center gap-4">
             <a href="#" className="hover:text-red-400 transition-colors">سياسة الخصوصية</a>
             <a href="#" className="hover:text-red-400 transition-colors">شروط الاستخدام</a>

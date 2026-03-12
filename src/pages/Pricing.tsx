@@ -51,7 +51,7 @@ export default function Pricing() {
         </div>
         <h1 className="text-4xl font-bold mb-4">كل الميزات، بدون أي تكلفة</h1>
         <p className="text-red-200 text-lg max-w-2xl mx-auto">
-          سواء كنت مقيماً تبحث عن عمل أو شركة تبحث عن مواهب — وورك هب مجاني بالكامل الآن
+          سواء كنت مقيماً تبحث عن عمل أو شركة تبحث عن مواهب — work1m مجاني بالكامل الآن
         </p>
       </div>
 

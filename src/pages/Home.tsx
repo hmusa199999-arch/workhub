@@ -254,7 +254,7 @@ export default function Home() {
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-14">
             <div className="inline-flex items-center gap-2 bg-red-600/10 border border-red-500/20 rounded-full px-4 py-1.5 text-xs text-red-400 font-black mb-4 tracking-wider uppercase">
-              ✦ لماذا وورك هب؟
+              ✦ لماذا work1m؟
             </div>
             <h2 className="text-4xl md:text-5xl font-black text-white mb-3">منصة بمستوى مختلف</h2>
             <p className="text-gray-500">سرعة، موثوقية، وتجربة لا مثيل لها</p>
