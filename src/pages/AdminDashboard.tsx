@@ -347,11 +347,10 @@ export default function AdminDashboard() {
           {user.phone && (
             <a
               href={`tel:${user.phone}`}
-              dir="ltr"
               className="flex items-center gap-2 px-3 py-1.5 mb-2 text-xs text-green-400 hover:text-green-300 hover:bg-green-500/10 rounded-lg transition-colors"
             >
               <Phone className="w-3.5 h-3.5 shrink-0" />
-              <span>{user.phone}</span>
+              <span dir="ltr" className="tracking-wide">{user.phone}</span>
             </a>
           )}
           <button onClick={() => { logout(); navigate('/'); }}
