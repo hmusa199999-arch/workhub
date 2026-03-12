@@ -1,0 +1,54 @@
+@import "tailwindcss";
+
+@layer base {
+  * {
+    direction: rtl;
+    font-family: 'Segoe UI', 'Arial', sans-serif;
+  }
+
+  body {
+    @apply bg-gray-50 text-gray-900 antialiased;
+  }
+
+  input, textarea, select {
+    direction: rtl;
+    text-align: right;
+  }
+
+  /* إصلاح لون الحقول عند الإكمال التلقائي (إزالة الأزرق) */
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus,
+  textarea:-webkit-autofill,
+  textarea:-webkit-autofill:hover,
+  textarea:-webkit-autofill:focus,
+  select:-webkit-autofill,
+  select:-webkit-autofill:hover,
+  select:-webkit-autofill:focus {
+    -webkit-box-shadow: 0 0 0px 1000px #111827 inset;
+    -webkit-text-fill-color: #f9fafb;
+    caret-color: #f9fafb;
+    transition: background-color 9999s ease-out 0s;
+  }
+}
+
+@layer utilities {
+  .gradient-primary {
+    background: linear-gradient(135deg, #7f1d1d 0%, #dc2626 50%, #ef4444 100%);
+  }
+  .gradient-hero {
+    background: linear-gradient(135deg, #0a0a0a 0%, #3b0000 40%, #7f1d1d 100%);
+  }
+  .card-hover {
+    @apply transition-all duration-300 hover:shadow-xl hover:-translate-y-1;
+  }
+  .red-glow {
+    box-shadow: 0 0 30px rgba(220, 38, 38, 0.3);
+  }
+  .text-gradient-red {
+    background: linear-gradient(135deg, #fca5a5, #f87171, #fbbf24);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+}
