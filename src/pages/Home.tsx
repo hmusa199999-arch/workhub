@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Search, MapPin, TrendingUp, Shield, Clock, Star, ChevronLeft, Zap, Users, CheckCircle } from 'lucide-react';
 import JobCard from '../components/JobCard';
+import BannerCarousel from '../components/BannerCarousel';
 import { mockJobs } from '../data/mockData';
 import { useAuth } from '../context/AuthContext';
 
@@ -159,6 +160,11 @@ export default function Home() {
           <div className="w-1 h-1 bg-red-400 rounded-full" />
         </div>
       </section>
+
+      {/* ══════════════════════════════════════════════════
+          BANNER CAROUSEL (admin-managed)
+      ══════════════════════════════════════════════════ */}
+      <BannerCarousel />
 
       {/* ══════════════════════════════════════════════════
           STATS

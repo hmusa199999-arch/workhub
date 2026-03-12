@@ -1,12 +1,17 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Users, Briefcase, ShieldCheck, CheckCircle,
   XCircle, Trash2, BarChart3, Bell, LogOut, Search,
   Building2, AlertCircle, Send, TrendingUp, Monitor, Smartphone,
   Tablet, Eye, RefreshCw, Ban, UserCheck, Phone, Mail, Globe,
-  Download, ClipboardList, Image as ImageIcon,
+  Download, ClipboardList, Image as ImageIcon, Megaphone, Plus,
+  Pencil, ToggleLeft, ToggleRight, Video, Type,
 } from 'lucide-react';
+import {
+  getBannerAds, addBannerAd, updateBannerAd, deleteBannerAd,
+  type BannerAd,
+} from '../utils/bannerStore';
 import { useAuth } from '../context/AuthContext';
 import { useApplications } from '../context/ApplicationsContext';
 import { mockJobs } from '../data/mockData';
@@ -26,6 +31,7 @@ const tabs = [
   { id: 'analytics',     label: 'الزوار',            icon: <TrendingUp className="w-4 h-4" /> },
   { id: 'approvals',     label: 'الطلبات',           icon: <Send className="w-4 h-4" /> },
   { id: 'ads',           label: 'المعاملات',         icon: <ClipboardList className="w-4 h-4" /> },
+  { id: 'banners',       label: 'إعلانات الصفحة',    icon: <Megaphone className="w-4 h-4" /> },
   { id: 'customers',     label: 'قاعدة العملاء',     icon: <Users className="w-4 h-4" /> },
   { id: 'jobs',          label: 'الوظائف',           icon: <Briefcase className="w-4 h-4" /> },
   { id: 'companies',     label: 'الشركات',           icon: <Building2 className="w-4 h-4" /> },
@@ -98,6 +104,25 @@ export default function AdminDashboard() {
   const [adsCatFilter, setAdsCatFilter] = useState<'all' | StoredAd['category']>('all');
   const [adsSearch, setAdsSearch] = useState('');
 
+  // ── Banners ──
+  const [bannerAds, setBannerAds] = useState<BannerAd[]>([]);
+  const [showBannerForm, setShowBannerForm] = useState(false);
+  const [editingBanner, setEditingBanner] = useState<BannerAd | null>(null);
+  const [bannerForm, setBannerForm] = useState({
+    type: 'image' as BannerAd['type'],
+    title: '',
+    subtitle: '',
+    link: '',
+    bgColor: '#7f1d1d',
+    startDate: new Date().toISOString().split('T')[0],
+    endDate: '',
+    duration: 5,
+    order: 1,
+    active: true,
+    mediaData: '',
+  });
+  const bannerFileRef = useRef<HTMLInputElement>(null);
+
   const pendingApprovals = getPendingApproval();
   const pendingAds = adsData.filter(a => a.status === 'pending');
 
@@ -105,7 +130,72 @@ export default function AdminDashboard() {
     setUsersDB(getUsersDB());
     setAnalytics(getAnalytics());
     setAdsData(getAllAdsAdmin());
+    setBannerAds(getBannerAds());
   }, [refreshKey]);
+
+  const openBannerForm = (b?: BannerAd) => {
+    if (b) {
+      setEditingBanner(b);
+      setBannerForm({
+        type: b.type,
+        title: b.title,
+        subtitle: b.subtitle || '',
+        link: b.link || '',
+        bgColor: b.bgColor || '#7f1d1d',
+        startDate: b.startDate,
+        endDate: b.endDate,
+        duration: b.duration,
+        order: b.order,
+        active: b.active,
+        mediaData: b.mediaData || '',
+      });
+    } else {
+      setEditingBanner(null);
+      setBannerForm({
+        type: 'image',
+        title: '',
+        subtitle: '',
+        link: '',
+        bgColor: '#7f1d1d',
+        startDate: new Date().toISOString().split('T')[0],
+        endDate: '',
+        duration: 5,
+        order: bannerAds.length + 1,
+        active: true,
+        mediaData: '',
+      });
+    }
+    setShowBannerForm(true);
+  };
+
+  const handleBannerMediaUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => setBannerForm(f => ({ ...f, mediaData: reader.result as string }));
+    reader.readAsDataURL(file);
+  };
+
+  const saveBanner = () => {
+    if (!bannerForm.title.trim() || !bannerForm.endDate) return;
+    if (editingBanner) {
+      updateBannerAd(editingBanner.id, { ...bannerForm });
+    } else {
+      addBannerAd({ ...bannerForm });
+    }
+    setBannerAds(getBannerAds());
+    setShowBannerForm(false);
+  };
+
+  const toggleBannerActive = (id: string, active: boolean) => {
+    updateBannerAd(id, { active });
+    setBannerAds(getBannerAds());
+  };
+
+  const handleDeleteBanner = (id: string) => {
+    deleteBannerAd(id);
+    setBannerAds(getBannerAds());
+  };
 
   if (!user || user.role !== 'admin') {
     navigate('/login');
@@ -918,6 +1008,232 @@ export default function AdminDashboard() {
                   )}
                 </div>
               </div>
+            </div>
+          )}
+
+          {/* ══════ BANNERS ══════ */}
+          {activeTab === 'banners' && (
+            <div className="space-y-5">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-lg font-bold text-white">إعلانات الصفحة الرئيسية</h2>
+                  <p className="text-xs text-gray-500 mt-0.5">تظهر كشريط متحرك أعلى الصفحة الرئيسية</p>
+                </div>
+                <button onClick={() => openBannerForm()}
+                  className="flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-500 text-white text-sm font-bold rounded-xl transition-all">
+                  <Plus className="w-4 h-4" /> إضافة إعلان
+                </button>
+              </div>
+
+              {/* Form */}
+              {showBannerForm && (
+                <div className="bg-gray-900 border border-gray-700 rounded-2xl p-5 space-y-4">
+                  <h3 className="font-bold text-white text-base">
+                    {editingBanner ? 'تعديل الإعلان' : 'إعلان جديد'}
+                  </h3>
+
+                  {/* Type selector */}
+                  <div className="flex gap-2">
+                    {(['image', 'video', 'text'] as BannerAd['type'][]).map(t => (
+                      <button key={t}
+                        onClick={() => setBannerForm(f => ({ ...f, type: t }))}
+                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all ${bannerForm.type === t ? 'bg-red-600 border-red-500 text-white' : 'border-gray-600 text-gray-400 hover:border-red-500'}`}>
+                        {t === 'image' ? <ImageIcon className="w-3.5 h-3.5" /> : t === 'video' ? <Video className="w-3.5 h-3.5" /> : <Type className="w-3.5 h-3.5" />}
+                        {t === 'image' ? 'صورة' : t === 'video' ? 'فيديو' : 'نص'}
+                      </button>
+                    ))}
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    {/* Title */}
+                    <div>
+                      <label className="text-xs text-gray-400 mb-1 block">العنوان *</label>
+                      <input value={bannerForm.title}
+                        onChange={e => setBannerForm(f => ({ ...f, title: e.target.value }))}
+                        placeholder="عنوان الإعلان"
+                        className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-xl text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500" />
+                    </div>
+
+                    {/* Subtitle */}
+                    <div>
+                      <label className="text-xs text-gray-400 mb-1 block">وصف قصير</label>
+                      <input value={bannerForm.subtitle}
+                        onChange={e => setBannerForm(f => ({ ...f, subtitle: e.target.value }))}
+                        placeholder="نص توضيحي اختياري"
+                        className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-xl text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500" />
+                    </div>
+
+                    {/* Link */}
+                    <div>
+                      <label className="text-xs text-gray-400 mb-1 block">الرابط (اختياري)</label>
+                      <input value={bannerForm.link}
+                        onChange={e => setBannerForm(f => ({ ...f, link: e.target.value }))}
+                        placeholder="https://..."
+                        className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-xl text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500" />
+                    </div>
+
+                    {/* Duration */}
+                    <div>
+                      <label className="text-xs text-gray-400 mb-1 block">مدة العرض (ثوانٍ)</label>
+                      <input type="number" min={2} max={60} value={bannerForm.duration}
+                        onChange={e => setBannerForm(f => ({ ...f, duration: Number(e.target.value) }))}
+                        className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-xl text-sm text-white focus:outline-none focus:ring-2 focus:ring-red-500" />
+                    </div>
+
+                    {/* Start Date */}
+                    <div>
+                      <label className="text-xs text-gray-400 mb-1 block">تاريخ البدء *</label>
+                      <input type="date" value={bannerForm.startDate}
+                        onChange={e => setBannerForm(f => ({ ...f, startDate: e.target.value }))}
+                        className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-xl text-sm text-white focus:outline-none focus:ring-2 focus:ring-red-500" />
+                    </div>
+
+                    {/* End Date */}
+                    <div>
+                      <label className="text-xs text-gray-400 mb-1 block">تاريخ الانتهاء *</label>
+                      <input type="date" value={bannerForm.endDate}
+                        onChange={e => setBannerForm(f => ({ ...f, endDate: e.target.value }))}
+                        className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-xl text-sm text-white focus:outline-none focus:ring-2 focus:ring-red-500" />
+                    </div>
+
+                    {/* Order */}
+                    <div>
+                      <label className="text-xs text-gray-400 mb-1 block">الترتيب</label>
+                      <input type="number" min={1} value={bannerForm.order}
+                        onChange={e => setBannerForm(f => ({ ...f, order: Number(e.target.value) }))}
+                        className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-xl text-sm text-white focus:outline-none focus:ring-2 focus:ring-red-500" />
+                    </div>
+
+                    {/* BG Color (text banners) */}
+                    {bannerForm.type === 'text' && (
+                      <div>
+                        <label className="text-xs text-gray-400 mb-1 block">لون الخلفية</label>
+                        <div className="flex items-center gap-2">
+                          <input type="color" value={bannerForm.bgColor}
+                            onChange={e => setBannerForm(f => ({ ...f, bgColor: e.target.value }))}
+                            className="w-10 h-10 rounded-lg border border-gray-600 cursor-pointer" />
+                          <span className="text-xs text-gray-500">{bannerForm.bgColor}</span>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Media Upload */}
+                  {(bannerForm.type === 'image' || bannerForm.type === 'video') && (
+                    <div>
+                      <label className="text-xs text-gray-400 mb-2 block">
+                        {bannerForm.type === 'image' ? 'رفع صورة' : 'رفع فيديو'}
+                      </label>
+                      <input
+                        ref={bannerFileRef}
+                        type="file"
+                        accept={bannerForm.type === 'image' ? 'image/*' : 'video/*'}
+                        onChange={handleBannerMediaUpload}
+                        className="hidden"
+                      />
+                      <button onClick={() => bannerFileRef.current?.click()}
+                        className="flex items-center gap-2 px-4 py-2 border border-dashed border-gray-600 rounded-xl text-sm text-gray-400 hover:border-red-500 hover:text-red-400 transition-all">
+                        {bannerForm.type === 'image' ? <ImageIcon className="w-4 h-4" /> : <Video className="w-4 h-4" />}
+                        {bannerForm.mediaData ? 'تم الرفع ✓ (اضغط لتغيير)' : 'اختر ملفاً'}
+                      </button>
+                      {bannerForm.mediaData && bannerForm.type === 'image' && (
+                        <img src={bannerForm.mediaData} alt="" className="mt-2 h-24 rounded-lg object-cover" />
+                      )}
+                    </div>
+                  )}
+
+                  {/* Active toggle */}
+                  <div className="flex items-center gap-3">
+                    <button onClick={() => setBannerForm(f => ({ ...f, active: !f.active }))}
+                      className="flex items-center gap-2 text-sm">
+                      {bannerForm.active
+                        ? <ToggleRight className="w-7 h-7 text-green-400" />
+                        : <ToggleLeft className="w-7 h-7 text-gray-500" />}
+                      <span className={bannerForm.active ? 'text-green-400' : 'text-gray-500'}>
+                        {bannerForm.active ? 'مفعّل' : 'معطّل'}
+                      </span>
+                    </button>
+                  </div>
+
+                  <div className="flex gap-2 pt-1">
+                    <button onClick={saveBanner}
+                      disabled={!bannerForm.title.trim() || !bannerForm.endDate}
+                      className="px-5 py-2 bg-red-600 hover:bg-red-500 disabled:opacity-40 text-white text-sm font-bold rounded-xl transition-all">
+                      {editingBanner ? 'حفظ التعديلات' : 'إضافة الإعلان'}
+                    </button>
+                    <button onClick={() => setShowBannerForm(false)}
+                      className="px-5 py-2 bg-gray-800 hover:bg-gray-700 text-gray-300 text-sm rounded-xl transition-all">
+                      إلغاء
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* Banners List */}
+              {bannerAds.length === 0 ? (
+                <div className="text-center py-16 text-gray-500">
+                  <Megaphone className="w-10 h-10 mx-auto mb-3 opacity-30" />
+                  <p>لا توجد إعلانات بعد</p>
+                  <p className="text-xs mt-1">اضغط "إضافة إعلان" لإنشاء أول إعلان</p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {bannerAds.sort((a, b) => a.order - b.order).map(b => {
+                    const today = new Date().toISOString().split('T')[0];
+                    const isLive = b.active && b.startDate <= today && b.endDate >= today;
+                    return (
+                      <div key={b.id}
+                        className="bg-gray-900 border border-gray-800 rounded-2xl p-4 flex items-center gap-4">
+                        {/* Preview thumb */}
+                        <div className="w-20 h-14 rounded-xl overflow-hidden shrink-0 border border-gray-700">
+                          {b.type === 'image' && b.mediaData
+                            ? <img src={b.mediaData} alt="" className="w-full h-full object-cover" />
+                            : b.type === 'video' && b.mediaData
+                            ? <video src={b.mediaData} className="w-full h-full object-cover" />
+                            : <div className="w-full h-full flex items-center justify-center"
+                                style={{ background: b.bgColor || '#7f1d1d' }}>
+                                <Type className="w-5 h-5 text-white/50" />
+                              </div>
+                          }
+                        </div>
+
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className="font-semibold text-white text-sm truncate">{b.title}</span>
+                            <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${isLive ? 'bg-green-500/20 text-green-400' : b.active ? 'bg-amber-500/20 text-amber-400' : 'bg-gray-700 text-gray-500'}`}>
+                              {isLive ? '● يعمل الآن' : b.active ? 'مجدول' : 'معطّل'}
+                            </span>
+                            <span className="text-xs text-gray-500 border border-gray-700 px-1.5 py-0.5 rounded-lg">
+                              {b.type === 'image' ? 'صورة' : b.type === 'video' ? 'فيديو' : 'نص'}
+                            </span>
+                          </div>
+                          <div className="text-xs text-gray-500 mt-1 flex gap-3 flex-wrap">
+                            <span>من {b.startDate} → {b.endDate}</span>
+                            <span>⏱ {b.duration}ث</span>
+                            <span>ترتيب: {b.order}</span>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-1.5 shrink-0">
+                          <button onClick={() => toggleBannerActive(b.id, !b.active)}
+                            title={b.active ? 'تعطيل' : 'تفعيل'}
+                            className={`p-1.5 rounded-lg transition-colors ${b.active ? 'text-green-400 hover:bg-green-500/10' : 'text-gray-500 hover:bg-gray-700'}`}>
+                            {b.active ? <ToggleRight className="w-5 h-5" /> : <ToggleLeft className="w-5 h-5" />}
+                          </button>
+                          <button onClick={() => openBannerForm(b)}
+                            className="p-1.5 rounded-lg text-gray-400 hover:text-red-400 hover:bg-red-500/10 transition-colors">
+                            <Pencil className="w-4 h-4" />
+                          </button>
+                          <button onClick={() => handleDeleteBanner(b.id)}
+                            className="p-1.5 rounded-lg text-gray-400 hover:text-red-400 hover:bg-red-500/10 transition-colors">
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
             </div>
           )}
 
