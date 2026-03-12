@@ -335,7 +335,7 @@ export default function AdminDashboard() {
 
         {/* Admin info */}
         <div className="p-4 border-t border-gray-800">
-          <div className="flex items-center gap-3 mb-3">
+          <div className="flex items-center gap-3 mb-2">
             <div className="w-9 h-9 rounded-full bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center font-bold text-sm shrink-0">
               {user.name[0]}
             </div>
@@ -344,6 +344,16 @@ export default function AdminDashboard() {
               <div className="text-xs text-amber-400">مدير النظام</div>
             </div>
           </div>
+          {user.phone && (
+            <a
+              href={`tel:${user.phone}`}
+              dir="ltr"
+              className="flex items-center gap-2 px-3 py-1.5 mb-2 text-xs text-green-400 hover:text-green-300 hover:bg-green-500/10 rounded-lg transition-colors"
+            >
+              <Phone className="w-3.5 h-3.5 shrink-0" />
+              <span>{user.phone}</span>
+            </a>
+          )}
           <button onClick={() => { logout(); navigate('/'); }}
             className="w-full flex items-center gap-2 px-3 py-2 text-xs text-gray-400 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors">
             <LogOut className="w-3.5 h-3.5" /> تسجيل الخروج
