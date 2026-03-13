@@ -14,6 +14,38 @@ interface PostAdModalProps {
 
 const UAE_EMIRATES = ['دبي', 'أبوظبي', 'الشارقة', 'عجمان', 'أم القيوين', 'رأس الخيمة', 'الفجيرة'];
 
+const ARAB_LOCATIONS: Record<string, string[]> = {
+  'الإمارات - دبي':         ['وسط المدينة (Downtown)', 'دبي مارينا', 'الجميرا', 'البرشاء', 'ديرة', 'الكرامة', 'مردف', 'القوز', 'الخليج التجاري', 'نخلة جميرا', 'السطوة', 'عود ميثاء', 'الروضة'],
+  'الإمارات - أبوظبي':      ['جزيرة الريم', 'السعديات', 'مدينة خليفة', 'محمد بن زايد', 'مصفح', 'الروضة', 'الخالدية', 'وسط المدينة', 'الظفرة', 'الرحبة'],
+  'الإمارات - الشارقة':     ['وسط الشارقة', 'الطيبة', 'البطايح', 'الحرة الصناعية', 'الخان', 'القصباء'],
+  'الإمارات - عجمان':       ['وسط عجمان', 'النعيمية', 'الراشدية', 'مصفوت', 'الحميدية'],
+  'الإمارات - رأس الخيمة':  ['وسط المدينة', 'الحمراء', 'المعيريض', 'خزام', 'الجزيرة الحمراء'],
+  'الإمارات - الفجيرة':     ['وسط الفجيرة', 'دبا الفجيرة', 'الحيل', 'قدفع'],
+  'الإمارات - أم القيوين':  ['وسط أم القيوين', 'فلج المعلا', 'السلمة'],
+  'الإمارات - العين':        ['وسط العين', 'الجيمي', 'الأقطع', 'مزيد', 'هيلي', 'المعترض'],
+  'السعودية - الرياض':      ['العليا', 'الملقا', 'النخيل', 'الياسمين', 'الروضة', 'الربوة', 'الشفا', 'العزيزية', 'البديعة', 'طريق الملك فهد'],
+  'السعودية - جدة':         ['الحمراء', 'السلامة', 'الزهراء', 'النزهة', 'العزيزية', 'البلد', 'الروضة', 'المحمدية', 'الصفا', 'ابحر'],
+  'السعودية - مكة المكرمة': ['الحرم المكي', 'العزيزية', 'الشوقية', 'النسيم', 'أجياد', 'الزاهر'],
+  'السعودية - المدينة المنورة': ['الحرم النبوي', 'العوالي', 'العزيزية', 'قباء', 'طيبة'],
+  'السعودية - الدمام':       ['العنود', 'الشاطئ', 'الفيصلية', 'النزهة', 'الجلوية', 'طريق الملك فهد'],
+  'الكويت':                  ['العاصمة', 'حولي', 'الفروانية', 'الأحمدي', 'مبارك الكبير', 'الجهراء'],
+  'قطر - الدوحة':           ['لوسيل', 'العش', 'مشيرب', 'الروضة', 'المرخية', 'فريج عبد العزيز', 'الوكرة', 'الخور', 'الريان'],
+  'البحرين':                 ['المنامة', 'المحرق', 'الرفاع', 'مدينة عيسى', 'مدينة حمد', 'عالي', 'سترة'],
+  'عُمان - مسقط':           ['مطرح', 'الروي', 'بوشر', 'العامرات', 'قريات', 'السيب', 'المصنعة'],
+  'مصر - القاهرة':          ['مدينة نصر', 'هليوبوليس (مصر الجديدة)', 'المعادي', 'الزمالك', 'المهندسين', 'الدقي', 'الشروق', 'التجمع الخامس', 'أكتوبر', 'الشيخ زايد'],
+  'مصر - الإسكندرية':       ['سموحة', 'العجمي', 'المنتزه', 'ستانلي', 'الرمل', 'سيدي بشر', 'الكيلو 21'],
+  'الأردن - عمّان':          ['الرابية', 'ضاحية الرشيد', 'الجبيهة', 'تلاع العلي', 'الصويفية', 'دابوق', 'مرج الحمام'],
+  'لبنان - بيروت':          ['الحمراء', 'الأشرفية', 'الضاحية', 'جونيه', 'جبيل', 'المتن'],
+  'العراق - بغداد':         ['الكرادة', 'المنصور', 'العلاوي', 'الزيونة', 'المشتل', 'اليرموك'],
+  'المغرب - الدار البيضاء': ['المعاريف', 'عين السبع', 'الحي الحسني', 'سيدي البرنوصي', 'برنارد'],
+  'المغرب - الرباط':        ['أكدال', 'الحسان', 'السويسي', 'دوار الحاج فاطمة'],
+  'تونس - تونس العاصمة':    ['المرسى', 'لا مارسا', 'حمام الأنف', 'أريانة', 'المنزه'],
+  'ليبيا - طرابلس':         ['حي الأندلس', 'بن عاشور', 'الدريبي', 'غرغور'],
+  'السودان - الخرطوم':      ['بحري', 'أمدرمان', 'الخرطوم بحري', 'الرياض', 'المنشية'],
+  'اليمن - صنعاء':          ['حدة', 'السبعين', 'شارع الزبيري', 'الرقاس'],
+  'سوريا - دمشق':           ['المالكي', 'أبو رمانة', 'كفرسوسة', 'المزة', 'الميدان'],
+};
+
 function Field({ label, children, required }: { label: string; children: React.ReactNode; required?: boolean }) {
   return (
     <div>
@@ -145,6 +177,8 @@ export default function PostAdModal({ category, onClose, onSuccess }: PostAdModa
   const [phone, setPhone]   = useState(user?.phone || '');
   const [price, setPrice]   = useState('');
   const [location, setLocation] = useState('');
+  const [reLocCountry, setReLocCountry] = useState('');
+  const [reLocArea, setReLocArea]       = useState('');
   const [desc, setDesc]     = useState('');
   const [intent, setIntent] = useState<'offer' | 'request'>('offer');
 
@@ -383,6 +417,34 @@ export default function PostAdModal({ category, onClose, onSuccess }: PostAdModa
                     <input value={reTitle} onChange={e => setReTitle(e.target.value)} placeholder="مثال: شقة فاخرة في وسط دبي" className={inputCls} />
                     {errors.reTitle && <p className="text-red-500 text-xs mt-1">{errors.reTitle}</p>}
                   </Field>
+                  {/* Location selector */}
+                  <Field label="الموقع (الدولة / المدينة)" required>
+                    <div className="flex flex-col gap-2">
+                      <select
+                        value={reLocCountry}
+                        onChange={e => { setReLocCountry(e.target.value); setReLocArea(''); setLocation(e.target.value); }}
+                        className={selectCls}
+                      >
+                        <option value="">— اختر الدولة / الإمارة —</option>
+                        {Object.keys(ARAB_LOCATIONS).map(k => (
+                          <option key={k} value={k}>{k}</option>
+                        ))}
+                      </select>
+                      {reLocCountry && (
+                        <select
+                          value={reLocArea}
+                          onChange={e => { setReLocArea(e.target.value); setLocation(reLocCountry + (e.target.value ? ' - ' + e.target.value : '')); }}
+                          className={selectCls}
+                        >
+                          <option value="">— اختر المنطقة / الحي (اختياري) —</option>
+                          {ARAB_LOCATIONS[reLocCountry].map(a => (
+                            <option key={a} value={a}>{a}</option>
+                          ))}
+                        </select>
+                      )}
+                    </div>
+                    {errors.location && <p className="text-red-500 text-xs mt-1">{errors.location}</p>}
+                  </Field>
                   <div className="grid grid-cols-2 gap-3">
                     <Field label="نوع العقار">
                       <select value={reType} onChange={e => setReType(e.target.value)} className={selectCls}>
@@ -406,15 +468,6 @@ export default function PostAdModal({ category, onClose, onSuccess }: PostAdModa
                       <input value={reArea} onChange={e => setReArea(e.target.value)} placeholder="1200" type="number" className={inputCls} />
                     </Field>
                   </div>
-                  <Field label="الموقع (الدولة / المدينة)" required>
-                    <input
-                      value={location}
-                      onChange={e => setLocation(e.target.value)}
-                      placeholder="مثال: دبي - الإمارات، جدة - السعودية، الدوحة - قطر"
-                      className={inputCls}
-                    />
-                    {errors.location && <p className="text-red-500 text-xs mt-1">{errors.location}</p>}
-                  </Field>
                 </>
               )}
 
