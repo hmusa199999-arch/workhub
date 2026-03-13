@@ -82,11 +82,16 @@ export default function Home() {
         <div className="relative z-10 max-w-5xl mx-auto">
 
           {/* Badge */}
-          <div className="inline-flex items-center gap-2.5 bg-red-600/10 border border-red-500/25 backdrop-blur-sm rounded-full px-5 py-2 text-sm mb-8 shadow-lg shadow-red-900/20">
+          <div className="inline-flex items-center gap-2.5 bg-red-600/10 border border-red-500/25 backdrop-blur-sm rounded-full px-5 py-2 text-sm mb-6 shadow-lg shadow-red-900/20">
             <span className="flex gap-0.5">
               {[...Array(5)].map((_, i) => <Star key={i} className="w-3 h-3 fill-amber-400 text-amber-400" />)}
             </span>
             <span className="text-red-200/80 font-semibold">المنصة الأولى للإعلانات والتوظيف في العالم العربي</span>
+          </div>
+
+          {/* ── Admin Banner Carousel (visible to all) ── */}
+          <div className="w-full max-w-4xl mx-auto mb-8 rounded-2xl overflow-hidden shadow-2xl shadow-red-900/30">
+            <BannerCarousel />
           </div>
 
           {/* Main Headline */}
@@ -160,11 +165,6 @@ export default function Home() {
           <div className="w-1 h-1 bg-red-400 rounded-full" />
         </div>
       </section>
-
-      {/* ══════════════════════════════════════════════════
-          BANNER CAROUSEL (admin-managed)
-      ══════════════════════════════════════════════════ */}
-      <BannerCarousel />
 
       {/* ══════════════════════════════════════════════════
           STATS

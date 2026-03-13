@@ -26,7 +26,22 @@ export default function BannerCarousel() {
     return () => { if (timerRef.current) clearTimeout(timerRef.current); };
   }, [current, ads, paused]);
 
-  if (ads.length === 0) return null;
+  if (ads.length === 0) {
+    return (
+      <div
+        className="relative w-full overflow-hidden flex items-center justify-center"
+        style={{ height: '260px', background: 'linear-gradient(135deg, #1a0505 0%, #2d0a0a 50%, #1a0505 100%)' }}
+      >
+        <div className="absolute inset-0 opacity-[0.04]"
+          style={{ backgroundImage: 'linear-gradient(#dc2626 1px, transparent 1px), linear-gradient(90deg, #dc2626 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
+        <div className="relative text-center px-6">
+          <div className="text-5xl mb-3">📢</div>
+          <p className="text-red-400/70 font-bold text-lg">مساحة إعلانية</p>
+          <p className="text-gray-600 text-sm mt-1">يمكن للإدارة إضافة إعلانات وفيديوهات وصور هنا</p>
+        </div>
+      </div>
+    );
+  }
 
   const ad = ads[current];
   const prev = () => setCurrent(i => (i - 1 + ads.length) % ads.length);
@@ -66,7 +81,7 @@ export default function BannerCarousel() {
   return (
     <div
       className="relative w-full overflow-hidden"
-      style={{ height: '220px' }}
+      style={{ height: '260px' }}
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
     >
