@@ -60,7 +60,7 @@ export default function Login() {
               <Flame className="w-6 h-6 text-white" />
             </div>
             <span className="text-2xl font-black text-white">
-              وورك<span className="text-red-400">هب</span>
+              work<span className="text-red-400">1m</span>
             </span>
           </Link>
           <h1 className="text-3xl xl:text-4xl font-black text-white mb-4 leading-snug">
@@ -92,7 +92,7 @@ export default function Login() {
                 <Flame className="w-6 h-6 text-white" />
               </div>
               <span className="text-2xl font-black text-white">
-                وورك<span className="text-red-400">هب</span>
+                work<span className="text-red-400">1m</span>
               </span>
             </Link>
           </div>

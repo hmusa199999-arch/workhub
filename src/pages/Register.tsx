@@ -66,7 +66,7 @@ export default function Register() {
             <div className="w-12 h-12 bg-gradient-to-br from-red-500 to-red-700 rounded-2xl flex items-center justify-center shadow-xl shadow-red-500/30">
               <Flame className="w-6 h-6 text-white" />
             </div>
-            <span className="text-2xl font-black text-white">وورك<span className="text-gradient-red">هب</span></span>
+            <span className="text-2xl font-black text-white">work<span className="text-red-500">1m</span></span>
           </Link>
           <h1 className="text-2xl font-black text-white">إنشاء حساب مجاني</h1>
           <p className="text-gray-500 mt-1 text-sm">بدون اشتراك — ابدأ بحساب وكلمة مرور</p>
