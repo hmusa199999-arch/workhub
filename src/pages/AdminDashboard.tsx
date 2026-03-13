@@ -21,7 +21,7 @@ import {
   getAnalytics, getUsersDB, saveUsersDB,
   type UserRecord,
 } from '../utils/analytics';
-import { subscribeToUsers } from '../utils/firestoreUsers';
+import { subscribeToUsers, updateUserInDB, deleteUserFromDB } from '../utils/firestoreUsers';
 import {
   getAllAdsAdmin, updateAdStatus, deleteAd, getAdLabel, getCategoryLabel,
   type StoredAd,
@@ -104,6 +104,8 @@ export default function AdminDashboard() {
   const [jobSearch, setJobSearch] = useState('');
   const [refreshKey, setRefreshKey] = useState(0);
   const [adsData, setAdsData] = useState<StoredAd[]>([]);
+  const [lastSync, setLastSync] = useState<Date | null>(null);
+  const [isConnected, setIsConnected] = useState(true);
   const [adsFilter, setAdsFilter] = useState<'all' | StoredAd['status']>('all');
   const [adsCatFilter, setAdsCatFilter] = useState<'all' | StoredAd['category']>('all');
   const [adsSearch, setAdsSearch] = useState('');
@@ -146,10 +148,10 @@ export default function AdminDashboard() {
   // Real-time ads from Firebase
   useEffect(() => {
     const unsubscribe = subscribeToAds((cloudAds: FirestoreAd[]) => {
-      if (cloudAds.length > 0) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        setAdsData(cloudAds as any as StoredAd[]);
-      }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      setAdsData(cloudAds as any as StoredAd[]);
+      setLastSync(new Date());
+      setIsConnected(true);
     });
     return unsubscribe;
   }, []);
@@ -157,25 +159,23 @@ export default function AdminDashboard() {
   // Real-time users from Firebase
   useEffect(() => {
     const unsubscribe = subscribeToUsers((cloudUsers) => {
-      {
-        // Convert CloudUser to UserRecord format and merge
-        const converted: UserRecord[] = cloudUsers.map(u => ({
-          id: u.id,
-          name: u.name,
-          email: `${u.username}@work1m`,
-          phone: u.phone,
-          role: (u.role === 'admin' ? 'seeker' : u.role) as 'seeker' | 'company',
-          loginMethod: 'phone' as const,
-          status: 'active' as const,
-          registeredAt: u.createdAt,
-          lastLogin: u.lastLogin || u.createdAt,
-          createdAt: u.createdAt,
-          lastSeen: u.lastLogin || u.createdAt,
-          pageViews: 0,
-          sessionsCount: 0,
-        }));
-        if (converted.length > 0) setUsersDB(converted);
-      }
+      const converted: UserRecord[] = cloudUsers.map(u => ({
+        id: u.id,
+        name: u.name,
+        email: u.email || `${u.username}@work1m`,
+        phone: u.phone,
+        role: (u.role === 'admin' ? 'seeker' : u.role) as 'seeker' | 'company',
+        loginMethod: 'phone' as const,
+        status: (u.status || 'active') as 'active' | 'banned',
+        registeredAt: u.createdAt,
+        lastLogin: u.lastLogin || u.createdAt,
+        createdAt: u.createdAt,
+        lastSeen: u.lastLogin || u.createdAt,
+        pageViews: 0,
+        sessionsCount: 0,
+      }));
+      setUsersDB(converted);
+      setLastSync(new Date());
     });
     return unsubscribe;
   }, []);
@@ -263,45 +263,55 @@ export default function AdminDashboard() {
     setJobList(prev => prev.filter(j => j.id !== id));
 
   const toggleUserStatus = (id: string) => {
-    const updated = usersDB.map(u =>
-      u.id === id ? { ...u, status: u.status === 'active' ? 'banned' as const : 'active' as const } : u
-    );
+    const target = usersDB.find(u => u.id === id);
+    if (!target) return;
+    const newStatus = target.status === 'active' ? 'banned' as const : 'active' as const;
+    // Update locally for instant UI feedback
+    const updated = usersDB.map(u => u.id === id ? { ...u, status: newStatus } : u);
     saveUsersDB(updated);
     setUsersDB(updated);
+    // Persist in Firebase
+    updateUserInDB(id, { status: newStatus }).catch(console.error);
   };
 
   const deleteUser = (id: string) => {
     const updated = usersDB.filter(u => u.id !== id);
     saveUsersDB(updated);
     setUsersDB(updated);
+    // Delete from Firebase
+    deleteUserFromDB(id).catch(console.error);
   };
 
   const handleAdStatus = async (id: string, status: StoredAd['status']) => {
-    // Update in localStorage first
-    updateAdStatus(id, status);
-    setAdsData(getAllAdsAdmin());
+    // Optimistic UI update
+    setAdsData(prev => prev.map(a => a.id === id ? { ...a, status } : a));
 
-    // Try to update in Firebase
     try {
       await updateAdStatusCloud(id, status as 'approved' | 'rejected');
     } catch {
-      // If doc doesn't exist in Firebase yet, save the full ad then update status
-      const localAd = getAllAdsAdmin().find(a => a.id === id);
+      // Ad not in Firebase yet — save the full ad first, then it will appear via real-time listener
+      const localAd = adsData.find(a => a.id === id) || getAllAdsAdmin().find(a => a.id === id);
       if (localAd) {
         try {
           await saveAdCloud({ ...localAd, status });
-          console.log('Ad saved to Firebase:', id);
         } catch (err) {
           console.error('Failed to save ad to Firebase:', err);
         }
       }
     }
+    // Also update localStorage for legacy
+    updateAdStatus(id, status);
   };
 
-  const handleDeleteAd = (id: string) => {
-    deleteAd(id);
-    deleteAdCloud(id).catch(console.error);
-    setAdsData(getAllAdsAdmin());
+  const handleDeleteAd = async (id: string) => {
+    // Optimistic UI update
+    setAdsData(prev => prev.filter(a => a.id !== id));
+    deleteAd(id); // localStorage
+    try {
+      await deleteAdCloud(id);
+    } catch (err) {
+      console.error('Delete from Firebase failed:', err);
+    }
   };
 
   const exportCustomersCSV = () => {
@@ -469,9 +479,21 @@ export default function AdminDashboard() {
         <header className="bg-gray-900 border-b border-gray-800 px-6 py-4 flex items-center justify-between">
           <div>
             <h1 className="font-bold text-lg">{tabs.find(t => t.id === activeTab)?.label}</h1>
-            <p className="text-gray-500 text-xs mt-0.5">
-              {new Date().toLocaleDateString('ar-AE', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
-            </p>
+            <div className="flex items-center gap-3 mt-0.5">
+              <p className="text-gray-500 text-xs">
+                {new Date().toLocaleDateString('ar-AE', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+              </p>
+              {/* Real-time indicator */}
+              <div className={`flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold ${isConnected ? 'bg-green-500/10 text-green-400' : 'bg-red-500/10 text-red-400'}`}>
+                <span className={`w-1.5 h-1.5 rounded-full ${isConnected ? 'bg-green-400 animate-pulse' : 'bg-red-400'}`} />
+                {isConnected ? 'مباشر' : 'غير متصل'}
+              </div>
+              {lastSync && (
+                <p className="text-gray-600 text-[10px]">
+                  آخر تحديث: {lastSync.toLocaleTimeString('ar-AE', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+                </p>
+              )}
+            </div>
           </div>
           <div className="flex items-center gap-3">
             <button onClick={() => setRefreshKey(k => k + 1)}

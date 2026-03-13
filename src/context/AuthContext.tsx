@@ -1,7 +1,9 @@
 import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
 import type { User, SeekerProfile, CompanyProfile } from '../types';
 import { registerUserInDB } from '../utils/analytics';
-import { saveUserToDB, getAllUsersFromDB, checkUsernameExists } from '../utils/firestoreUsers';
+import {
+  saveUserToDB, updateUserInDB, checkUsernameExists, getUserByUsername,
+} from '../utils/firestoreUsers';
 
 const STORAGE_USER_KEY = 'workhub_user';
 
@@ -13,7 +15,10 @@ const ADMIN_ACCOUNTS: { username: string; password: string; phone: string; name:
 interface AuthContextType {
   user: User | null;
   login: (data: { username: string; password: string }) => Promise<boolean>;
-  register: (data: { name: string; username: string; password: string; phone?: string; role: 'seeker' | 'company'; targetCountry?: string; targetCity?: string; cvFileName?: string }) => Promise<boolean>;
+  register: (data: {
+    name: string; username: string; password: string; phone?: string;
+    role: 'seeker' | 'company'; targetCountry?: string; targetCity?: string; cvFileName?: string;
+  }) => Promise<boolean>;
   logout: () => void;
   updateProfile: (data: Partial<User> | Partial<SeekerProfile> | Partial<CompanyProfile>) => void;
   isLoading: boolean;
@@ -22,7 +27,7 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser]       = useState<User | null>(null);
+  const [user, setUser]           = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -36,37 +41,52 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.setItem(STORAGE_USER_KEY, JSON.stringify(u));
   };
 
+  // ── LOGIN ─────────────────────────────────────────────────────────────────
   const login = async ({ username, password }: { username: string; password: string }): Promise<boolean> => {
     setIsLoading(true);
-    await new Promise(r => setTimeout(r, 400));
+    await new Promise(r => setTimeout(r, 300));
     const trimmed = username.trim();
 
     // Admin fixed accounts
     const adminMatch = ADMIN_ACCOUNTS.find(a => a.username === trimmed && a.password === password);
     if (adminMatch) {
-      persist({ id: adminMatch.id, name: adminMatch.name, email: 'admin@work1m.com', role: 'admin', createdAt: new Date().toISOString().split('T')[0], phone: adminMatch.phone });
+      persist({
+        id: adminMatch.id, name: adminMatch.name,
+        email: 'admin@work1m.com', role: 'admin',
+        createdAt: new Date().toISOString().split('T')[0],
+        phone: adminMatch.phone,
+      });
       setIsLoading(false);
       return true;
     }
 
-    // Look up user from Firebase
+    // Look up user from Firebase by username
     try {
-      const allUsers = await getAllUsersFromDB();
-      const found = allUsers.find(u => u.username.toLowerCase() === trimmed.toLowerCase());
+      const found = await getUserByUsername(trimmed);
       if (!found) { setIsLoading(false); return false; }
 
-      // Simple password check (stored as-is for now)
-      const storedPw = localStorage.getItem(`pw_${found.id}`);
-      if (storedPw !== password) { setIsLoading(false); return false; }
+      // Check if user is banned
+      if (found.status === 'banned') { setIsLoading(false); return false; }
+
+      // Verify password stored in Firebase
+      if (!found.passwordHash || found.passwordHash !== password) {
+        // Fallback: check old localStorage password (migration)
+        const localPw = localStorage.getItem(`pw_${found.id}`);
+        if (localPw !== password) { setIsLoading(false); return false; }
+        // Migrate password to Firebase
+        updateUserInDB(found.id, { passwordHash: password }).catch(console.error);
+      }
 
       const loggedUser: User = {
-        id: found.id, name: found.name, email: `${found.username}@work1m`,
-        role: found.role as 'seeker' | 'company', createdAt: found.createdAt, phone: found.phone,
+        id: found.id, name: found.name,
+        email: found.email || `${found.username}@work1m`,
+        role: found.role as 'seeker' | 'company',
+        createdAt: found.createdAt, phone: found.phone,
       };
       persist(loggedUser);
 
-      // Update last login
-      saveUserToDB({ ...found, lastLogin: new Date().toISOString() }).catch(console.error);
+      // Update last login timestamp in Firebase
+      updateUserInDB(found.id, { lastLogin: new Date().toISOString() }).catch(console.error);
 
       setIsLoading(false);
       return true;
@@ -77,9 +97,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const register = async (data: { name: string; username: string; password: string; phone?: string; role: 'seeker' | 'company'; targetCountry?: string; targetCity?: string; cvFileName?: string }): Promise<boolean> => {
+  // ── REGISTER ──────────────────────────────────────────────────────────────
+  const register = async (data: {
+    name: string; username: string; password: string; phone?: string;
+    role: 'seeker' | 'company'; targetCountry?: string; targetCity?: string; cvFileName?: string;
+  }): Promise<boolean> => {
     setIsLoading(true);
-    await new Promise(r => setTimeout(r, 400));
+    await new Promise(r => setTimeout(r, 300));
     const username = data.username.trim();
 
     try {
@@ -89,15 +113,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       const id = `${data.role}_${Date.now()}`;
 
-      // Save to Firebase
+      // Save full user to Firebase including password
       await saveUserToDB({
-        id, username, name: data.name || username,
-        phone: data.phone || '', role: data.role,
-        targetCountry: data.targetCountry, targetCity: data.targetCity,
+        id,
+        username,
+        name: data.name || username,
+        phone: data.phone || '',
+        role: data.role,
+        targetCountry: data.targetCountry,
+        targetCity: data.targetCity,
         createdAt: new Date().toISOString(),
+        passwordHash: data.password, // stored in Firebase for cross-device login
+        status: 'active',
       });
 
-      // Store password locally (only on this device)
+      // Also keep local copy for fast login on same device
       localStorage.setItem(`pw_${id}`, data.password);
 
       const newUser: User = {
@@ -107,8 +137,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       };
       persist(newUser);
 
-      // Also register in analytics
-      registerUserInDB({ id, name: newUser.name, email: newUser.email, phone: data.phone, role: data.role, loginMethod: 'phone' });
+      // Also register in local analytics
+      registerUserInDB({
+        id, name: newUser.name, email: newUser.email,
+        phone: data.phone, role: data.role, loginMethod: 'phone',
+      });
 
       setIsLoading(false);
       return true;
@@ -128,6 +161,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (!user) return;
     const updated = { ...user, ...data };
     persist(updated);
+    // Also update in Firebase
+    updateUserInDB(user.id, data as Record<string, unknown>).catch(console.error);
   };
 
   return (

@@ -1,6 +1,6 @@
 import {
   collection, doc, addDoc, updateDoc, deleteDoc,
-  query, orderBy, onSnapshot,
+  query, orderBy, where, onSnapshot,
 } from 'firebase/firestore';
 import { db } from './firebase';
 
@@ -54,14 +54,27 @@ export function subscribeToAdsByCategory(
   category: AdCategory,
   callback: (ads: FirestoreAd[]) => void
 ): () => void {
-  const q = query(collection(db, ADS_COLLECTION), orderBy('createdAt', 'desc'));
+  const q = query(
+    collection(db, ADS_COLLECTION),
+    where('category', '==', category),
+    where('status', '==', 'approved'),
+    orderBy('createdAt', 'desc')
+  );
   return onSnapshot(q, (snapshot) => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const ads: FirestoreAd[] = snapshot.docs
-      .map(docSnap => ({ id: docSnap.id, ...(docSnap.data() as any) }))
-      .filter((ad: FirestoreAd) => ad.category === category && ad.status === 'approved');
+    const ads: FirestoreAd[] = snapshot.docs.map(docSnap => ({ id: docSnap.id, ...(docSnap.data() as any) }));
     callback(ads);
-  }, (error) => { console.error('subscribeToAdsByCategory error:', error); callback([]); });
+  }, (error) => {
+    console.error('subscribeToAdsByCategory error:', error);
+    // Fallback: get all and filter
+    const qFallback = query(collection(db, ADS_COLLECTION), orderBy('createdAt', 'desc'));
+    onSnapshot(qFallback, (snap) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const ads = snap.docs.map(d => ({ id: d.id, ...(d.data() as any) }))
+        .filter((a: FirestoreAd) => a.category === category && a.status === 'approved');
+      callback(ads);
+    });
+  });
 }
 
 // ── Save ad to Firebase ───────────────────────────────────────────────────────
