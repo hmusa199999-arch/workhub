@@ -5,6 +5,7 @@ import JobCard from '../components/JobCard';
 import DirectBannerCarousel from '../components/DirectBannerCarousel';
 import { mockJobs } from '../data/mockData';
 import { useAuth } from '../context/AuthContext';
+import { subscribeToAds, type FirestoreAd } from '../utils/firestoreAds';
 
 export default function Home() {
   const navigate = useNavigate();
@@ -12,16 +13,35 @@ export default function Home() {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchLocation, setSearchLocation] = useState('');
   const [count, setCount] = useState(0);
+  const [liveAds, setLiveAds] = useState<FirestoreAd[]>([]);
+
+  // Real-time ads count from Firebase
+  useEffect(() => {
+    const unsubscribe = subscribeToAds((ads) => {
+      setLiveAds(ads.filter(a => a.status === 'approved'));
+    });
+    return unsubscribe;
+  }, []);
+
+  // Live counts per category
+  const liveCounts = {
+    jobs:      liveAds.filter(a => a.category !== 'car' && a.category !== 'realestate' && a.category !== 'service' && a.category !== 'plate' && a.category !== 'job_seeker').length,
+    cars:      liveAds.filter(a => a.category === 'car').length,
+    realestate:liveAds.filter(a => a.category === 'realestate').length,
+    services:  liveAds.filter(a => a.category === 'service').length,
+    plates:    liveAds.filter(a => a.category === 'plate').length,
+  };
 
   // Animated counter for hero
   useEffect(() => {
-    const target = 1301;
+    const target = mockJobs.length + liveCounts.jobs;
     const step = Math.ceil(target / 60);
     const timer = setInterval(() => {
       setCount(c => { if (c + step >= target) { clearInterval(timer); return target; } return c + step; });
     }, 20);
     return () => clearInterval(timer);
-  }, []);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [liveAds.length]);
 
   const featuredJobs = mockJobs.filter(j => j.featured).slice(0, 4);
 
@@ -34,11 +54,11 @@ export default function Home() {
   };
 
   const categories = [
-    { to: '/jobs',       icon: '💼', label: 'وظائف',       count: '1,301+', glow: 'hover:shadow-red-500/20'  },
-    { to: '/cars',       icon: '🚗', label: 'سيارات',      count: '5,200+', glow: 'hover:shadow-orange-500/20' },
-    { to: '/real-estate',icon: '🏡', label: 'عقارات',      count: '3,800+', glow: 'hover:shadow-emerald-500/20' },
-    { to: '/services',   icon: '🛠️', label: 'خدمات',       count: '900+',   glow: 'hover:shadow-rose-500/20'  },
-    { to: '/car-plates', icon: '🚘', label: 'أرقام سيارات',count: '30+',    glow: 'hover:shadow-amber-500/20' },
+    { to: '/jobs',        icon: '💼', label: 'وظائف',        liveCount: mockJobs.length + liveCounts.jobs,      glow: 'hover:shadow-red-500/20'  },
+    { to: '/cars',        icon: '🚗', label: 'سيارات',       liveCount: liveCounts.cars,                        glow: 'hover:shadow-orange-500/20' },
+    { to: '/real-estate', icon: '🏡', label: 'عقارات',       liveCount: liveCounts.realestate,                  glow: 'hover:shadow-emerald-500/20' },
+    { to: '/services',    icon: '🛠️', label: 'خدمات',        liveCount: liveCounts.services,                    glow: 'hover:shadow-rose-500/20'  },
+    { to: '/car-plates',  icon: '🚘', label: 'أرقام سيارات', liveCount: liveCounts.plates,                      glow: 'hover:shadow-amber-500/20' },
   ];
 
   const features = [
@@ -213,7 +233,9 @@ export default function Home() {
                 <div className="relative">
                   <div className="text-4xl md:text-5xl mb-3 group-hover:scale-110 transition-transform duration-300">{cat.icon}</div>
                   <div className="font-black text-gray-300 text-sm group-hover:text-white transition-colors">{cat.label}</div>
-                  <div className="text-[11px] text-gray-600 mt-1 group-hover:text-red-400 transition-colors font-semibold">{cat.count} إعلان</div>
+                  <div className={`text-[11px] mt-1 transition-colors font-bold ${cat.liveCount > 0 ? 'text-red-400 group-hover:text-red-300' : 'text-gray-600 group-hover:text-gray-400'}`}>
+                    {cat.liveCount > 0 ? `${cat.liveCount} إعلان` : 'كن الأول'}
+                  </div>
                 </div>
               </Link>
             ))}

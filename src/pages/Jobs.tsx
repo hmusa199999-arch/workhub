@@ -6,7 +6,7 @@ import PostSeekerAdModal from '../components/PostSeekerAdModal';
 import { mockJobs, sectors } from '../data/mockData';
 import { useAuth } from '../context/AuthContext';
 import { getAdsByJobSeeker, type StoredAd } from '../utils/adsStore';
-import { subscribeToAdsByCategory } from '../utils/firestoreAds';
+import { subscribeToAds, subscribeToAdsByCategory, type FirestoreAd } from '../utils/firestoreAds';
 import type { JobType, ExperienceLevel } from '../types';
 
 const typeOptions: { value: JobType | ''; label: string }[] = [
@@ -51,6 +51,15 @@ export default function Jobs() {
   const [showSeekerModal, setShowSeekerModal] = useState(false);
   const [seekerAds, setSeekerAds] = useState<StoredAd[]>([]);
   const [showSeekers, setShowSeekers] = useState(false);
+  const [allCloudAds, setAllCloudAds] = useState<FirestoreAd[]>([]);
+
+  // Subscribe to all approved ads for live counts
+  useEffect(() => {
+    const unsubscribe = subscribeToAds((ads) => {
+      setAllCloudAds(ads.filter(a => a.status === 'approved'));
+    });
+    return unsubscribe;
+  }, []);
 
   useEffect(() => {
     setSeekerAds(getAdsByJobSeeker());
@@ -59,6 +68,19 @@ export default function Jobs() {
     });
     return unsubscribe;
   }, []);
+
+  // Count ads per sector from Firebase
+  const sectorCounts = useMemo(() => {
+    const counts: Record<string, number> = {};
+    allCloudAds.forEach(ad => {
+      if (ad.category === 'job_seeker') return; // exclude job seekers from sector counts
+      const s = (ad as StoredAd & { sector?: string }).sector || (ad as Record<string, unknown>).jsSector as string;
+      if (s) counts[s] = (counts[s] || 0) + 1;
+    });
+    return counts;
+  }, [allCloudAds]);
+
+  const totalJobAds = allCloudAds.filter(a => a.category !== 'job_seeker').length;
 
   const filtered = useMemo(() => {
     let jobs = [...mockJobs];
@@ -164,6 +186,7 @@ export default function Jobs() {
           <h2 className="text-sm font-black text-gray-400 mb-4 tracking-wide">تصفح حسب القطاع</h2>
           <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-9 gap-3">
             {/* "All" card */}
+            {/* All sectors card */}
             <button
               onClick={() => { setSector(''); setSearchParams({}); }}
               className={`flex flex-col items-center justify-center gap-2 p-4 rounded-2xl border-2 transition-all duration-200 hover:scale-105 group
@@ -173,12 +196,14 @@ export default function Jobs() {
               <span className="text-2xl">🏷️</span>
               <span className="text-xs font-black">الكل</span>
               <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${!sector ? 'bg-white/20 text-white' : 'bg-gray-700 text-gray-500'}`}>
-                {mockJobs.length}
+                {mockJobs.length + totalJobAds}
               </span>
             </button>
 
             {sectors.map(s => {
               const isActive = sector === s.id;
+              const liveCount = sectorCounts[s.id] || 0;
+              const totalCount = s.jobCount + liveCount;
               return (
                 <button key={s.id}
                   onClick={() => { setSector(s.id); setSearchParams({ sector: s.id }); }}
@@ -188,8 +213,10 @@ export default function Jobs() {
                       : 'bg-gray-800/80 border-gray-700 text-gray-400 hover:border-red-500/50 hover:bg-gray-800'}`}>
                   <span className="text-2xl">{s.icon}</span>
                   <span className="text-xs font-black text-center leading-tight">{s.name}</span>
-                  <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${isActive ? 'bg-white/20 text-white' : 'bg-gray-700 text-gray-500'}`}>
-                    {s.jobCount}
+                  <span className={`text-xs font-bold px-2 py-0.5 rounded-full transition-all ${
+                    isActive ? 'bg-white/20 text-white' : totalCount > 0 ? 'bg-red-500/20 text-red-400' : 'bg-gray-700 text-gray-500'
+                  }`}>
+                    {totalCount}
                   </span>
                 </button>
               );
