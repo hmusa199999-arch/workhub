@@ -9,9 +9,11 @@ import {
   Pencil, ToggleLeft, ToggleRight, Video, Type,
 } from 'lucide-react';
 import {
-  getAllBanners as getBannerAds, addBanner as addBannerAd, updateBanner as updateBannerAd, deleteBanner as deleteBannerAd,
+  addBanner as addBannerAd,
+  updateBannerInDB as updateBannerAd, deleteBannerFromDB as deleteBannerAd,
+  subscribeToAllBanners,
   type BannerAd,
-} from '../utils/directBannerStore';
+} from '../utils/firestoreBanners';
 import { useAuth } from '../context/AuthContext';
 import { useApplications } from '../context/ApplicationsContext';
 import { mockJobs } from '../data/mockData';
@@ -19,10 +21,12 @@ import {
   getAnalytics, getUsersDB, saveUsersDB,
   type UserRecord,
 } from '../utils/analytics';
+import { subscribeToUsers } from '../utils/firestoreUsers';
 import {
   getAllAdsAdmin, updateAdStatus, deleteAd, getAdLabel, getCategoryLabel,
   type StoredAd,
 } from '../utils/adsStore';
+import { subscribeToAds, updateAdStatus as updateAdStatusCloud, deleteAd as deleteAdCloud } from '../utils/firestoreAds';
 import type { ApplicationStatus } from '../types';
 
 // ─── Sidebar Tabs ───────────────────────────────────────────────────────
@@ -131,8 +135,49 @@ export default function AdminDashboard() {
     setUsersDB(getUsersDB());
     setAnalytics(getAnalytics());
     setAdsData(getAllAdsAdmin());
-    setBannerAds(getBannerAds());
   }, [refreshKey]);
+
+  // Real-time banners from Firebase
+  useEffect(() => {
+    const unsubscribe = subscribeToAllBanners(setBannerAds);
+    return unsubscribe;
+  }, []);
+
+  // Real-time ads from Firebase
+  useEffect(() => {
+    const unsubscribe = subscribeToAds((cloudAds) => {
+      if (cloudAds.length > 0) {
+        setAdsData(cloudAds as unknown as StoredAd[]);
+      }
+    });
+    return unsubscribe;
+  }, []);
+
+  // Real-time users from Firebase
+  useEffect(() => {
+    const unsubscribe = subscribeToUsers((cloudUsers) => {
+      {
+        // Convert CloudUser to UserRecord format and merge
+        const converted: UserRecord[] = cloudUsers.map(u => ({
+          id: u.id,
+          name: u.name,
+          email: `${u.username}@work1m`,
+          phone: u.phone,
+          role: (u.role === 'admin' ? 'seeker' : u.role) as 'seeker' | 'company',
+          loginMethod: 'phone' as const,
+          status: 'active' as const,
+          registeredAt: u.createdAt,
+          lastLogin: u.lastLogin || u.createdAt,
+          createdAt: u.createdAt,
+          lastSeen: u.lastLogin || u.createdAt,
+          pageViews: 0,
+          sessionsCount: 0,
+        }));
+        if (converted.length > 0) setUsersDB(converted);
+      }
+    });
+    return unsubscribe;
+  }, []);
 
   const openBannerForm = (b?: BannerAd) => {
     if (b) {
@@ -179,32 +224,29 @@ export default function AdminDashboard() {
     reader.readAsDataURL(file);
   };
 
-  const saveBanner = () => {
+  const saveBanner = async () => {
     if (!bannerForm.title.trim() || !bannerForm.endDate) return;
-    
-    if (editingBanner) {
-      updateBannerAd(editingBanner.id, { ...bannerForm });
-    } else {
-      addBannerAd({ ...bannerForm });
+
+    try {
+      if (editingBanner) {
+        await updateBannerAd(editingBanner.id, { ...bannerForm });
+      } else {
+        await addBannerAd({ ...bannerForm, createdAt: new Date().toISOString() });
+      }
+      setShowBannerForm(false);
+      // bannerAds state updates automatically via subscribeToAllBanners
+    } catch (error) {
+      console.error('Failed to save banner:', error);
+      alert('حدث خطأ، تحقق من الاتصال بالإنترنت');
     }
-    
-    setBannerAds(getBannerAds());
-    setShowBannerForm(false);
-    
-    // Show success message
-    setTimeout(() => {
-      alert('✅ تم حفظ الإعلان! يظهر للجميع الآن مباشرة!');
-    }, 100);
   };
 
   const toggleBannerActive = (id: string, active: boolean) => {
-    updateBannerAd(id, { active });
-    setBannerAds(getBannerAds());
+    updateBannerAd(id, { active }).catch(console.error);
   };
 
   const handleDeleteBanner = (id: string) => {
-    deleteBannerAd(id);
-    setBannerAds(getBannerAds());
+    deleteBannerAd(id).catch(console.error);
   };
 
   if (!user || user.role !== 'admin') {
@@ -235,11 +277,13 @@ export default function AdminDashboard() {
 
   const handleAdStatus = (id: string, status: StoredAd['status']) => {
     updateAdStatus(id, status);
+    updateAdStatusCloud(id, status as 'approved' | 'rejected').catch(console.error);
     setAdsData(getAllAdsAdmin());
   };
 
   const handleDeleteAd = (id: string) => {
     deleteAd(id);
+    deleteAdCloud(id).catch(console.error);
     setAdsData(getAllAdsAdmin());
   };
 

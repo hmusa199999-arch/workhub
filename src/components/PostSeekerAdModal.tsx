@@ -1,6 +1,7 @@
 import { useState, useRef } from 'react';
 import { X, User, MapPin, FileText, Upload, CheckCircle, Loader2 } from 'lucide-react';
-import { saveAd } from '../utils/adsStore';
+import { saveAd as saveAdLocal } from '../utils/adsStore';
+import { saveAd as saveAdCloud } from '../utils/firestoreAds';
 import { useAuth } from '../context/AuthContext';
 
 const jobTypes = ['دوام كامل', 'دوام جزئي', 'عن بُعد', 'مستقل', 'تدريب'];
@@ -59,10 +60,10 @@ export default function PostSeekerAdModal({ onClose, onSuccess }: Props) {
     setLoading(true);
     await new Promise(r => setTimeout(r, 600));
 
-    saveAd({
+    const adData = {
       id: `jseeker_${Date.now()}`,
-      category: 'job_seeker',
-      intent: 'request',
+      category: 'job_seeker' as const,
+      intent: 'request' as const,
       createdAt: new Date().toISOString(),
       name: name.trim(),
       phone: phone.trim(),
@@ -77,7 +78,10 @@ export default function PostSeekerAdModal({ onClose, onSuccess }: Props) {
       jsType,
       jsNationality: jsNationality.trim(),
       jsCv,
-    });
+    };
+    saveAdLocal(adData);
+    const { id: _id, ...adWithoutId } = adData;
+    saveAdCloud({ ...adWithoutId }).catch(console.error);
 
     setLoading(false);
     setSubmitted(true);

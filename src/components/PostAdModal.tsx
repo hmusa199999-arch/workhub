@@ -1,7 +1,8 @@
 import { useState, useRef } from 'react';
 import { X, Loader2, CheckCircle, DollarSign, ImagePlus, Trash2 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import { saveAd, type StoredAd } from '../utils/adsStore';
+import { saveAd as saveAdLocal, type StoredAd } from '../utils/adsStore';
+import { saveAd as saveAdCloud } from '../utils/firestoreAds';
 
 export type AdCategory = 'car' | 'realestate' | 'service' | 'plate';
 
@@ -239,7 +240,10 @@ export default function PostAdModal({ category, onClose, onSuccess }: PostAdModa
       adData = { ...base, plateEmirate, plateNum, plateCode, plateCat, location: plateEmirate };
     }
 
-    saveAd(adData);
+    // Save to both local and cloud
+    saveAdLocal(adData);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    saveAdCloud(adData as any).catch(console.error);
     onSuccess?.();
     setLoading(false);
     setStep('done');
