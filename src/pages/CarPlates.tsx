@@ -251,6 +251,17 @@ function UserPlateCard({ ad }: { ad: import('../utils/adsStore').StoredAd }) {
   );
 }
 
+// Map Arabic emirate name → EmirateId
+const EMIRATE_AR_TO_ID: Record<string, EmirateId> = {
+  'دبي':          'dubai',
+  'أبوظبي':       'abu-dhabi',
+  'الشارقة':      'sharjah',
+  'عجمان':        'ajman',
+  'أم القيوين':   'umm-al-quwain',
+  'رأس الخيمة':   'ras-al-khaimah',
+  'الفجيرة':      'fujairah',
+};
+
 export default function CarPlates() {
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -273,6 +284,7 @@ export default function CarPlates() {
     });
   }, []);
 
+  // Filter mock plate ads
   const filtered = plateAds.filter(p => {
     const matchEmirate = selectedEmirate === 'all' || p.emirate === selectedEmirate;
     const matchCat = selectedCategory === 'الكل' || p.category === selectedCategory;
@@ -285,9 +297,35 @@ export default function CarPlates() {
     return matchEmirate && matchCat && matchPrice && matchSearch;
   });
 
+  // Filter user ads by emirate + search + price
+  const filteredUserAds = userAds.filter(ad => {
+    const adEmirateId = EMIRATE_AR_TO_ID[ad.plateEmirate || ''] || ad.plateEmirate;
+    const matchEmirate = selectedEmirate === 'all' || adEmirateId === selectedEmirate || ad.plateEmirate === selectedEmirate;
+    const min = minPrice ? Number(minPrice) : undefined;
+    const max = maxPrice ? Number(maxPrice) : undefined;
+    const matchPrice =
+      (min == null || Number.isNaN(min) || (ad.price || 0) >= min) &&
+      (max == null || Number.isNaN(max) || (ad.price || 0) <= max);
+    const matchSearch = !search ||
+      (ad.plateNum || '').includes(search) ||
+      ((ad.plateCode || '').toUpperCase().includes(search.toUpperCase()));
+    return matchEmirate && matchPrice && matchSearch;
+  });
+
   const featuredPlates = filtered.filter(p => p.featured);
   const regularPlates = filtered.filter(p => !p.featured);
-  const totalByEmirate = (id: EmirateId) => plateAds.filter(p => p.emirate === id).length;
+
+  // Count per emirate including user ads
+  const totalByEmirate = (id: EmirateId) => {
+    const mockCount = plateAds.filter(p => p.emirate === id).length;
+    const userCount = userAds.filter(ad => {
+      const adEmirateId = EMIRATE_AR_TO_ID[ad.plateEmirate || ''] || ad.plateEmirate;
+      return adEmirateId === id || ad.plateEmirate === id;
+    }).length;
+    return mockCount + userCount;
+  };
+
+  const totalAll = plateAds.length + userAds.length;
 
   return (
     <div className="min-h-screen bg-gray-950">
@@ -394,7 +432,7 @@ export default function CarPlates() {
               className={`flex flex-col items-center gap-1.5 px-5 py-3 rounded-2xl border-2 shrink-0 transition-all ${selectedEmirate === 'all' ? 'border-red-600 bg-red-600 text-white shadow-lg shadow-red-900/30' : 'border-gray-700 bg-gray-900 hover:border-red-500/50 text-gray-300'}`}>
               <span className="text-xl">🇦🇪</span>
               <span className="text-xs font-bold whitespace-nowrap">كل الإمارات</span>
-              <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full ${selectedEmirate === 'all' ? 'bg-gray-900/20 text-white' : 'bg-gray-800 text-gray-500'}`}>{plateAds.length}</span>
+              <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full ${selectedEmirate === 'all' ? 'bg-gray-900/20 text-white' : 'bg-gray-800 text-gray-500'}`}>{totalAll}</span>
             </button>
             {emirates.map(em => (
               <button key={em.id} onClick={() => setSelectedEmirate(em.id)}
@@ -409,14 +447,14 @@ export default function CarPlates() {
 
         {/* Results count */}
         <div className="flex items-center justify-between mb-4">
-          <p className="text-sm text-gray-500">{filtered.length > 0 ? `${filtered.length} رقم متاح` : 'لا توجد نتائج'}</p>
+          <p className="text-sm text-gray-500">{(filtered.length + filteredUserAds.length) > 0 ? `${filtered.length + filteredUserAds.length} رقم متاح` : 'لا توجد نتائج'}</p>
           {(selectedEmirate !== 'all' || selectedCategory !== 'الكل' || search) && (
             <button onClick={() => { setSelectedEmirate('all'); setSelectedCategory('الكل'); setMinPrice(''); setMaxPrice(''); setSearch(''); }}
               className="text-xs text-red-500 hover:underline">مسح الفلاتر</button>
           )}
         </div>
 
-        {filtered.length === 0 && userAds.length === 0 ? (
+        {filtered.length === 0 && filteredUserAds.length === 0 ? (
           <div className="text-center py-20">
             <div className="text-6xl mb-4">🚘</div>
             <h3 className="text-lg font-bold text-gray-600 mb-2">لا توجد نتائج</h3>
@@ -425,28 +463,28 @@ export default function CarPlates() {
         ) : (
           <>
             {/* User-posted plate offers */}
-            {userAds.filter(a => a.intent !== 'request').length > 0 && (
+            {filteredUserAds.filter(a => a.intent !== 'request').length > 0 && (
               <div className="mb-8">
                 <div className="flex items-center gap-2 mb-4">
                   <span className="text-red-500">📸</span>
-                  <h3 className="font-bold text-gray-800">إعلانات الأعضاء على الأرقام</h3>
-                  <span className="text-xs bg-red-50 text-red-500 border border-red-200 px-2 py-0.5 rounded-full font-semibold">{userAds.filter(a => a.intent !== 'request').length}</span>
+                  <h3 className="font-bold text-gray-200">إعلانات الأعضاء على الأرقام</h3>
+                  <span className="text-xs bg-red-900/30 text-red-400 border border-red-800/40 px-2 py-0.5 rounded-full font-semibold">{filteredUserAds.filter(a => a.intent !== 'request').length}</span>
                 </div>
                 <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                  {userAds.filter(a => a.intent !== 'request').map(ad => <UserPlateCard key={ad.id} ad={ad} />)}
+                  {filteredUserAds.filter(a => a.intent !== 'request').map(ad => <UserPlateCard key={ad.id} ad={ad} />)}
                 </div>
               </div>
             )}
 
             {/* User plate requests */}
-            {userAds.filter(a => a.intent === 'request').length > 0 && (
+            {filteredUserAds.filter(a => a.intent === 'request').length > 0 && (
               <div className="mb-10">
                 <div className="flex items-center gap-2 mb-4">
                   <span className="text-amber-400">📩</span>
-                  <h3 className="font-bold text-amber-300">طلبات الأشخاص على الأرقام ({userAds.filter(a => a.intent === 'request').length})</h3>
+                  <h3 className="font-bold text-amber-300">طلبات الأشخاص على الأرقام ({filteredUserAds.filter(a => a.intent === 'request').length})</h3>
                 </div>
                 <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                  {userAds.filter(a => a.intent === 'request').map(ad => <UserPlateCard key={ad.id} ad={ad} />)}
+                  {filteredUserAds.filter(a => a.intent === 'request').map(ad => <UserPlateCard key={ad.id} ad={ad} />)}
                 </div>
               </div>
             )}
