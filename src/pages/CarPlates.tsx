@@ -174,8 +174,8 @@ function PlateCard({ plate }: { plate: PlateAd }) {
           <MessageCircle className="w-4 h-4 text-gray-500" /> Negotiation
         </a>
         <a href={`tel:${plate.sellerPhone}`}
-          className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border border-gray-700 text-gray-700 text-sm font-semibold hover:bg-gray-800 transition-colors">
-          <Phone className="w-4 h-4 text-gray-500" /> Contact: {maskPhone(plate.sellerPhone)}
+          className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border border-gray-700 text-gray-400 text-sm font-semibold hover:bg-gray-800 transition-colors">
+          <Phone className="w-4 h-4 text-gray-500" /> <span dir="ltr">{maskPhone(plate.sellerPhone)}</span>
         </a>
       </div>
     </div>
@@ -243,8 +243,8 @@ function UserPlateCard({ ad }: { ad: import('../utils/adsStore').StoredAd }) {
           <MessageCircle className="w-4 h-4 text-gray-500" /> Negotiation
         </a>
         <a href={`tel:${ad.phone}`}
-          className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border border-gray-700 text-gray-700 text-sm font-semibold hover:bg-gray-800 transition-colors">
-          <Phone className="w-4 h-4 text-gray-500" /> Contact: {maskPhone(ad.phone)}
+          className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border border-gray-700 text-gray-400 text-sm font-semibold hover:bg-gray-800 transition-colors">
+          <Phone className="w-4 h-4 text-gray-500" /> <span dir="ltr">{maskPhone(ad.phone)}</span>
         </a>
       </div>
     </div>
