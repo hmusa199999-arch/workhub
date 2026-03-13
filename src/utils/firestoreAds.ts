@@ -1,103 +1,88 @@
 import {
-  collection, doc, getDocs, addDoc, updateDoc, deleteDoc,
+  collection, doc, addDoc, updateDoc, deleteDoc,
   query, orderBy, onSnapshot,
 } from 'firebase/firestore';
 import { db } from './firebase';
 
-// Mirror of StoredAd from adsStore.ts
-export interface StoredAd {
+// Same category names as adsStore.ts - MUST match exactly
+export type AdCategory = 'car' | 'realestate' | 'service' | 'plate' | 'job_seeker';
+
+export interface FirestoreAd {
   id: string;
-  category: 'cars' | 'real_estate' | 'services' | 'car_plates' | 'jobs' | 'job_seeker';
-  intent: 'offer' | 'request';
-  title: string;
-  description?: string;
+  category: AdCategory;
+  intent?: 'offer' | 'request';
+  status: 'pending' | 'approved' | 'rejected';
+  phone: string;
+  createdAt: string;
+  title?: string;
+  name?: string;
+  desc?: string;
   price?: number;
   location?: string;
-  city?: string;
-  phone: string;
   images?: string[];
-  status: 'pending' | 'approved' | 'rejected';
-  userId?: string;
-  userName?: string;
-  createdAt: string;
-  // Cars fields
-  carBrand?: string; carModel?: string; carYear?: string; carMileage?: string; carColor?: string; carFuel?: string; carTransmission?: string;
-  // Real estate fields
-  propType?: string; propArea?: string; propRooms?: string; propBath?: string; propFloor?: string;
-  // Job fields
-  jobTitle?: string; jobSector?: string; jobType?: string; jobExp?: string; jobSalary?: string; targetCountry?: string; targetCity?: string; cvUrl?: string;
-  // Job seeker fields
-  jsTitle?: string; jsSector?: string; jsExp?: string; jsType?: string; jsNationality?: string; jsCv?: string;
-  // Car plate fields
+  // Cars
+  carTitle?: string; carBrand?: string; carModel?: string; carYear?: string;
+  carMileage?: string; carColor?: string; carFuel?: string; carTransmission?: string;
+  // Real estate
+  reTitle?: string; propType?: string; propArea?: string; propRooms?: string;
+  propBath?: string; propFloor?: string;
+  // Services
+  svcTitle?: string; serviceType?: string;
+  // Car plates
   plateNumber?: string; plateEmirate?: string; plateCode?: string;
-  // Services fields
-  serviceType?: string;
+  // Job seeker
+  jsTitle?: string; jsSector?: string; jsExp?: string; jsType?: string;
+  jsNationality?: string; jsCv?: string;
+  // Extra
+  [key: string]: unknown;
 }
 
 const ADS_COLLECTION = 'ads';
 
-// ── Real-time listener ────────────────────────────────────────────────────────
-export function subscribeToAds(callback: (ads: StoredAd[]) => void): () => void {
+// ── Real-time: all ads (admin) ────────────────────────────────────────────────
+export function subscribeToAds(callback: (ads: FirestoreAd[]) => void): () => void {
   const q = query(collection(db, ADS_COLLECTION), orderBy('createdAt', 'desc'));
-
-  const unsubscribe = onSnapshot(q, (snapshot) => {
-    const ads: StoredAd[] = snapshot.docs.map(docSnap => ({
-      id: docSnap.id,
-      ...docSnap.data() as Omit<StoredAd, 'id'>,
-    }));
+  return onSnapshot(q, (snapshot) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const ads: FirestoreAd[] = snapshot.docs.map(docSnap => ({ id: docSnap.id, ...(docSnap.data() as any) }));
     callback(ads);
-  }, (error) => {
-    console.error('Error listening to ads:', error);
-  });
-
-  return unsubscribe;
+  }, (error) => { console.error('subscribeToAds error:', error); });
 }
 
-// ── CRUD ──────────────────────────────────────────────────────────────────────
-export async function getAllAds(): Promise<StoredAd[]> {
-  try {
-    const q = query(collection(db, ADS_COLLECTION), orderBy('createdAt', 'desc'));
-    const snapshot = await getDocs(q);
-    return snapshot.docs.map(docSnap => ({
-      id: docSnap.id,
-      ...docSnap.data() as Omit<StoredAd, 'id'>,
-    }));
-  } catch (error) {
-    console.error('Error getting ads:', error);
-    return [];
-  }
+// ── Real-time: by category (for listing pages) ────────────────────────────────
+export function subscribeToAdsByCategory(
+  category: AdCategory,
+  callback: (ads: FirestoreAd[]) => void
+): () => void {
+  const q = query(collection(db, ADS_COLLECTION), orderBy('createdAt', 'desc'));
+  return onSnapshot(q, (snapshot) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const ads: FirestoreAd[] = snapshot.docs
+      .map(docSnap => ({ id: docSnap.id, ...(docSnap.data() as any) }))
+      .filter((ad: FirestoreAd) => ad.category === category && ad.status === 'approved');
+    callback(ads);
+  }, (error) => { console.error('subscribeToAdsByCategory error:', error); callback([]); });
 }
 
-export async function saveAd(ad: Partial<StoredAd> & { category: StoredAd['category']; phone: string; createdAt: string }): Promise<string> {
+// ── Save ad to Firebase ───────────────────────────────────────────────────────
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export async function saveAd(ad: Record<string, any>): Promise<string> {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { id: _id, ...adWithoutId } = ad;
   const adData = {
-    ...ad,
-    title: ad.title || ad.jsTitle || 'إعلان',
-    status: 'approved' as const,
-    createdAt: ad.createdAt || new Date().toISOString(),
+    ...adWithoutId,
+    status: 'approved',
+    createdAt: adWithoutId.createdAt || new Date().toISOString(),
   };
   const docRef = await addDoc(collection(db, ADS_COLLECTION), adData);
   return docRef.id;
 }
 
+// ── Update / Delete ───────────────────────────────────────────────────────────
 export async function updateAdStatus(id: string, status: 'approved' | 'rejected'): Promise<void> {
   await updateDoc(doc(db, ADS_COLLECTION, id), { status });
 }
 
 export async function deleteAd(id: string): Promise<void> {
   await deleteDoc(doc(db, ADS_COLLECTION, id));
-}
-
-// ── Filtered getters ──────────────────────────────────────────────────────────
-export async function getAdsByCategory(category: StoredAd['category']): Promise<StoredAd[]> {
-  const allAds = await getAllAds();
-  return allAds.filter(ad => ad.category === category && ad.status === 'approved');
-}
-
-export async function getAdsByJobSeeker(): Promise<StoredAd[]> {
-  return getAdsByCategory('job_seeker');
-}
-
-export async function getPendingAds(): Promise<StoredAd[]> {
-  const allAds = await getAllAds();
-  return allAds.filter(ad => ad.status === 'pending');
 }

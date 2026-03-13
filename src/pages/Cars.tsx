@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { Search, ChevronLeft, Plus, MapPin, Phone } from 'lucide-react';
 import PostAdModal from '../components/PostAdModal';
 import { getAdsByCategory, type StoredAd } from '../utils/adsStore';
+import { subscribeToAdsByCategory } from '../utils/firestoreAds';
 import { useAuth } from '../context/AuthContext';
 
 // لا توجد سيارات افتراضية – تبدأ القائمة فارغة وتُملأ بإعلانات المستخدمين
@@ -79,9 +80,15 @@ export default function Cars() {
   const [minPrice, setMinPrice] = useState('');
   const [maxPrice, setMaxPrice] = useState('');
 
-  const loadAds = () => setUserAds(getAdsByCategory('car'));
-
-  useEffect(() => { loadAds(); }, []);
+  useEffect(() => {
+    // Load local ads immediately
+    setUserAds(getAdsByCategory('car'));
+    // Subscribe to Firebase for real-time updates from all devices
+    const unsubscribe = subscribeToAdsByCategory('car', (cloudAds) => {
+      setUserAds(cloudAds as StoredAd[]);
+    });
+    return unsubscribe;
+  }, []);
 
   const filteredMock = mockCars.filter(c => {
     const matchEmirate = emirate === 'كل الإمارات' || c.location === emirate;
@@ -284,7 +291,7 @@ export default function Cars() {
         <PostAdModal
           category="car"
           onClose={() => setShowModal(false)}
-          onSuccess={() => { loadAds(); setShowModal(false); }}
+          onSuccess={() => { setShowModal(false); }}
         />
       )}
     </div>

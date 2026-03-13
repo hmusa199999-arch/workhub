@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Search, MapPin, ChevronLeft, Plus, Star, Phone } from 'lucide-react';
 import PostAdModal from '../components/PostAdModal';
 import { getAdsByCategory, type StoredAd } from '../utils/adsStore';
+import { subscribeToAdsByCategory } from '../utils/firestoreAds';
 import { useAuth } from '../context/AuthContext';
 
 // لا توجد خدمات افتراضية – تعتمد الصفحة على إعلانات المستخدمين فقط
@@ -49,9 +50,13 @@ export default function Services() {
   const [emirate, setEmirate] = useState('كل الإمارات');
   const [activeCat, setActiveCat] = useState('الكل');
 
-  const loadAds = () => setUserAds(getAdsByCategory('service'));
-
-  useEffect(() => { loadAds(); }, []);
+  useEffect(() => {
+    setUserAds(getAdsByCategory('service'));
+    const unsubscribe = subscribeToAdsByCategory('service', (cloudAds) => {
+      setUserAds(cloudAds as StoredAd[]);
+    });
+    return unsubscribe;
+  }, []);
 
   const filteredMock = mockServices.filter(s => {
     const matchEmirate = emirate === 'كل الإمارات' || s.location === emirate;
@@ -230,7 +235,7 @@ export default function Services() {
         <PostAdModal
           category="service"
           onClose={() => setShowModal(false)}
-          onSuccess={() => { loadAds(); setShowModal(false); }}
+          onSuccess={() => { setShowModal(false); }}
         />
       )}
     </div>

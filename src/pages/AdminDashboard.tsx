@@ -26,7 +26,7 @@ import {
   getAllAdsAdmin, updateAdStatus, deleteAd, getAdLabel, getCategoryLabel,
   type StoredAd,
 } from '../utils/adsStore';
-import { subscribeToAds, updateAdStatus as updateAdStatusCloud, deleteAd as deleteAdCloud } from '../utils/firestoreAds';
+import { subscribeToAds, updateAdStatus as updateAdStatusCloud, deleteAd as deleteAdCloud, type FirestoreAd } from '../utils/firestoreAds';
 import type { ApplicationStatus } from '../types';
 
 // ─── Sidebar Tabs ───────────────────────────────────────────────────────
@@ -145,9 +145,10 @@ export default function AdminDashboard() {
 
   // Real-time ads from Firebase
   useEffect(() => {
-    const unsubscribe = subscribeToAds((cloudAds) => {
+    const unsubscribe = subscribeToAds((cloudAds: FirestoreAd[]) => {
       if (cloudAds.length > 0) {
-        setAdsData(cloudAds as unknown as StoredAd[]);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        setAdsData(cloudAds as any as StoredAd[]);
       }
     });
     return unsubscribe;

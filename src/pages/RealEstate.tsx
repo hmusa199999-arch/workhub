@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Search, MapPin, ChevronLeft, Plus, BedDouble, Bath, Square, Phone } from 'lucide-react';
 import PostAdModal from '../components/PostAdModal';
 import { getAdsByCategory, type StoredAd } from '../utils/adsStore';
+import { subscribeToAdsByCategory } from '../utils/firestoreAds';
 import { useAuth } from '../context/AuthContext';
 
 // لا توجد عقارات افتراضية – تعتمد الصفحة على إعلانات المستخدمين فقط
@@ -56,9 +57,13 @@ export default function RealEstate() {
   const [propType, setPropType] = useState('الكل');
   const [purpose, setPurpose] = useState('الكل');
 
-  const loadAds = () => setUserAds(getAdsByCategory('realestate'));
-
-  useEffect(() => { loadAds(); }, []);
+  useEffect(() => {
+    setUserAds(getAdsByCategory('realestate'));
+    const unsubscribe = subscribeToAdsByCategory('realestate', (cloudAds) => {
+      setUserAds(cloudAds as StoredAd[]);
+    });
+    return unsubscribe;
+  }, []);
 
   const filteredMock = mockProperties.filter(p => {
     const matchEmirate = emirate === 'كل الإمارات' || p.location === emirate;
@@ -251,7 +256,7 @@ export default function RealEstate() {
         <PostAdModal
           category="realestate"
           onClose={() => setShowModal(false)}
-          onSuccess={() => { loadAds(); setShowModal(false); }}
+          onSuccess={() => { setShowModal(false); }}
         />
       )}
     </div>

@@ -6,6 +6,7 @@ import PostSeekerAdModal from '../components/PostSeekerAdModal';
 import { mockJobs, sectors } from '../data/mockData';
 import { useAuth } from '../context/AuthContext';
 import { getAdsByJobSeeker, type StoredAd } from '../utils/adsStore';
+import { subscribeToAdsByCategory } from '../utils/firestoreAds';
 import type { JobType, ExperienceLevel } from '../types';
 
 const typeOptions: { value: JobType | ''; label: string }[] = [
@@ -53,6 +54,10 @@ export default function Jobs() {
 
   useEffect(() => {
     setSeekerAds(getAdsByJobSeeker());
+    const unsubscribe = subscribeToAdsByCategory('job_seeker', (cloudAds) => {
+      setSeekerAds(cloudAds as StoredAd[]);
+    });
+    return unsubscribe;
   }, []);
 
   const filtered = useMemo(() => {
@@ -333,7 +338,7 @@ export default function Jobs() {
       {showSeekerModal && (
         <PostSeekerAdModal
           onClose={() => setShowSeekerModal(false)}
-          onSuccess={() => setSeekerAds(getAdsByJobSeeker())}
+          onSuccess={() => {}}
         />
       )}
     </div>

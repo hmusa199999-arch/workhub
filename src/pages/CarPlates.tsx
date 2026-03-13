@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Phone, Search, Filter, Plus, ChevronLeft, Eye, CheckCircle, MessageCircle } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { emirates, plateAds, type EmirateId, type PlateAd } from '../data/platesData';
@@ -260,12 +260,15 @@ export default function CarPlates() {
   const [showFilters, setShowFilters] = useState(false);
   const [userAds, setUserAds] = useState<import('../utils/adsStore').StoredAd[]>([]);
 
-  const loadAds = () => {
+  useEffect(() => {
     import('../utils/adsStore').then(m => setUserAds(m.getAdsByCategory('plate')));
-  };
-
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  useState(() => { loadAds(); });
+    import('../utils/firestoreAds').then(({ subscribeToAdsByCategory }) => {
+      const unsub = subscribeToAdsByCategory('plate', (cloudAds) => {
+        setUserAds(cloudAds as import('../utils/adsStore').StoredAd[]);
+      });
+      return unsub;
+    });
+  }, []);
 
   const filtered = plateAds.filter(p => {
     const matchEmirate = selectedEmirate === 'all' || p.emirate === selectedEmirate;
@@ -483,7 +486,7 @@ export default function CarPlates() {
         </div>
       </div>
 
-      {showModal && <PostAdModal category="plate" onClose={() => setShowModal(false)} onSuccess={() => { setShowModal(false); loadAds(); }} />}
+      {showModal && <PostAdModal category="plate" onClose={() => setShowModal(false)} onSuccess={() => { setShowModal(false); }} />}
     </div>
   );
 }
