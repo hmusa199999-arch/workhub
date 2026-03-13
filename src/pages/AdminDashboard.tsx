@@ -9,9 +9,9 @@ import {
   Pencil, ToggleLeft, ToggleRight, Video, Type,
 } from 'lucide-react';
 import {
-  getBannerAds, addBannerAd, updateBannerAd, deleteBannerAd, generateBannersDownload,
+  getBannerAds, addBannerAd, updateBannerAd, deleteBannerAd, exportBannersForUpload, autoUploadBanners,
   type BannerAd,
-} from '../utils/cloudBannerStore';
+} from '../utils/simpleBannerStore';
 import { useAuth } from '../context/AuthContext';
 import { useApplications } from '../context/ApplicationsContext';
 import { mockJobs } from '../data/mockData';
@@ -185,10 +185,19 @@ export default function AdminDashboard() {
     if (!bannerForm.title.trim() || !bannerForm.endDate) return;
     try {
       if (editingBanner) {
-        await updateBannerAd(editingBanner.id, { ...bannerForm });
+        updateBannerAd(editingBanner.id, { ...bannerForm });
       } else {
-        await addBannerAd({ ...bannerForm });
+        addBannerAd({ ...bannerForm });
       }
+      
+      // Try auto-upload first
+      const uploaded = await autoUploadBanners();
+      if (uploaded) {
+        alert('✅ تم حفظ الإعلان ونشره للجميع تلقائياً!');
+      } else {
+        alert('💾 تم حفظ الإعلان محلياً. اضغط "رفع للسيرفر" لنشره للجميع.');
+      }
+      
       const updated = await getBannerAds();
       setBannerAds(updated);
       setShowBannerForm(false);
@@ -199,7 +208,8 @@ export default function AdminDashboard() {
 
   const toggleBannerActive = async (id: string, active: boolean) => {
     try {
-      await updateBannerAd(id, { active });
+      updateBannerAd(id, { active });
+      await autoUploadBanners();
       const updated = await getBannerAds();
       setBannerAds(updated);
     } catch (error) {
@@ -209,7 +219,8 @@ export default function AdminDashboard() {
 
   const handleDeleteBanner = async (id: string) => {
     try {
-      await deleteBannerAd(id);
+      deleteBannerAd(id);
+      await autoUploadBanners();
       const updated = await getBannerAds();
       setBannerAds(updated);
     } catch (error) {
@@ -1048,17 +1059,17 @@ export default function AdminDashboard() {
                 <div>
                   <h2 className="text-lg font-bold text-white">إعلانات الصفحة الرئيسية</h2>
                   <p className="text-xs text-gray-500 mt-0.5">تظهر كشريط متحرك أعلى الصفحة الرئيسية</p>
-                  <div className="mt-2 p-2 bg-yellow-900/20 border border-yellow-700/30 rounded-lg">
-                    <p className="text-xs text-yellow-300">
-                      💡 <strong>ملاحظة:</strong> بعد إضافة الإعلانات، اضغط "تحميل JSON" وارفع الملف في مجلد public/banners.json لتظهر لجميع الزوار
+                  <div className="mt-2 p-2 bg-green-900/20 border border-green-700/30 rounded-lg">
+                    <p className="text-xs text-green-300">
+                      🚀 <strong>تلقائي:</strong> الإعلانات تحاول الرفع تلقائياً. إذا فشل، استخدم "رفع للسيرفر" وضع الملف في public/banners.json
                     </p>
                   </div>
                 </div>
                 <div className="flex gap-2">
-                  <button onClick={generateBannersDownload}
+                  <button onClick={exportBannersForUpload}
                     title="تحميل ملف JSON لرفعه على السيرفر"
                     className="flex items-center gap-2 px-3 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-semibold transition-all">
-                    📥 تحميل JSON
+                    📥 رفع للسيرفر
                   </button>
                   <button onClick={() => openBannerForm()}
                     className="flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-500 text-white text-sm font-bold rounded-xl transition-all">

@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { ChevronLeft, ChevronRight, ExternalLink } from 'lucide-react';
-import { getActiveBannerAds, type BannerAd } from '../utils/cloudBannerStore';
+import { getActiveBannerAds, type BannerAd } from '../utils/simpleBannerStore';
 
 // Extract YouTube video ID from any YouTube URL
 function getYoutubeId(url: string): string | null {
