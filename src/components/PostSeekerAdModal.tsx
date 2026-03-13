@@ -92,8 +92,8 @@ export default function PostSeekerAdModal({ onClose, onSuccess }: Props) {
       <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
         <div className="bg-white rounded-3xl p-10 text-center max-w-sm w-full shadow-2xl">
           <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
-          <h3 className="text-xl font-black text-gray-900 mb-2">تم إرسال إعلانك!</h3>
-          <p className="text-gray-500 text-sm">سيظهر إعلانك بعد مراجعة الإدارة</p>
+          <h3 className="text-xl font-black text-gray-900 mb-2">تم نشر إعلانك!</h3>
+          <p className="text-gray-500 text-sm">إعلانك الآن مرئي لجميع الزوار</p>
         </div>
       </div>
     );
@@ -206,7 +206,7 @@ export default function PostSeekerAdModal({ onClose, onSuccess }: Props) {
           </button>
 
           <p className="text-center text-xs text-gray-400">
-            سيظهر إعلانك في قسم "باحثو العمل" بعد موافقة الإدارة
+            إعلانك سيظهر فوراً في قسم "باحثو العمل" لجميع الزوار
           </p>
         </div>
       </div>

@@ -52,7 +52,7 @@ export interface StoredAd {
 
 export function saveAd(ad: Omit<StoredAd, 'status'>): void {
   const existing = getAllAds();
-  const full: StoredAd = { intent: 'offer', ...ad, status: 'pending' };
+  const full: StoredAd = { intent: 'offer', ...ad, status: 'approved' };
   existing.unshift(full);
   try {
     localStorage.setItem(KEY, JSON.stringify(existing));

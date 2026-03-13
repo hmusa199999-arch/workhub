@@ -272,9 +272,9 @@ export default function PostAdModal({ category, onClose, onSuccess }: PostAdModa
             <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mb-5">
               <CheckCircle className="w-10 h-10 text-green-500" />
             </div>
-            <h3 className="text-2xl font-black text-gray-900 mb-2">تم استلام إعلانك! 🎉</h3>
-            <p className="text-gray-500 text-sm mb-2">إعلانك قيد المراجعة من قِبل الإدارة</p>
-            <p className="text-xs text-amber-600 bg-amber-50 px-4 py-2 rounded-xl border border-amber-200 mb-4">⏳ سيظهر إعلانك بعد موافقة الإدارة خلال وقت قصير</p>
+            <h3 className="text-2xl font-black text-gray-900 mb-2">تم نشر إعلانك! 🎉</h3>
+            <p className="text-gray-500 text-sm mb-2">إعلانك الآن مرئي لجميع الزوار</p>
+            <p className="text-xs text-green-700 bg-green-50 px-4 py-2 rounded-xl border border-green-200 mb-4">✅ إعلانك نشط الآن ويمكن لأي شخص رؤيته</p>
             {images.length > 1 && (
               <div className="flex gap-2 mb-6">
                 {images.slice(1, 5).map((src, i) => (
