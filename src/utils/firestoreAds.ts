@@ -5,7 +5,7 @@ import {
 import { db } from './firebase';
 
 // Same category names as adsStore.ts - MUST match exactly
-export type AdCategory = 'car' | 'realestate' | 'service' | 'plate' | 'job_seeker' | 'auction';
+export type AdCategory = 'car' | 'realestate' | 'service' | 'plate' | 'job_seeker';
 
 export interface FirestoreAd {
   id: string;
@@ -33,8 +33,6 @@ export interface FirestoreAd {
   // Job seeker
   jsTitle?: string; jsSector?: string; jsExp?: string; jsType?: string;
   jsNationality?: string; jsCv?: string;
-  // Auction
-  auctionSubCat?: string; auctionStartPrice?: number; auctionCondition?: string; auctionEndDate?: string;
   // Extra
   [key: string]: unknown;
 }

@@ -16,7 +16,7 @@ export default function Footer() {
               <span className="text-xl font-bold text-white">work<span className="text-red-400">1m</span></span>
             </Link>
             <p className="text-sm text-gray-500 leading-relaxed mb-5">
-              منصة الإعلانات والتوظيف الأولى في العالم العربي — وظائف، سيارات، عقارات، خدمات، أرقام مركبات، ومزادات.
+              منصة الإعلانات والتوظيف الأولى في العالم العربي — وظائف، سيارات، عقارات، خدمات، وأرقام مركبات.
             </p>
             {/* Social */}
             <div className="flex items-center gap-3">
@@ -57,7 +57,6 @@ export default function Footer() {
               <li><Link to="/real-estate" className="hover:text-red-400 transition-colors">🏡 العقارات</Link></li>
               <li><Link to="/services" className="hover:text-red-400 transition-colors">🛠️ الخدمات</Link></li>
               <li><Link to="/car-plates" className="hover:text-red-400 transition-colors">🚘 أرقام السيارات</Link></li>
-              <li><Link to="/auctions" className="hover:text-yellow-400 transition-colors">🔨 المزادات</Link></li>
             </ul>
           </div>
 
