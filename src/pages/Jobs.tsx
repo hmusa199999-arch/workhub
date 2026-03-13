@@ -153,27 +153,42 @@ export default function Jobs() {
         </div>
       </div>
 
-      {/* Sectors */}
-      <div className="bg-gray-900/80 border-b border-red-900/20 px-4 py-5">
+      {/* Sectors – Card Grid */}
+      <div className="bg-gray-900/60 border-b border-red-900/20 px-4 py-6">
         <div className="max-w-7xl mx-auto">
-          <h2 className="text-xs font-black text-gray-500 uppercase tracking-widest mb-3">تصفح حسب القطاع</h2>
-          <div className="flex gap-2 overflow-x-auto pb-1">
+          <h2 className="text-sm font-black text-gray-400 mb-4 tracking-wide">تصفح حسب القطاع</h2>
+          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-9 gap-3">
+            {/* "All" card */}
             <button
               onClick={() => { setSector(''); setSearchParams({}); }}
-              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold whitespace-nowrap border-2 transition-all shrink-0 ${!sector ? 'bg-red-600 border-red-600 text-white shadow-sm shadow-red-500/20' : 'border-gray-700 text-gray-400 hover:border-red-500/40 bg-gray-800'}`}>
-              🏷️ الكل
+              className={`flex flex-col items-center justify-center gap-2 p-4 rounded-2xl border-2 transition-all duration-200 hover:scale-105 group
+                ${!sector
+                  ? 'bg-gradient-to-br from-red-600 to-red-800 border-red-500 text-white shadow-lg shadow-red-500/30'
+                  : 'bg-gray-800/80 border-gray-700 text-gray-400 hover:border-red-500/50 hover:bg-gray-800'}`}>
+              <span className="text-2xl">🏷️</span>
+              <span className="text-xs font-black">الكل</span>
+              <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${!sector ? 'bg-white/20 text-white' : 'bg-gray-700 text-gray-500'}`}>
+                {mockJobs.length}
+              </span>
             </button>
-            {sectors.map(s => (
-              <button key={s.id}
-                onClick={() => { setSector(s.id); setSearchParams({ sector: s.id }); }}
-                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold whitespace-nowrap border-2 transition-all shrink-0 ${sector === s.id ? 'bg-red-600 border-red-600 text-white shadow-sm shadow-red-500/20' : 'border-gray-700 text-gray-400 hover:border-red-500/40 bg-gray-800'}`}>
-                <span>{s.icon}</span>
-                {s.name}
-                <span className={`text-xs px-1.5 py-0.5 rounded-full font-bold ${sector === s.id ? 'bg-gray-900/20 text-white' : 'bg-gray-700 text-gray-500'}`}>
-                  {s.jobCount}
-                </span>
-              </button>
-            ))}
+
+            {sectors.map(s => {
+              const isActive = sector === s.id;
+              return (
+                <button key={s.id}
+                  onClick={() => { setSector(s.id); setSearchParams({ sector: s.id }); }}
+                  className={`flex flex-col items-center justify-center gap-2 p-4 rounded-2xl border-2 transition-all duration-200 hover:scale-105 group
+                    ${isActive
+                      ? 'bg-gradient-to-br from-red-600 to-red-800 border-red-500 text-white shadow-lg shadow-red-500/30'
+                      : 'bg-gray-800/80 border-gray-700 text-gray-400 hover:border-red-500/50 hover:bg-gray-800'}`}>
+                  <span className="text-2xl">{s.icon}</span>
+                  <span className="text-xs font-black text-center leading-tight">{s.name}</span>
+                  <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${isActive ? 'bg-white/20 text-white' : 'bg-gray-700 text-gray-500'}`}>
+                    {s.jobCount}
+                  </span>
+                </button>
+              );
+            })}
           </div>
         </div>
       </div>
