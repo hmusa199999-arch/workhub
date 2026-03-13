@@ -42,7 +42,7 @@ const faqs = [
 
 export default function Pricing() {
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-950">
       {/* Hero */}
       <div className="gradient-hero text-white py-20 px-4 text-center">
         <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 border border-white/20 rounded-full text-sm font-medium mb-6">

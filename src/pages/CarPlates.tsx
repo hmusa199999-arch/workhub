@@ -80,12 +80,12 @@ function PlateVisual({
         <div className={`${s.strip} flex`}>
           <div className="w-1/5 bg-black" />
           <div className="w-1/5 bg-red-600" />
-          <div className="flex-1 bg-white" />
+          <div className="flex-1 bg-gray-900" />
           <div className="w-1/5 bg-green-600" />
         </div>
 
         {/* Plate body */}
-        <div className="bg-white flex items-stretch">
+        <div className="bg-gray-900 flex items-stretch">
           {/* Left: emirate section */}
           <div className={`${accentColor} flex flex-col items-center justify-center px-2 py-2 shrink-0 min-w-[52px]`}>
             <span className={`${s.em} font-black text-white text-center leading-tight uppercase tracking-tight`}>
@@ -103,7 +103,7 @@ function PlateVisual({
 
           {/* Right: number */}
           <div className="flex-1 flex items-center justify-center px-3 py-2">
-            <span className={`${s.plate} font-black tracking-widest text-gray-900 font-mono`}>
+            <span className={`${s.plate} font-black tracking-widest text-gray-100 font-mono`}>
               {plateNumber}
             </span>
           </div>
@@ -119,7 +119,7 @@ function PlateVisual({
         <div className={`${s.strip} flex`}>
           <div className="w-1/5 bg-black" />
           <div className="w-1/5 bg-red-600" />
-          <div className="flex-1 bg-white" />
+          <div className="flex-1 bg-gray-900" />
           <div className="w-1/5 bg-green-600" />
         </div>
       </div>
@@ -130,7 +130,7 @@ function PlateVisual({
 /** xPlate-style card — mock data uses PlateVisual */
 function PlateCard({ plate }: { plate: PlateAd }) {
   return (
-    <div className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 border border-gray-200">
+    <div className="bg-gray-900 rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 border border-gray-700">
       {plate.featured && (
         <div className="bg-amber-500 flex items-center justify-center gap-2 py-1.5">
           <span className="text-white font-black text-xs tracking-wider uppercase">⭐ Featured</span>
@@ -170,11 +170,11 @@ function PlateCard({ plate }: { plate: PlateAd }) {
           </span>
         </div>
         <a href={`https://wa.me/${plate.sellerPhone.replace(/\D/g, '')}`} target="_blank" rel="noopener noreferrer"
-          className="w-full mb-2 flex items-center justify-center gap-2 py-2.5 rounded-xl border border-gray-200 text-gray-700 text-sm font-semibold hover:bg-gray-50 transition-colors">
+          className="w-full mb-2 flex items-center justify-center gap-2 py-2.5 rounded-xl border border-gray-700 text-gray-700 text-sm font-semibold hover:bg-gray-800 transition-colors">
           <MessageCircle className="w-4 h-4 text-gray-500" /> Negotiation
         </a>
         <a href={`tel:${plate.sellerPhone}`}
-          className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border border-gray-200 text-gray-700 text-sm font-semibold hover:bg-gray-50 transition-colors">
+          className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border border-gray-700 text-gray-700 text-sm font-semibold hover:bg-gray-800 transition-colors">
           <Phone className="w-4 h-4 text-gray-500" /> Contact: {maskPhone(plate.sellerPhone)}
         </a>
       </div>
@@ -186,7 +186,7 @@ function PlateCard({ plate }: { plate: PlateAd }) {
 function UserPlateCard({ ad }: { ad: import('../utils/adsStore').StoredAd }) {
   const hasImage = ad.images && ad.images.length > 0;
   return (
-    <div className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 border border-gray-200">
+    <div className="bg-gray-900 rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 border border-gray-700">
       {/* Image or placeholder */}
       {hasImage ? (
         <div className="relative">
@@ -236,11 +236,11 @@ function UserPlateCard({ ad }: { ad: import('../utils/adsStore').StoredAd }) {
 
         {/* Buttons */}
         <a href={`https://wa.me/${ad.phone.replace(/\D/g, '')}`} target="_blank" rel="noopener noreferrer"
-          className="w-full mb-2 flex items-center justify-center gap-2 py-2.5 rounded-xl border border-gray-200 text-gray-700 text-sm font-semibold hover:bg-gray-50 transition-colors">
+          className="w-full mb-2 flex items-center justify-center gap-2 py-2.5 rounded-xl border border-gray-700 text-gray-700 text-sm font-semibold hover:bg-gray-800 transition-colors">
           <MessageCircle className="w-4 h-4 text-gray-500" /> Negotiation
         </a>
         <a href={`tel:${ad.phone}`}
-          className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border border-gray-200 text-gray-700 text-sm font-semibold hover:bg-gray-50 transition-colors">
+          className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border border-gray-700 text-gray-700 text-sm font-semibold hover:bg-gray-800 transition-colors">
           <Phone className="w-4 h-4 text-gray-500" /> Contact: {maskPhone(ad.phone)}
         </a>
       </div>
@@ -301,8 +301,8 @@ export default function CarPlates() {
               </div>
               <p className="text-red-300/70 text-sm">أرقام مركبات مميزة للبيع من جميع إمارات الدولة</p>
               <div className="flex items-center gap-3 mt-3">
-                <span className="px-3 py-1 bg-white/10 rounded-full text-xs">{plateAds.length} إعلان</span>
-                <span className="px-3 py-1 bg-white/10 rounded-full text-xs">7 إمارات</span>
+                <span className="px-3 py-1 bg-gray-900/10 rounded-full text-xs">{plateAds.length} إعلان</span>
+                <span className="px-3 py-1 bg-gray-900/10 rounded-full text-xs">7 إمارات</span>
                 <span className="px-3 py-1 bg-amber-500/20 border border-amber-400/30 text-amber-300 rounded-full text-xs font-semibold">مجاني للنشر</span>
               </div>
             </div>
@@ -388,14 +388,14 @@ export default function CarPlates() {
               className={`flex flex-col items-center gap-1.5 px-5 py-3 rounded-2xl border-2 shrink-0 transition-all ${selectedEmirate === 'all' ? 'border-red-600 bg-red-600 text-white shadow-lg shadow-red-900/30' : 'border-gray-700 bg-gray-900 hover:border-red-500/50 text-gray-300'}`}>
               <span className="text-xl">🇦🇪</span>
               <span className="text-xs font-bold whitespace-nowrap">كل الإمارات</span>
-              <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full ${selectedEmirate === 'all' ? 'bg-white/20 text-white' : 'bg-gray-800 text-gray-500'}`}>{plateAds.length}</span>
+              <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full ${selectedEmirate === 'all' ? 'bg-gray-900/20 text-white' : 'bg-gray-800 text-gray-500'}`}>{plateAds.length}</span>
             </button>
             {emirates.map(em => (
               <button key={em.id} onClick={() => setSelectedEmirate(em.id)}
                 className={`flex flex-col items-center gap-1.5 px-5 py-3 rounded-2xl border-2 shrink-0 transition-all ${selectedEmirate === em.id ? 'border-red-600 bg-red-600 text-white shadow-lg shadow-red-900/30' : 'border-gray-700 bg-gray-900 hover:border-red-500/50 text-gray-300'}`}>
                 <span className="text-xl">{em.flag}</span>
                 <span className="text-xs font-bold whitespace-nowrap">{em.nameAr}</span>
-                <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full ${selectedEmirate === em.id ? 'bg-white/20 text-white' : 'bg-gray-800 text-gray-500'}`}>{totalByEmirate(em.id)}</span>
+                <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full ${selectedEmirate === em.id ? 'bg-gray-900/20 text-white' : 'bg-gray-800 text-gray-500'}`}>{totalByEmirate(em.id)}</span>
               </button>
             ))}
           </div>

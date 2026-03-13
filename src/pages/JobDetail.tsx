@@ -78,7 +78,7 @@ export default function JobDetail() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8 px-4">
+    <div className="min-h-screen bg-gray-950 py-8 px-4">
       <div className="max-w-5xl mx-auto">
         {/* Breadcrumb */}
         <div className="flex items-center gap-2 text-sm text-gray-500 mb-6">
@@ -93,9 +93,9 @@ export default function JobDetail() {
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-6">
             {/* Header Card */}
-            <div className="bg-white rounded-2xl border border-gray-200 p-6">
+            <div className="bg-gray-900 rounded-2xl border border-gray-700 p-6">
               <div className="flex items-start gap-4 mb-5">
-                <div className="w-16 h-16 rounded-2xl bg-gray-100 flex items-center justify-center border border-gray-200 shrink-0 overflow-hidden">
+                <div className="w-16 h-16 rounded-2xl bg-gray-100 flex items-center justify-center border border-gray-700 shrink-0 overflow-hidden">
                   {job.companyLogo ? (
                     <img src={job.companyLogo} alt={job.companyName} className="w-full h-full object-contain p-2" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
                   ) : (
@@ -103,7 +103,7 @@ export default function JobDetail() {
                   )}
                 </div>
                 <div className="flex-1">
-                  <h1 className="text-2xl font-bold text-gray-900 mb-1">{job.title}</h1>
+                  <h1 className="text-2xl font-bold text-gray-100 mb-1">{job.title}</h1>
                   <div className="flex items-center gap-2 text-gray-500 text-sm">
                     <Building2 className="w-4 h-4" />
                     <span>{job.companyName}</span>
@@ -111,10 +111,10 @@ export default function JobDetail() {
                 </div>
                 <div className="flex gap-2 shrink-0">
                   <button onClick={() => setSaved(!saved)}
-                    className={`p-2.5 rounded-xl border transition-colors ${saved ? 'border-blue-300 bg-blue-50 text-blue-600' : 'border-gray-200 text-gray-500 hover:bg-gray-50'}`}>
+                    className={`p-2.5 rounded-xl border transition-colors ${saved ? 'border-blue-300 bg-blue-50 text-blue-600' : 'border-gray-700 text-gray-500 hover:bg-gray-800'}`}>
                     <Bookmark className={`w-4 h-4 ${saved ? 'fill-blue-600' : ''}`} />
                   </button>
-                  <button className="p-2.5 rounded-xl border border-gray-200 text-gray-500 hover:bg-gray-50 transition-colors">
+                  <button className="p-2.5 rounded-xl border border-gray-700 text-gray-500 hover:bg-gray-800 transition-colors">
                     <Share2 className="w-4 h-4" />
                   </button>
                 </div>
@@ -135,7 +135,7 @@ export default function JobDetail() {
               </div>
 
               {(job.salaryMin || job.salaryMax) && (
-                <div className="flex items-center gap-2 text-lg font-bold text-gray-900 mb-5">
+                <div className="flex items-center gap-2 text-lg font-bold text-gray-100 mb-5">
                   <span className="text-green-600">💰</span>
                   {job.salaryMin && job.salaryMax
                     ? `${job.salaryMin.toLocaleString()} - ${job.salaryMax.toLocaleString()} ${job.currency || 'AED'} / شهرياً`
@@ -175,13 +175,13 @@ export default function JobDetail() {
             </div>
 
             {/* Description */}
-            <div className="bg-white rounded-2xl border border-gray-200 p-6">
-              <h2 className="text-lg font-bold text-gray-900 mb-4">وصف الوظيفة</h2>
+            <div className="bg-gray-900 rounded-2xl border border-gray-700 p-6">
+              <h2 className="text-lg font-bold text-gray-100 mb-4">وصف الوظيفة</h2>
               <p className="text-gray-600 leading-relaxed">{job.description}</p>
             </div>
 
-            <div className="bg-white rounded-2xl border border-gray-200 p-6">
-              <h2 className="text-lg font-bold text-gray-900 mb-4">المتطلبات</h2>
+            <div className="bg-gray-900 rounded-2xl border border-gray-700 p-6">
+              <h2 className="text-lg font-bold text-gray-100 mb-4">المتطلبات</h2>
               <ul className="space-y-2.5">
                 {job.requirements.map((req, i) => (
                   <li key={i} className="flex items-start gap-3 text-gray-600 text-sm">
@@ -192,8 +192,8 @@ export default function JobDetail() {
               </ul>
             </div>
 
-            <div className="bg-white rounded-2xl border border-gray-200 p-6">
-              <h2 className="text-lg font-bold text-gray-900 mb-4">المهام والمسؤوليات</h2>
+            <div className="bg-gray-900 rounded-2xl border border-gray-700 p-6">
+              <h2 className="text-lg font-bold text-gray-100 mb-4">المهام والمسؤوليات</h2>
               <ul className="space-y-2.5">
                 {job.responsibilities.map((resp, i) => (
                   <li key={i} className="flex items-start gap-3 text-gray-600 text-sm">
@@ -204,8 +204,8 @@ export default function JobDetail() {
               </ul>
             </div>
 
-            <div className="bg-white rounded-2xl border border-gray-200 p-6">
-              <h2 className="text-lg font-bold text-gray-900 mb-4">المهارات المطلوبة</h2>
+            <div className="bg-gray-900 rounded-2xl border border-gray-700 p-6">
+              <h2 className="text-lg font-bold text-gray-100 mb-4">المهارات المطلوبة</h2>
               <div className="flex flex-wrap gap-2">
                 {job.skills.map(skill => (
                   <span key={skill} className="px-3 py-1.5 bg-blue-50 text-blue-700 text-sm font-medium rounded-xl border border-blue-200">
@@ -218,10 +218,10 @@ export default function JobDetail() {
 
           {/* Sidebar */}
           <div className="space-y-5">
-            <div className="bg-white rounded-2xl border border-gray-200 p-5">
-              <h3 className="font-bold text-gray-900 mb-4">عن الشركة</h3>
+            <div className="bg-gray-900 rounded-2xl border border-gray-700 p-5">
+              <h3 className="font-bold text-gray-100 mb-4">عن الشركة</h3>
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-12 h-12 rounded-xl bg-gray-100 flex items-center justify-center border border-gray-200 overflow-hidden">
+                <div className="w-12 h-12 rounded-xl bg-gray-100 flex items-center justify-center border border-gray-700 overflow-hidden">
                   {job.companyLogo ? (
                     <img src={job.companyLogo} alt={job.companyName} className="w-full h-full object-contain p-1.5" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
                   ) : (
@@ -229,7 +229,7 @@ export default function JobDetail() {
                   )}
                 </div>
                 <div>
-                  <div className="font-semibold text-gray-900 text-sm">{job.companyName}</div>
+                  <div className="font-semibold text-gray-100 text-sm">{job.companyName}</div>
                   <div className="text-xs text-gray-500">{job.location}</div>
                 </div>
               </div>
@@ -239,8 +239,8 @@ export default function JobDetail() {
               </a>
             </div>
 
-            <div className="bg-white rounded-2xl border border-gray-200 p-5">
-              <h3 className="font-bold text-gray-900 mb-4">تفاصيل الوظيفة</h3>
+            <div className="bg-gray-900 rounded-2xl border border-gray-700 p-5">
+              <h3 className="font-bold text-gray-100 mb-4">تفاصيل الوظيفة</h3>
               <div className="space-y-3 text-sm">
                 {[
                   { label: 'نوع العمل', value: typeLabels[job.type] },
@@ -275,8 +275,8 @@ export default function JobDetail() {
             </div>
 
             {relatedJobs.length > 0 && (
-              <div className="bg-white rounded-2xl border border-gray-200 p-5">
-                <h3 className="font-bold text-gray-900 mb-4">وظائف مشابهة</h3>
+              <div className="bg-gray-900 rounded-2xl border border-gray-700 p-5">
+                <h3 className="font-bold text-gray-100 mb-4">وظائف مشابهة</h3>
                 <div className="space-y-3">
                   {relatedJobs.map(rj => (
                     <Link key={rj.id} to={`/jobs/${rj.id}`} className="block p-3 bg-gray-50 rounded-xl hover:bg-blue-50 transition-colors">
@@ -294,8 +294,8 @@ export default function JobDetail() {
       {/* Apply Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={() => setShowModal(false)}>
-          <div className="bg-white rounded-2xl p-6 w-full max-w-lg shadow-2xl" onClick={e => e.stopPropagation()}>
-            <h2 className="text-xl font-bold text-gray-900 mb-1">التقديم على: {job.title}</h2>
+          <div className="bg-gray-900 rounded-2xl p-6 w-full max-w-lg shadow-2xl" onClick={e => e.stopPropagation()}>
+            <h2 className="text-xl font-bold text-gray-100 mb-1">التقديم على: {job.title}</h2>
             <p className="text-sm text-gray-500 mb-1">{job.companyName}</p>
             <div className="flex items-center gap-2 text-xs text-amber-600 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 mb-5">
               <AlertCircle className="w-3.5 h-3.5 shrink-0" />
@@ -305,10 +305,10 @@ export default function JobDetail() {
               <label className="block text-sm font-medium text-gray-700 mb-2">رسالة تقديمية (اختياري)</label>
               <textarea rows={4} value={coverLetter} onChange={e => setCoverLetter(e.target.value)}
                 placeholder="اكتب رسالة تعريفية قصيرة تبرز فيها مهاراتك وسبب رغبتك في هذه الوظيفة..."
-                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm resize-none" />
+                className="w-full px-4 py-3 rounded-xl border border-gray-700 focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm resize-none" />
             </div>
             <div className="flex gap-3">
-              <button onClick={() => setShowModal(false)} className="flex-1 py-3 border border-gray-200 text-gray-700 font-semibold rounded-xl hover:bg-gray-50 transition-colors">
+              <button onClick={() => setShowModal(false)} className="flex-1 py-3 border border-gray-700 text-gray-700 font-semibold rounded-xl hover:bg-gray-800 transition-colors">
                 إلغاء
               </button>
               <button onClick={handleApply} disabled={applying}

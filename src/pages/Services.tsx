@@ -85,7 +85,7 @@ export default function Services() {
               </div>
               <p className="text-red-300/70 text-sm">خدمات منزلية ومهنية موثوقة في الإمارات</p>
               <div className="flex gap-3 mt-3">
-                <span className="px-3 py-1 bg-white/10 rounded-full text-xs">{mockServices.length + userAds.length} خدمة</span>
+                <span className="px-3 py-1 bg-gray-900/10 rounded-full text-xs">{mockServices.length + userAds.length} خدمة</span>
                 <span className="px-3 py-1 bg-amber-500/20 border border-amber-400/30 text-amber-300 rounded-full text-xs font-semibold">نشر مجاني</span>
               </div>
             </div>

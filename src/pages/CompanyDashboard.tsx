@@ -6,7 +6,7 @@ import { useApplications } from '../context/ApplicationsContext';
 import { mockJobs } from '../data/mockData';
 import type { CompanyProfile, Application } from '../types';
 
-const inputCls = 'w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-red-500 text-sm bg-white';
+const inputCls = 'w-full px-4 py-3 rounded-xl border border-gray-700 focus:outline-none focus:ring-2 focus:ring-red-500 text-sm bg-gray-900';
 
 const tabs: { id: 'overview' | 'jobs' | 'applicants' | 'profile'; label: string; icon: React.ReactNode }[] = [
   { id: 'overview',   label: 'نظرة عامة',  icon: <TrendingUp className="w-4 h-4" /> },
@@ -70,13 +70,13 @@ export default function CompanyDashboard() {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-950">
       {/* Header */}
       <div className="gradient-hero text-white py-8 px-4">
         <div className="max-w-6xl mx-auto">
           <div className="flex items-center justify-between gap-4">
             <div className="flex items-center gap-4">
-              <div className="w-16 h-16 rounded-2xl bg-white/10 flex items-center justify-center text-3xl border border-white/20">
+              <div className="w-16 h-16 rounded-2xl bg-gray-900/10 flex items-center justify-center text-3xl border border-white/20">
                 🏢
               </div>
               <div>
@@ -97,7 +97,7 @@ export default function CompanyDashboard() {
             </div>
             <button
               onClick={() => navigate('/post-job')}
-              className="flex items-center gap-2 px-5 py-2.5 bg-white text-red-600 font-bold rounded-xl hover:bg-red-50 transition-colors text-sm shrink-0"
+              className="flex items-center gap-2 px-5 py-2.5 bg-gray-900 text-red-600 font-bold rounded-xl hover:bg-red-50 transition-colors text-sm shrink-0"
             >
               <Plus className="w-4 h-4" />
               نشر وظيفة
@@ -108,12 +108,12 @@ export default function CompanyDashboard() {
 
       <div className="max-w-6xl mx-auto px-4 py-6">
         {/* Tabs */}
-        <div className="flex gap-1 p-1 bg-white rounded-xl border border-gray-200 mb-6 overflow-x-auto">
+        <div className="flex gap-1 p-1 bg-gray-900 rounded-xl border border-gray-700 mb-6 overflow-x-auto">
           {tabs.map(tab => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all whitespace-nowrap ${activeTab === tab.id ? 'bg-red-600 text-white shadow-sm' : 'text-gray-500 hover:bg-gray-50'}`}
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all whitespace-nowrap ${activeTab === tab.id ? 'bg-red-600 text-white shadow-sm' : 'text-gray-500 hover:bg-gray-800'}`}
             >
               {tab.icon}
               {tab.label}
@@ -127,11 +127,11 @@ export default function CompanyDashboard() {
             {/* Stats */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
               {statsData.map(stat => (
-                <div key={stat.label} className="bg-white rounded-2xl border border-gray-200 p-5">
+                <div key={stat.label} className="bg-gray-900 rounded-2xl border border-gray-700 p-5">
                   <div className={`w-10 h-10 ${stat.bg} rounded-xl flex items-center justify-center mb-3`}>
                     {stat.icon}
                   </div>
-                  <div className="text-2xl font-bold text-gray-900">{stat.value}</div>
+                  <div className="text-2xl font-bold text-gray-100">{stat.value}</div>
                   <div className="text-sm text-gray-500 mt-0.5">{stat.label}</div>
                   <div className="text-xs text-green-600 font-medium mt-1">{stat.change}</div>
                 </div>
@@ -139,9 +139,9 @@ export default function CompanyDashboard() {
             </div>
 
             {/* Active Jobs */}
-            <div className="bg-white rounded-2xl border border-gray-200 p-6">
+            <div className="bg-gray-900 rounded-2xl border border-gray-700 p-6">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-bold text-gray-900">الوظائف النشطة</h2>
+                <h2 className="text-lg font-bold text-gray-100">الوظائف النشطة</h2>
                 <button onClick={() => setActiveTab('jobs')} className="flex items-center gap-1 text-sm text-red-600 font-medium hover:gap-2 transition-all">
                   عرض الكل <ChevronLeft className="w-4 h-4" />
                 </button>
@@ -174,9 +174,9 @@ export default function CompanyDashboard() {
             </div>
 
             {/* Recent Applicants */}
-            <div className="bg-white rounded-2xl border border-gray-200 p-6">
+            <div className="bg-gray-900 rounded-2xl border border-gray-700 p-6">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-bold text-gray-900">آخر المتقدمين</h2>
+                <h2 className="text-lg font-bold text-gray-100">آخر المتقدمين</h2>
                 <button onClick={() => setActiveTab('applicants')} className="flex items-center gap-1 text-sm text-red-600 font-medium hover:gap-2 transition-all">
                   عرض الكل <ChevronLeft className="w-4 h-4" />
                 </button>
@@ -212,9 +212,9 @@ export default function CompanyDashboard() {
 
         {/* Jobs Tab */}
         {activeTab === 'jobs' && (
-          <div className="bg-white rounded-2xl border border-gray-200 p-6">
+          <div className="bg-gray-900 rounded-2xl border border-gray-700 p-6">
             <div className="flex items-center justify-between mb-5">
-              <h2 className="text-lg font-bold text-gray-900">وظائفي ({companyJobs.length})</h2>
+              <h2 className="text-lg font-bold text-gray-100">وظائفي ({companyJobs.length})</h2>
               <button onClick={() => navigate('/post-job')} className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-xl hover:bg-blue-700 transition-colors">
                 <Plus className="w-4 h-4" />
                 نشر وظيفة جديدة
@@ -231,10 +231,10 @@ export default function CompanyDashboard() {
             ) : (
               <div className="space-y-4">
                 {companyJobs.map(job => (
-                  <div key={job.id} className="border border-gray-200 rounded-2xl p-5">
+                  <div key={job.id} className="border border-gray-700 rounded-2xl p-5">
                     <div className="flex items-start justify-between gap-4 mb-3">
                       <div>
-                        <Link to={`/jobs/${job.id}`} className="font-bold text-gray-900 hover:text-blue-600 transition-colors">{job.title}</Link>
+                        <Link to={`/jobs/${job.id}`} className="font-bold text-gray-100 hover:text-blue-600 transition-colors">{job.title}</Link>
                         <div className="text-sm text-gray-500 mt-0.5">{job.location}</div>
                       </div>
                       <div className="flex items-center gap-2">
@@ -249,7 +249,7 @@ export default function CompanyDashboard() {
                       <span>نُشرت: {new Date(job.postedAt).toLocaleDateString('ar-SA')}</span>
                     </div>
                     <div className="flex gap-2 mt-4">
-                      <Link to={`/jobs/${job.id}`} className="px-4 py-2 text-sm font-medium border border-gray-200 text-gray-700 rounded-xl hover:bg-gray-50 transition-colors">عرض</Link>
+                      <Link to={`/jobs/${job.id}`} className="px-4 py-2 text-sm font-medium border border-gray-700 text-gray-700 rounded-xl hover:bg-gray-800 transition-colors">عرض</Link>
                       <button className="px-4 py-2 text-sm font-medium bg-blue-50 text-blue-600 rounded-xl hover:bg-blue-100 transition-colors">تعديل</button>
                       <button className="px-4 py-2 text-sm font-medium bg-red-50 text-red-600 rounded-xl hover:bg-red-100 transition-colors">إيقاف</button>
                     </div>
@@ -262,8 +262,8 @@ export default function CompanyDashboard() {
 
         {/* Applicants Tab */}
         {activeTab === 'applicants' && (
-          <div className="bg-white rounded-2xl border border-gray-200 p-6">
-            <h2 className="text-lg font-bold text-gray-900 mb-5">المتقدمون ({allApplications.length})</h2>
+          <div className="bg-gray-900 rounded-2xl border border-gray-700 p-6">
+            <h2 className="text-lg font-bold text-gray-100 mb-5">المتقدمون ({allApplications.length})</h2>
             {allApplications.length === 0 ? (
               <div className="text-center py-16 text-gray-400">
                 <Users className="w-16 h-16 mx-auto mb-4 opacity-20" />
@@ -273,12 +273,12 @@ export default function CompanyDashboard() {
             ) : (
             <div className="space-y-4">
               {allApplications.map(app => (
-                <div key={app.id} className="flex flex-col sm:flex-row sm:items-center gap-4 p-5 border border-gray-200 rounded-2xl hover:border-red-200 transition-colors">
+                <div key={app.id} className="flex flex-col sm:flex-row sm:items-center gap-4 p-5 border border-gray-700 rounded-2xl hover:border-red-200 transition-colors">
                   <div className="w-12 h-12 rounded-xl bg-red-100 flex items-center justify-center text-red-600 text-xl font-bold shrink-0">
                     {app.seekerName[0]}
                   </div>
                   <div className="flex-1">
-                    <div className="font-bold text-gray-900">{app.seekerName}</div>
+                    <div className="font-bold text-gray-100">{app.seekerName}</div>
                     <div className="text-sm text-gray-500">{app.seekerEmail}</div>
                     <div className="text-xs text-gray-400 mt-1">تقدّم على: {app.jobTitle} • {new Date(app.appliedAt).toLocaleDateString('ar-AE')}</div>
                   </div>
@@ -297,10 +297,10 @@ export default function CompanyDashboard() {
 
         {/* Profile Tab */}
         {activeTab === 'profile' && (
-          <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
+          <div className="bg-gray-900 rounded-2xl border border-gray-700 overflow-hidden">
             {/* Header bar */}
             <div className="px-6 py-5 border-b border-gray-100 flex items-center justify-between">
-              <h2 className="text-lg font-bold text-gray-900">ملف الشركة</h2>
+              <h2 className="text-lg font-bold text-gray-100">ملف الشركة</h2>
               <div className="flex items-center gap-2">
                 {saved && (
                   <span className="text-xs text-green-600 font-semibold flex items-center gap-1">
@@ -310,7 +310,7 @@ export default function CompanyDashboard() {
                 {editMode ? (
                   <>
                     <button onClick={() => setEditMode(false)}
-                      className="flex items-center gap-1.5 px-4 py-2 text-sm font-semibold text-gray-600 border border-gray-200 rounded-xl hover:bg-gray-50">
+                      className="flex items-center gap-1.5 px-4 py-2 text-sm font-semibold text-gray-600 border border-gray-700 rounded-xl hover:bg-gray-800">
                       <X className="w-3.5 h-3.5" /> إلغاء
                     </button>
                     <button onClick={handleSave}
@@ -349,7 +349,7 @@ export default function CompanyDashboard() {
                   ) : (
                     <div>
                       <div className="flex items-center gap-2">
-                        <h3 className="text-xl font-bold text-gray-900">{company.companyName}</h3>
+                        <h3 className="text-xl font-bold text-gray-100">{company.companyName}</h3>
                         {company.verified && <CheckCircle className="w-5 h-5 text-red-500 fill-red-500" />}
                       </div>
                       <p className="text-gray-500 text-sm mt-0.5">{company.industry}</p>
@@ -370,7 +370,7 @@ export default function CompanyDashboard() {
                       value={form.phone || ''}
                       dir="ltr"
                       onChange={e => setForm(p => ({ ...p, phone: e.target.value }))}
-                      className="w-full px-3 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-red-500 text-sm"
+                      className="w-full px-3 py-3 rounded-xl border border-gray-700 focus:outline-none focus:ring-2 focus:ring-red-500 text-sm"
                       placeholder="+9715..., +2010..., +90..."
                     />
                   ) : (

@@ -4,7 +4,7 @@ import { TrendingUp } from 'lucide-react';
 
 export default function Sectors() {
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-950">
       <div className="gradient-hero text-white py-14 px-4 text-center">
         <h1 className="text-4xl font-bold mb-3">القطاعات المهنية</h1>
         <p className="text-red-200">تصفح الوظائف المتاحة حسب قطاع العمل</p>

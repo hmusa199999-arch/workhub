@@ -169,7 +169,7 @@ export default function Jobs() {
                 className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold whitespace-nowrap border-2 transition-all shrink-0 ${sector === s.id ? 'bg-red-600 border-red-600 text-white shadow-sm shadow-red-500/20' : 'border-gray-700 text-gray-400 hover:border-red-500/40 bg-gray-800'}`}>
                 <span>{s.icon}</span>
                 {s.name}
-                <span className={`text-xs px-1.5 py-0.5 rounded-full font-bold ${sector === s.id ? 'bg-white/20 text-white' : 'bg-gray-700 text-gray-500'}`}>
+                <span className={`text-xs px-1.5 py-0.5 rounded-full font-bold ${sector === s.id ? 'bg-gray-900/20 text-white' : 'bg-gray-700 text-gray-500'}`}>
                   {s.jobCount}
                 </span>
               </button>

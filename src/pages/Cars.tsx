@@ -57,7 +57,7 @@ function UserCarCard({ ad }: { ad: StoredAd }) {
                 واتساب
               </a>
               <a href={`tel:${ad.phone}`}
-                className="flex items-center gap-1 px-4 py-2.5 border-2 border-gray-200 text-xs font-semibold rounded-xl hover:bg-gray-50 transition-colors">
+                className="flex items-center gap-1 px-4 py-2.5 border-2 border-gray-700 text-xs font-semibold rounded-xl hover:bg-gray-800 transition-colors">
                 <Phone className="w-3.5 h-3.5" /> اتصال
               </a>
             </>
@@ -108,7 +108,7 @@ export default function Cars() {
   const totalCount = mockCars.length + userAds.length;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-950">
       {/* Hero */}
       <div className="bg-gradient-to-br from-gray-950 via-red-950/60 to-gray-950 text-white py-10 px-4 border-b border-red-900/30">
         <div className="max-w-6xl mx-auto">
@@ -125,7 +125,7 @@ export default function Cars() {
               </div>
               <p className="text-red-300/70 text-sm">آلاف السيارات الجديدة والمستعملة في الإمارات</p>
               <div className="flex gap-3 mt-3">
-                <span className="px-3 py-1 bg-white/10 rounded-full text-xs">{totalCount} سيارة</span>
+                <span className="px-3 py-1 bg-gray-900/10 rounded-full text-xs">{totalCount} سيارة</span>
                 <span className="px-3 py-1 bg-amber-500/20 border border-amber-400/30 text-amber-300 rounded-full text-xs font-semibold">نشر مجاني</span>
               </div>
             </div>
@@ -252,7 +252,7 @@ export default function Cars() {
                       واتساب
                     </a>
                     <a href={`tel:${car.phone}`}
-                      className="px-4 py-2.5 border-2 border-gray-200 text-xs font-semibold rounded-xl hover:bg-gray-50 transition-colors">
+                      className="px-4 py-2.5 border-2 border-gray-700 text-xs font-semibold rounded-xl hover:bg-gray-800 transition-colors">
                       اتصال
                     </a>
                   </div>
