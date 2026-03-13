@@ -8,7 +8,7 @@ export default function Login() {
   const { login } = useAuth();
   const navigate = useNavigate();
   const [params] = useSearchParams();
-  const { lang, setLang, t, isAr } = useLang();
+  const { t, isAr } = useLang();
 
   const [role, setRole] = useState<'seeker' | 'company'>(
     (params.get('role') as 'seeker' | 'company') || 'seeker'
@@ -53,32 +53,6 @@ export default function Login() {
       </div>
 
       <div className="w-full max-w-md relative z-10">
-
-        {/* Language toggle */}
-        <div className="flex justify-end mb-4">
-          <div className="flex items-center gap-1 p-1 bg-gray-900 border border-gray-700 rounded-xl">
-            <button
-              onClick={() => setLang('ar')}
-              className={`px-3 py-1.5 text-xs font-black rounded-lg transition-all ${
-                lang === 'ar'
-                  ? 'bg-red-600 text-white shadow-md'
-                  : 'text-gray-500 hover:text-gray-300'
-              }`}
-            >
-              عربي
-            </button>
-            <button
-              onClick={() => setLang('en')}
-              className={`px-3 py-1.5 text-xs font-black rounded-lg transition-all ${
-                lang === 'en'
-                  ? 'bg-red-600 text-white shadow-md'
-                  : 'text-gray-500 hover:text-gray-300'
-              }`}
-            >
-              EN
-            </button>
-          </div>
-        </div>
 
         {/* Card */}
         <div className="bg-gray-900 border border-red-900/30 rounded-3xl shadow-2xl shadow-red-900/20 overflow-hidden">

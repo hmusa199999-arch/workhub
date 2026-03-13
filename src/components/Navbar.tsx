@@ -8,7 +8,7 @@ export default function Navbar() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const { lang, setLang, t, isAr } = useLang();
+  const { t, isAr } = useLang();
   const [menuOpen, setMenuOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
 
@@ -125,22 +125,6 @@ export default function Navbar() {
                 </Link>
               </div>
             )}
-
-            {/* Language Toggle */}
-            <div className="flex items-center gap-0.5 p-1 bg-gray-900 border border-gray-700/60 rounded-xl">
-              <button
-                onClick={() => setLang('ar')}
-                className={`flex items-center gap-1 px-2.5 py-1.5 text-xs font-black rounded-lg transition-all ${lang === 'ar' ? 'bg-red-600 text-white shadow' : 'text-gray-500 hover:text-gray-300'}`}
-              >
-                AR
-              </button>
-              <button
-                onClick={() => setLang('en')}
-                className={`flex items-center gap-1 px-2.5 py-1.5 text-xs font-black rounded-lg transition-all ${lang === 'en' ? 'bg-red-600 text-white shadow' : 'text-gray-500 hover:text-gray-300'}`}
-              >
-                EN
-              </button>
-            </div>
 
             {/* Mobile Menu Toggle */}
             <button className="md:hidden p-2 text-gray-400 hover:text-white hover:bg-white/5 rounded-xl transition-colors" onClick={() => setMenuOpen(!menuOpen)}>
