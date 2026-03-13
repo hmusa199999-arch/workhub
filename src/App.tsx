@@ -19,6 +19,9 @@ import Cars from './pages/Cars';
 import RealEstate from './pages/RealEstate';
 import Services from './pages/Services';
 import CarPlates from './pages/CarPlates';
+import About from './pages/About';
+import Privacy from './pages/Privacy';
+import Terms from './pages/Terms';
 import IntroSplash from './components/IntroSplash';
 import { trackPageView, seedVisitsIfEmpty } from './utils/analytics';
 
@@ -86,6 +89,9 @@ export default function App() {
             <Route path="/real-estate" element={<Layout><RealEstate /></Layout>} />
             <Route path="/services" element={<Layout><Services /></Layout>} />
             <Route path="/car-plates" element={<Layout><CarPlates /></Layout>} />
+            <Route path="/about" element={<Layout><About /></Layout>} />
+            <Route path="/privacy" element={<Layout><Privacy /></Layout>} />
+            <Route path="/terms" element={<Layout><Terms /></Layout>} />
           </Routes>
         </BrowserRouter>
       </ApplicationsProvider>

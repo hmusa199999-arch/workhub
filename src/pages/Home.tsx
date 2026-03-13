@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Search, MapPin, TrendingUp, Shield, Clock, Star, ChevronLeft, Zap, Users, CheckCircle } from 'lucide-react';
+import { Search, MapPin, TrendingUp, Shield, Clock, Star, ChevronLeft, Zap, Users, CheckCircle, ArrowLeft } from 'lucide-react';
 import JobCard from '../components/JobCard';
 import DirectBannerCarousel from '../components/DirectBannerCarousel';
 import { mockJobs } from '../data/mockData';
@@ -309,6 +309,155 @@ export default function Home() {
               </div>
 
               {/* Company card */}
+              <div className="relative group overflow-hidden bg-gradient-to-br from-gray-900 to-gray-950 border border-gray-700/50 hover:border-red-600/40 rounded-3xl p-8 text-white transition-all duration-300 hover:shadow-2xl hover:shadow-red-900/20">
+                <div className="absolute -top-16 -right-16 w-48 h-48 bg-white/2 rounded-full" />
+                <div className="relative">
+                  <div className="text-5xl mb-4">🏢</div>
+                  <h3 className="text-2xl font-black mb-2">صاحب عمل؟</h3>
+                  <p className="text-gray-400 mb-6 text-sm leading-relaxed">انشر إعلاناتك واستقطب أفضل الكفاءات من خلال منصتنا المتكاملة.</p>
+                  <div className="space-y-2 mb-6">
+                    {['نشر إعلانات مجاناً', 'إدارة المتقدمين بسهولة', 'لوحة تحكم متكاملة'].map(b => (
+                      <div key={b} className="flex items-center gap-2 text-xs text-gray-500">
+                        <CheckCircle className="w-3.5 h-3.5 shrink-0 text-red-400" /> {b}
+                      </div>
+                    ))}
+                  </div>
+                  <Link to="/register?role=company"
+                    className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-l from-red-600 to-red-500 text-white font-black rounded-xl hover:from-red-500 hover:to-red-400 transition-all shadow-lg shadow-red-500/20 text-sm">
+                    سجّل شركتك ←
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* ══════════════════════════════════════════════════
+          HOW IT WORKS
+      ══════════════════════════════════════════════════ */}
+      <section className="py-20 px-4 bg-gray-900/30 border-y border-red-900/10">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-14">
+            <div className="inline-flex items-center gap-2 bg-red-600/10 border border-red-500/20 rounded-full px-4 py-1.5 text-xs text-red-400 font-black mb-4 tracking-wider uppercase">
+              ✦ كيف يعمل الموقع؟
+            </div>
+            <h2 className="text-3xl md:text-4xl font-black text-white mb-3">ثلاث خطوات بسيطة</h2>
+            <p className="text-gray-500">سجل — انشر — تواصل</p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {[
+              { step: '01', icon: '👤', title: 'أنشئ حسابك', desc: 'سجّل بأي اسم مستخدم وكلمة مرور في أقل من دقيقة — مجاناً تماماً بدون رسوم.' },
+              { step: '02', icon: '📝', title: 'أضف إعلانك', desc: 'انشر إعلانك في أي قسم (وظائف، سيارات، عقارات...) مع الصور والتفاصيل.' },
+              { step: '03', icon: '📞', title: 'تواصل وأغلق الصفقة', desc: 'يتواصل معك المهتمون مباشرة عبر واتساب أو الهاتف — سريع وسهل.' },
+            ].map(s => (
+              <div key={s.step} className="relative bg-gray-900 border border-gray-800 hover:border-red-600/30 rounded-2xl p-7 text-center transition-all hover:-translate-y-1">
+                <div className="absolute -top-3 right-6 bg-red-600 text-white text-xs font-black px-3 py-1 rounded-full">{s.step}</div>
+                <div className="text-5xl mb-4">{s.icon}</div>
+                <h3 className="font-black text-white text-lg mb-2">{s.title}</h3>
+                <p className="text-gray-500 text-sm leading-relaxed">{s.desc}</p>
+              </div>
+            ))}
+          </div>
+          <div className="text-center mt-10">
+            <Link to="/register"
+              className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-l from-red-600 to-red-500 text-white font-black rounded-2xl hover:from-red-500 hover:to-red-400 transition-all shadow-lg shadow-red-500/30 text-base">
+              ابدأ الآن — مجاناً <ArrowLeft className="w-5 h-5" />
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* ══════════════════════════════════════════════════
+          VISITOR CTAs (prominent for non-logged-in users)
+      ══════════════════════════════════════════════════ */}
+      {!user && (
+        <section className="py-16 px-4">
+          <div className="max-w-4xl mx-auto">
+            <div className="grid md:grid-cols-2 gap-4">
+              <Link to="/jobs"
+                className="group relative overflow-hidden bg-gradient-to-br from-red-950 to-gray-950 border-2 border-red-700/40 hover:border-red-500/70 rounded-3xl p-8 text-white transition-all duration-300 hover:shadow-2xl hover:shadow-red-900/30 hover:-translate-y-1">
+                <div className="absolute -top-10 -left-10 w-40 h-40 bg-red-600/10 rounded-full group-hover:bg-red-600/15 transition-colors" />
+                <div className="relative">
+                  <div className="text-4xl mb-3">🔍</div>
+                  <h3 className="text-xl font-black mb-2">ابحث عن وظيفة</h3>
+                  <p className="text-red-200/50 text-sm mb-4">أكثر من 1,300 فرصة عمل في الإمارات والعالم العربي</p>
+                  <span className="inline-flex items-center gap-1.5 text-red-300 text-sm font-bold group-hover:gap-3 transition-all">
+                    تصفح الوظائف <ArrowLeft className="w-4 h-4" />
+                  </span>
+                </div>
+              </Link>
+              <Link to="/register"
+                className="group relative overflow-hidden bg-gradient-to-br from-gray-900 to-gray-950 border-2 border-gray-700/50 hover:border-red-600/50 rounded-3xl p-8 text-white transition-all duration-300 hover:shadow-2xl hover:shadow-red-900/20 hover:-translate-y-1">
+                <div className="absolute -top-10 -left-10 w-40 h-40 bg-white/2 rounded-full" />
+                <div className="relative">
+                  <div className="text-4xl mb-3">📢</div>
+                  <h3 className="text-xl font-black mb-2">انشر إعلانك</h3>
+                  <p className="text-gray-400 text-sm mb-4">سجّل وأضف إعلانك مجاناً في دقيقة واحدة</p>
+                  <span className="inline-flex items-center gap-1.5 text-red-400 text-sm font-bold group-hover:gap-3 transition-all">
+                    سجّل الآن <ArrowLeft className="w-4 h-4" />
+                  </span>
+                </div>
+              </Link>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* ══════════════════════════════════════════════════
+          TRUST BAND
+      ══════════════════════════════════════════════════ */}
+      <section className="py-10 px-4 border-t border-red-900/10">
+        <div className="max-w-5xl mx-auto">
+          <div className="flex flex-wrap justify-center items-center gap-6 md:gap-10 text-sm text-gray-500">
+            {[
+              { icon: '🔒', text: 'بيانات آمنة ومشفرة' },
+              { icon: '🆓', text: 'مجاني 100% — بدون رسوم خفية' },
+              { icon: '⚡', text: 'نشر فوري وظهور فوري' },
+              { icon: '🌍', text: 'يغطي 15+ دولة عربية' },
+              { icon: '📱', text: 'يعمل على جميع الأجهزة' },
+            ].map(t => (
+              <div key={t.text} className="flex items-center gap-2">
+                <span className="text-lg">{t.icon}</span>
+                <span>{t.text}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ══════════════════════════════════════════════════
+          CTA (existing)
+      ══════════════════════════════════════════════════ */}
+      {!user && (
+        <section className="py-20 px-4 border-t border-red-900/10">
+          <div className="max-w-4xl mx-auto">
+            <div className="text-center mb-12">
+              <h2 className="text-4xl font-black text-white mb-2">ابدأ اليوم — مجاناً</h2>
+              <p className="text-gray-500">بدون اشتراك · بدون رسوم خفية · بدون تعقيد</p>
+            </div>
+            <div className="grid md:grid-cols-2 gap-5">
+              <div className="relative group overflow-hidden bg-gradient-to-br from-red-950 to-gray-950 border border-red-800/40 hover:border-red-600/60 rounded-3xl p-8 text-white transition-all duration-300 hover:shadow-2xl hover:shadow-red-900/30">
+                <div className="absolute -top-16 -right-16 w-48 h-48 bg-red-600/10 rounded-full group-hover:bg-red-600/15 transition-colors" />
+                <div className="absolute -bottom-12 -left-12 w-32 h-32 bg-red-800/10 rounded-full" />
+                <div className="relative">
+                  <div className="text-5xl mb-4">👤</div>
+                  <h3 className="text-2xl font-black mb-2">باحث عن عمل؟</h3>
+                  <p className="text-red-200/50 mb-6 text-sm leading-relaxed">أنشئ ملفك الشخصي وابدأ رحلتك نحو وظيفة أحلامك بين آلاف الفرص المتاحة.</p>
+                  <div className="space-y-2 mb-6">
+                    {['تصفح آلاف الوظائف مجاناً', 'ملف شخصي احترافي', 'تقديم بنقرة واحدة'].map(b => (
+                      <div key={b} className="flex items-center gap-2 text-xs text-red-300/70">
+                        <CheckCircle className="w-3.5 h-3.5 shrink-0" /> {b}
+                      </div>
+                    ))}
+                  </div>
+                  <Link to="/register?role=seeker"
+                    className="inline-flex items-center gap-2 px-6 py-3 bg-white text-red-700 font-black rounded-xl hover:bg-red-50 transition-colors shadow-lg text-sm">
+                    ابدأ الآن مجاناً ←
+                  </Link>
+                </div>
+              </div>
+
               <div className="relative group overflow-hidden bg-gradient-to-br from-gray-900 to-gray-950 border border-gray-700/50 hover:border-red-600/40 rounded-3xl p-8 text-white transition-all duration-300 hover:shadow-2xl hover:shadow-red-900/20">
                 <div className="absolute -top-16 -right-16 w-48 h-48 bg-white/2 rounded-full" />
                 <div className="relative">
