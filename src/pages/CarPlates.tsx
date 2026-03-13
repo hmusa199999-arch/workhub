@@ -208,17 +208,20 @@ function UserPlateCard({ ad }: { ad: import('../utils/adsStore').StoredAd }) {
       )}
 
       <div className="px-4 pb-4 pt-3">
-        {/* Title & location */}
-        <div className="mb-2">
-          {ad.plateNum && (
-            <p className="font-black text-gray-800 text-base leading-tight">
-              {ad.plateCode ? `${ad.plateCode} · ` : ''}{ad.plateNum}
+        {/* Plate number - big & bold like a real plate */}
+        {ad.plateNum && (
+          <div className="mb-3 bg-gradient-to-br from-gray-800 to-gray-900 border-2 border-red-700/40 rounded-xl py-3 px-4 text-center">
+            {ad.plateCode && (
+              <p className="text-red-400 text-xs font-bold tracking-widest mb-1">{ad.plateCode}</p>
+            )}
+            <p className="text-white font-black text-4xl tracking-widest leading-none" style={{ fontFamily: 'monospace', letterSpacing: '0.15em' }}>
+              {ad.plateNum}
             </p>
-          )}
-          {ad.plateEmirate && (
-            <p className="text-xs text-gray-400 mt-0.5">📍 {ad.plateEmirate}</p>
-          )}
-        </div>
+            {ad.plateEmirate && (
+              <p className="text-gray-400 text-xs mt-1.5">📍 {ad.plateEmirate}</p>
+            )}
+          </div>
+        )}
 
         {/* Price */}
         <div className="mb-3">
