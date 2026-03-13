@@ -25,8 +25,7 @@ function formatViews(n: number) {
 }
 
 function maskPhone(phone: string) {
-  const digits = phone.replace(/\D/g, '').slice(-9);
-  return `0${digits.slice(0, 6)}xxx`;
+  return phone;
 }
 
 /** Real UAE-style plate visual */
