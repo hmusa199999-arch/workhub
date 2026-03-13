@@ -101,8 +101,9 @@ function PlateVisual({
           <div className="w-px bg-gray-300" />
 
           {/* Right: number */}
-          <div className="flex-1 flex items-center justify-center px-3 py-2">
-            <span className={`${s.plate} font-black tracking-widest text-gray-100 font-mono`}>
+          <div className="flex-1 flex items-center justify-center px-2 py-2 overflow-hidden">
+            <span className={`${s.plate} font-black tracking-wide text-gray-100 font-mono truncate max-w-full`}
+              style={{ letterSpacing: plateNumber.length > 5 ? '0.05em' : '0.1em' }}>
               {plateNumber}
             </span>
           </div>
@@ -210,11 +211,11 @@ function UserPlateCard({ ad }: { ad: import('../utils/adsStore').StoredAd }) {
       <div className="px-4 pb-4 pt-3">
         {/* Plate number - big & bold like a real plate */}
         {ad.plateNum && (
-          <div className="mb-3 bg-gradient-to-br from-gray-800 to-gray-900 border-2 border-red-700/40 rounded-xl py-3 px-4 text-center">
+          <div className="mb-3 bg-gradient-to-br from-gray-800 to-gray-900 border-2 border-red-700/40 rounded-xl py-3 px-2 text-center overflow-hidden">
             {ad.plateCode && (
               <p className="text-red-400 text-xs font-bold tracking-widest mb-1">{ad.plateCode}</p>
             )}
-            <p className="text-white font-black text-4xl tracking-widest leading-none" style={{ fontFamily: 'monospace', letterSpacing: '0.15em' }}>
+            <p className="text-white font-black text-3xl sm:text-4xl leading-none truncate w-full text-center" style={{ fontFamily: 'monospace', letterSpacing: '0.1em' }}>
               {ad.plateNum}
             </p>
             {ad.plateEmirate && (
