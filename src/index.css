@@ -51,7 +51,15 @@
   }
 }
 
+@keyframes slide-up {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
+}
+
 @layer utilities {
+  .animate-slide-up {
+    animation: slide-up 0.28s cubic-bezier(0.32, 0.72, 0, 1);
+  }
   .gradient-primary {
     background: linear-gradient(135deg, #7f1d1d 0%, #dc2626 50%, #ef4444 100%);
   }

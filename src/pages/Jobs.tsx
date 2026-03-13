@@ -118,67 +118,132 @@ export default function Jobs() {
   };
 
   const hasFilters = query || location || sector || type || exp;
+  const [showSearchPanel, setShowSearchPanel] = useState(false);
 
   return (
     <div className="min-h-screen bg-gray-950">
-      {/* Search Header */}
-      <div className="bg-gray-900 border-b border-red-900/30 sticky top-16 z-40">
-        <div className="max-w-7xl mx-auto px-4 py-4">
-          <form onSubmit={handleSearch} className="flex flex-col sm:flex-row gap-2">
-            <div className="flex-1 flex items-center gap-3 px-4 py-2.5 bg-gray-800 border border-gray-700 rounded-xl">
-              <Search className="w-4 h-4 text-red-400 shrink-0" />
-              <input
-                type="text"
-                value={query}
-                onChange={e => setQuery(e.target.value)}
-                placeholder="المسمى الوظيفي أو المهارة أو الشركة..."
-                className="flex-1 bg-transparent text-white placeholder-gray-500 outline-none text-sm"
-              />
-              {query && <button type="button" onClick={() => setQuery('')}><X className="w-4 h-4 text-gray-500" /></button>}
-            </div>
-            <div className="flex items-center gap-3 px-4 py-2.5 bg-gray-800 border border-gray-700 rounded-xl sm:w-52">
-              <MapPin className="w-4 h-4 text-red-400 shrink-0" />
-              <input
-                type="text"
-                value={location}
-                onChange={e => setLocation(e.target.value)}
-                placeholder="الدولة أو المدينة..."
-                className="flex-1 bg-transparent text-white placeholder-gray-500 outline-none text-sm"
-              />
-            </div>
-            <button type="submit" className="px-6 py-2.5 bg-gradient-to-l from-red-600 to-red-500 text-white text-sm font-black rounded-xl hover:from-red-500 hover:to-red-400 transition-all shadow-sm shadow-red-500/20">
-              بحث
-            </button>
-            <button
-              type="button"
-              onClick={() => setShowFilters(!showFilters)}
-              className={`flex items-center gap-2 px-4 py-2.5 border rounded-xl text-sm font-bold transition-colors ${showFilters ? 'bg-red-500/10 border-red-500/40 text-red-400' : 'border-gray-700 text-gray-400 hover:bg-gray-800'}`}
-            >
-              <SlidersHorizontal className="w-4 h-4" />
-              فلاتر
-            </button>
-          </form>
 
-          {/* Filters Panel */}
-          {showFilters && (
-            <div className="mt-3 pt-3 border-t border-gray-800 grid grid-cols-2 sm:grid-cols-4 gap-3">
-              {[
-                { value: sector, onChange: (v: string) => setSector(v), options: [{ value: '', label: 'جميع القطاعات' }, ...sectors.map(s => ({ value: s.id, label: s.name }))] },
-                { value: type, onChange: (v: string) => setType(v as JobType | ''), options: typeOptions.map(o => ({ value: o.value, label: o.label })) },
-                { value: exp, onChange: (v: string) => setExp(v as ExperienceLevel | ''), options: expOptions.map(o => ({ value: o.value, label: o.label })) },
-                { value: sort, onChange: (v: string) => setSort(v), options: sortOptions.map(o => ({ value: o.value, label: `ترتيب: ${o.label}` })) },
-              ].map((sel, i) => (
-                <div key={i} className="relative">
-                  <select value={sel.value} onChange={e => sel.onChange(e.target.value)} className="w-full appearance-none px-3 py-2 text-sm border border-gray-700 rounded-xl bg-gray-800 text-gray-300 focus:ring-2 focus:ring-red-500 focus:outline-none">
-                    {sel.options.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
-                  </select>
-                  <ChevronDown className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-500 pointer-events-none" />
-                </div>
-              ))}
+      {/* ── Floating Search FAB (+ button) ─────────────────────── */}
+      <button
+        onClick={() => setShowSearchPanel(true)}
+        className={`fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 px-6 py-3.5 rounded-full shadow-2xl shadow-red-500/30 transition-all duration-300 font-black text-base
+          ${hasFilters
+            ? 'bg-red-600 text-white pr-5'
+            : 'bg-gradient-to-r from-red-600 to-red-500 text-white'
+          }`}
+        aria-label="بحث وفلترة"
+      >
+        {hasFilters ? (
+          <>
+            <Search className="w-5 h-5" />
+            <span>فلترة نشطة</span>
+            <span className="w-5 h-5 bg-white/30 rounded-full flex items-center justify-center text-xs font-black">
+              {[query, location, sector, type, exp].filter(Boolean).length}
+            </span>
+          </>
+        ) : (
+          <>
+            <Plus className="w-5 h-5" />
+            <span>بحث</span>
+          </>
+        )}
+      </button>
+
+      {/* ── Search Bottom Sheet ─────────────────────────────────── */}
+      {showSearchPanel && (
+        <>
+          {/* Backdrop */}
+          <div
+            className="fixed inset-0 bg-black/60 z-50 backdrop-blur-sm"
+            onClick={() => setShowSearchPanel(false)}
+          />
+          {/* Sheet */}
+          <div className="fixed bottom-0 left-0 right-0 z-50 bg-gray-900 rounded-t-3xl border-t border-red-900/30 shadow-2xl shadow-black/60 px-5 pt-4 pb-8 animate-slide-up">
+            {/* Handle */}
+            <div className="w-10 h-1 bg-gray-700 rounded-full mx-auto mb-5" />
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-white font-black text-base flex items-center gap-2">
+                <Search className="w-4 h-4 text-red-400" /> بحث وفلترة
+              </h3>
+              <button onClick={() => setShowSearchPanel(false)}
+                className="w-8 h-8 rounded-xl bg-gray-800 flex items-center justify-center hover:bg-gray-700 transition">
+                <X className="w-4 h-4 text-gray-400" />
+              </button>
             </div>
-          )}
-        </div>
-      </div>
+
+            <form onSubmit={e => { handleSearch(e); setShowSearchPanel(false); }} className="space-y-3">
+              {/* Job title input */}
+              <div className="flex items-center gap-3 px-4 py-3 bg-gray-800 border border-gray-700 rounded-2xl">
+                <Search className="w-4 h-4 text-red-400 shrink-0" />
+                <input
+                  type="text"
+                  value={query}
+                  onChange={e => setQuery(e.target.value)}
+                  placeholder="المسمى الوظيفي أو المهارة أو الشركة..."
+                  className="flex-1 bg-transparent text-white placeholder-gray-500 outline-none text-sm"
+                  autoFocus
+                />
+                {query && <button type="button" onClick={() => setQuery('')}><X className="w-4 h-4 text-gray-500" /></button>}
+              </div>
+
+              {/* Location input */}
+              <div className="flex items-center gap-3 px-4 py-3 bg-gray-800 border border-gray-700 rounded-2xl">
+                <MapPin className="w-4 h-4 text-red-400 shrink-0" />
+                <input
+                  type="text"
+                  value={location}
+                  onChange={e => setLocation(e.target.value)}
+                  placeholder="الدولة أو المدينة..."
+                  className="flex-1 bg-transparent text-white placeholder-gray-500 outline-none text-sm"
+                />
+                {location && <button type="button" onClick={() => setLocation('')}><X className="w-4 h-4 text-gray-500" /></button>}
+              </div>
+
+              {/* Filters toggle */}
+              <button
+                type="button"
+                onClick={() => setShowFilters(!showFilters)}
+                className={`w-full flex items-center justify-between px-4 py-3 border rounded-2xl text-sm font-bold transition-colors ${showFilters ? 'bg-red-500/10 border-red-500/40 text-red-400' : 'border-gray-700 text-gray-400 bg-gray-800'}`}
+              >
+                <span className="flex items-center gap-2"><SlidersHorizontal className="w-4 h-4" /> فلاتر متقدمة</span>
+                <ChevronDown className={`w-4 h-4 transition-transform ${showFilters ? 'rotate-180' : ''}`} />
+              </button>
+
+              {showFilters && (
+                <div className="grid grid-cols-2 gap-3 pt-1">
+                  {[
+                    { value: sector, onChange: (v: string) => setSector(v), options: [{ value: '', label: 'جميع القطاعات' }, ...sectors.map(s => ({ value: s.id, label: s.name }))] },
+                    { value: type, onChange: (v: string) => setType(v as JobType | ''), options: typeOptions.map(o => ({ value: o.value, label: o.label })) },
+                    { value: exp, onChange: (v: string) => setExp(v as ExperienceLevel | ''), options: expOptions.map(o => ({ value: o.value, label: o.label })) },
+                    { value: sort, onChange: (v: string) => setSort(v), options: sortOptions.map(o => ({ value: o.value, label: `ترتيب: ${o.label}` })) },
+                  ].map((sel, i) => (
+                    <div key={i} className="relative">
+                      <select value={sel.value} onChange={e => sel.onChange(e.target.value)}
+                        className="w-full appearance-none px-3 py-2.5 text-sm border border-gray-700 rounded-xl bg-gray-800 text-gray-300 focus:ring-2 focus:ring-red-500 focus:outline-none">
+                        {sel.options.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+                      </select>
+                      <ChevronDown className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-500 pointer-events-none" />
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              <div className="flex gap-3 pt-1">
+                {hasFilters && (
+                  <button type="button" onClick={() => { clearFilters(); setShowSearchPanel(false); }}
+                    className="flex-1 py-3 border-2 border-gray-700 text-gray-400 font-bold rounded-2xl hover:bg-gray-800 transition text-sm">
+                    مسح الكل
+                  </button>
+                )}
+                <button type="submit"
+                  className="flex-1 py-3 bg-gradient-to-r from-red-600 to-red-500 text-white font-black rounded-2xl hover:from-red-500 hover:to-red-400 transition-all shadow-lg shadow-red-500/20 text-sm">
+                  بحث الآن
+                </button>
+              </div>
+            </form>
+          </div>
+        </>
+      )}
 
       {/* Sectors – Card Grid */}
       <div className="bg-gray-900/60 border-b border-red-900/20 px-4 py-6">
