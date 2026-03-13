@@ -16,6 +16,14 @@ const LanguageContext = createContext<LanguageContextValue>({
   isAr: true,
 });
 
+function applyLang(l: Lang) {
+  const dir = l === 'ar' ? 'rtl' : 'ltr';
+  document.documentElement.dir  = dir;
+  document.documentElement.lang = l;
+  // Also set on body for extra specificity
+  document.body.dir = dir;
+}
+
 export function LanguageProvider({ children }: { children: ReactNode }) {
   const [lang, setLangState] = useState<Lang>(() => {
     return (localStorage.getItem('work1m_lang') as Lang) || 'ar';
@@ -24,14 +32,12 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   const setLang = (l: Lang) => {
     setLangState(l);
     localStorage.setItem('work1m_lang', l);
-    // Update document direction
-    document.documentElement.dir = l === 'ar' ? 'rtl' : 'ltr';
-    document.documentElement.lang = l;
+    applyLang(l);
   };
 
+  // Apply on mount and whenever lang changes
   useEffect(() => {
-    document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
-    document.documentElement.lang = lang;
+    applyLang(lang);
   }, [lang]);
 
   const t = (ar: string, en: string) => lang === 'ar' ? ar : en;

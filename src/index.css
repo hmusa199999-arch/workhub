@@ -2,20 +2,39 @@
 
 @layer base {
   * {
-    direction: rtl;
     font-family: 'Segoe UI', 'Arial', sans-serif;
+  }
+
+  /* RTL mode (Arabic) */
+  html[dir="rtl"] * {
+    direction: rtl;
+  }
+
+  /* LTR mode (English) */
+  html[dir="ltr"] * {
+    direction: ltr;
   }
 
   body {
     @apply bg-gray-950 text-gray-100 antialiased;
   }
 
-  input, textarea, select {
+  /* Inputs follow the document direction */
+  html[dir="rtl"] input,
+  html[dir="rtl"] textarea,
+  html[dir="rtl"] select {
     direction: rtl;
     text-align: right;
   }
 
-  /* إصلاح لون الحقول عند الإكمال التلقائي (إزالة الأزرق) */
+  html[dir="ltr"] input,
+  html[dir="ltr"] textarea,
+  html[dir="ltr"] select {
+    direction: ltr;
+    text-align: left;
+  }
+
+  /* Fix autofill color */
   input:-webkit-autofill,
   input:-webkit-autofill:hover,
   input:-webkit-autofill:focus,

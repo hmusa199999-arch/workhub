@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { BrowserRouter, Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { ApplicationsProvider } from './context/ApplicationsContext';
-import { LanguageProvider } from './context/LanguageContext';
+import { LanguageProvider, useLang } from './context/LanguageContext';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Home from './pages/Home';
@@ -27,8 +27,9 @@ import IntroSplash from './components/IntroSplash';
 import { trackPageView, seedVisitsIfEmpty } from './utils/analytics';
 
 function Layout({ children }: { children: React.ReactNode }) {
+  const { isAr } = useLang();
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col" dir={isAr ? 'rtl' : 'ltr'}>
       <Navbar />
       <main className="flex-1">{children}</main>
       <Footer />
