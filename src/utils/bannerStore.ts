@@ -1,7 +1,8 @@
 export interface BannerAd {
   id: string;
-  type: 'image' | 'video' | 'text';
-  mediaData?: string;       // base64 for image/video
+  type: 'image' | 'video' | 'youtube' | 'text';
+  mediaData?: string;       // base64 (uploaded file)
+  mediaUrl?: string;        // external URL (image/video/youtube)
   title: string;
   subtitle?: string;
   link?: string;

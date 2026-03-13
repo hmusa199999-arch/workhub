@@ -109,7 +109,7 @@ export default function AdminDashboard() {
   const [showBannerForm, setShowBannerForm] = useState(false);
   const [editingBanner, setEditingBanner] = useState<BannerAd | null>(null);
   const [bannerForm, setBannerForm] = useState({
-    type: 'image' as BannerAd['type'],
+    type: 'youtube' as BannerAd['type'],
     title: '',
     subtitle: '',
     link: '',
@@ -120,6 +120,7 @@ export default function AdminDashboard() {
     order: 1,
     active: true,
     mediaData: '',
+    mediaUrl: '',
   });
   const bannerFileRef = useRef<HTMLInputElement>(null);
 
@@ -148,6 +149,7 @@ export default function AdminDashboard() {
         order: b.order,
         active: b.active,
         mediaData: b.mediaData || '',
+        mediaUrl: b.mediaUrl || '',
       });
     } else {
       setEditingBanner(null);
@@ -163,6 +165,7 @@ export default function AdminDashboard() {
         order: bannerAds.length + 1,
         active: true,
         mediaData: '',
+        mediaUrl: '',
       });
     }
     setShowBannerForm(true);
@@ -1043,13 +1046,17 @@ export default function AdminDashboard() {
                   </h3>
 
                   {/* Type selector */}
-                  <div className="flex gap-2">
-                    {(['image', 'video', 'text'] as BannerAd['type'][]).map(t => (
-                      <button key={t}
-                        onClick={() => setBannerForm(f => ({ ...f, type: t }))}
-                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all ${bannerForm.type === t ? 'bg-red-600 border-red-500 text-white' : 'border-gray-600 text-gray-400 hover:border-red-500'}`}>
-                        {t === 'image' ? <ImageIcon className="w-3.5 h-3.5" /> : t === 'video' ? <Video className="w-3.5 h-3.5" /> : <Type className="w-3.5 h-3.5" />}
-                        {t === 'image' ? 'صورة' : t === 'video' ? 'فيديو' : 'نص'}
+                  <div className="flex flex-wrap gap-2">
+                    {([
+                      { id: 'youtube', label: '▶ يوتيوب', icon: <Video className="w-3.5 h-3.5" /> },
+                      { id: 'image',   label: 'صورة',     icon: <ImageIcon className="w-3.5 h-3.5" /> },
+                      { id: 'video',   label: 'فيديو',    icon: <Video className="w-3.5 h-3.5" /> },
+                      { id: 'text',    label: 'نص/لون',   icon: <Type className="w-3.5 h-3.5" /> },
+                    ] as { id: BannerAd['type']; label: string; icon: React.ReactNode }[]).map(t => (
+                      <button key={t.id}
+                        onClick={() => setBannerForm(f => ({ ...f, type: t.id }))}
+                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all ${bannerForm.type === t.id ? 'bg-red-600 border-red-500 text-white' : 'border-gray-600 text-gray-400 hover:border-red-500'}`}>
+                        {t.icon} {t.label}
                       </button>
                     ))}
                   </div>
@@ -1128,27 +1135,67 @@ export default function AdminDashboard() {
                     )}
                   </div>
 
-                  {/* Media Upload */}
-                  {(bannerForm.type === 'image' || bannerForm.type === 'video') && (
+                  {/* YouTube URL */}
+                  {bannerForm.type === 'youtube' && (
                     <div>
-                      <label className="text-xs text-gray-400 mb-2 block">
-                        {bannerForm.type === 'image' ? 'رفع صورة' : 'رفع فيديو'}
-                      </label>
+                      <label className="text-xs text-gray-400 mb-2 block">🔗 رابط يوتيوب</label>
                       <input
-                        ref={bannerFileRef}
-                        type="file"
-                        accept={bannerForm.type === 'image' ? 'image/*' : 'video/*'}
-                        onChange={handleBannerMediaUpload}
-                        className="hidden"
+                        value={bannerForm.mediaUrl || ''}
+                        onChange={e => setBannerForm(f => ({ ...f, mediaUrl: e.target.value }))}
+                        placeholder="https://www.youtube.com/watch?v=... أو https://youtu.be/..."
+                        dir="ltr"
+                        className="w-full px-3 py-2.5 bg-gray-800 border border-gray-700 rounded-xl text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500"
                       />
+                      <p className="text-xs text-gray-600 mt-1">الفيديو سيعمل تلقائياً وبدون صوت</p>
+                    </div>
+                  )}
+
+                  {/* Image URL or upload */}
+                  {bannerForm.type === 'image' && (
+                    <div className="space-y-2">
+                      <label className="text-xs text-gray-400 block">🖼️ رابط الصورة أو ارفعها من جهازك</label>
+                      <input
+                        value={bannerForm.mediaUrl || ''}
+                        onChange={e => setBannerForm(f => ({ ...f, mediaUrl: e.target.value, mediaData: '' }))}
+                        placeholder="https://example.com/image.jpg"
+                        dir="ltr"
+                        className="w-full px-3 py-2.5 bg-gray-800 border border-gray-700 rounded-xl text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500"
+                      />
+                      <div className="flex items-center gap-2 text-xs text-gray-500">
+                        <span className="flex-1 h-px bg-gray-700" /> أو <span className="flex-1 h-px bg-gray-700" />
+                      </div>
+                      <input ref={bannerFileRef} type="file" accept="image/*" onChange={handleBannerMediaUpload} className="hidden" />
                       <button onClick={() => bannerFileRef.current?.click()}
-                        className="flex items-center gap-2 px-4 py-2 border border-dashed border-gray-600 rounded-xl text-sm text-gray-400 hover:border-red-500 hover:text-red-400 transition-all">
-                        {bannerForm.type === 'image' ? <ImageIcon className="w-4 h-4" /> : <Video className="w-4 h-4" />}
-                        {bannerForm.mediaData ? 'تم الرفع ✓ (اضغط لتغيير)' : 'اختر ملفاً'}
+                        className="flex items-center gap-2 px-4 py-2 border border-dashed border-gray-600 rounded-xl text-sm text-gray-400 hover:border-red-500 hover:text-red-400 transition-all w-full justify-center">
+                        <ImageIcon className="w-4 h-4" />
+                        {bannerForm.mediaData ? '✓ تم رفع الصورة (اضغط لتغيير)' : 'ارفع صورة من جهازك'}
                       </button>
-                      {bannerForm.mediaData && bannerForm.type === 'image' && (
-                        <img src={bannerForm.mediaData} alt="" className="mt-2 h-24 rounded-lg object-cover" />
+                      {(bannerForm.mediaData || bannerForm.mediaUrl) && (
+                        <img src={bannerForm.mediaData || bannerForm.mediaUrl} alt="" className="mt-2 h-24 rounded-lg object-cover w-full" onError={() => {}} />
                       )}
+                    </div>
+                  )}
+
+                  {/* Video URL or upload */}
+                  {bannerForm.type === 'video' && (
+                    <div className="space-y-2">
+                      <label className="text-xs text-gray-400 block">🎬 رابط الفيديو أو ارفعه من جهازك</label>
+                      <input
+                        value={bannerForm.mediaUrl || ''}
+                        onChange={e => setBannerForm(f => ({ ...f, mediaUrl: e.target.value, mediaData: '' }))}
+                        placeholder="https://example.com/video.mp4"
+                        dir="ltr"
+                        className="w-full px-3 py-2.5 bg-gray-800 border border-gray-700 rounded-xl text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500"
+                      />
+                      <div className="flex items-center gap-2 text-xs text-gray-500">
+                        <span className="flex-1 h-px bg-gray-700" /> أو <span className="flex-1 h-px bg-gray-700" />
+                      </div>
+                      <input ref={bannerFileRef} type="file" accept="video/*" onChange={handleBannerMediaUpload} className="hidden" />
+                      <button onClick={() => bannerFileRef.current?.click()}
+                        className="flex items-center gap-2 px-4 py-2 border border-dashed border-gray-600 rounded-xl text-sm text-gray-400 hover:border-red-500 hover:text-red-400 transition-all w-full justify-center">
+                        <Video className="w-4 h-4" />
+                        {bannerForm.mediaData ? '✓ تم رفع الفيديو (اضغط لتغيير)' : 'ارفع فيديو من جهازك'}
+                      </button>
                     </div>
                   )}
 
