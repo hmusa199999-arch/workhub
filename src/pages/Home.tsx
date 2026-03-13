@@ -276,64 +276,6 @@ export default function Home() {
       </section>
 
       {/* ══════════════════════════════════════════════════
-          CTA
-      ══════════════════════════════════════════════════ */}
-      {!user && (
-        <section className="py-20 px-4 border-t border-red-900/10">
-          <div className="max-w-4xl mx-auto">
-            <div className="text-center mb-12">
-              <h2 className="text-4xl font-black text-white mb-2">ابدأ اليوم — مجاناً</h2>
-              <p className="text-gray-500">بدون اشتراك · بدون رسوم خفية · بدون تعقيد</p>
-            </div>
-            <div className="grid md:grid-cols-2 gap-5">
-              {/* Seeker card */}
-              <div className="relative group overflow-hidden bg-gradient-to-br from-red-950 to-gray-950 border border-red-800/40 hover:border-red-600/60 rounded-3xl p-8 text-white transition-all duration-300 hover:shadow-2xl hover:shadow-red-900/30">
-                <div className="absolute -top-16 -right-16 w-48 h-48 bg-red-600/10 rounded-full group-hover:bg-red-600/15 transition-colors" />
-                <div className="absolute -bottom-12 -left-12 w-32 h-32 bg-red-800/10 rounded-full" />
-                <div className="relative">
-                  <div className="text-5xl mb-4">👤</div>
-                  <h3 className="text-2xl font-black mb-2">باحث عن عمل؟</h3>
-                  <p className="text-red-200/50 mb-6 text-sm leading-relaxed">أنشئ ملفك الشخصي وابدأ رحلتك نحو وظيفة أحلامك بين آلاف الفرص المتاحة.</p>
-                  <div className="space-y-2 mb-6">
-                    {['تصفح آلاف الوظائف مجاناً', 'ملف شخصي احترافي', 'تقديم بنقرة واحدة'].map(b => (
-                      <div key={b} className="flex items-center gap-2 text-xs text-red-300/70">
-                        <CheckCircle className="w-3.5 h-3.5 shrink-0" /> {b}
-                      </div>
-                    ))}
-                  </div>
-                  <Link to="/register?role=seeker"
-                    className="inline-flex items-center gap-2 px-6 py-3 bg-white text-red-700 font-black rounded-xl hover:bg-red-50 transition-colors shadow-lg text-sm">
-                    ابدأ الآن مجاناً ←
-                  </Link>
-                </div>
-              </div>
-
-              {/* Company card */}
-              <div className="relative group overflow-hidden bg-gradient-to-br from-gray-900 to-gray-950 border border-gray-700/50 hover:border-red-600/40 rounded-3xl p-8 text-white transition-all duration-300 hover:shadow-2xl hover:shadow-red-900/20">
-                <div className="absolute -top-16 -right-16 w-48 h-48 bg-white/2 rounded-full" />
-                <div className="relative">
-                  <div className="text-5xl mb-4">🏢</div>
-                  <h3 className="text-2xl font-black mb-2">صاحب عمل؟</h3>
-                  <p className="text-gray-400 mb-6 text-sm leading-relaxed">انشر إعلاناتك واستقطب أفضل الكفاءات من خلال منصتنا المتكاملة.</p>
-                  <div className="space-y-2 mb-6">
-                    {['نشر إعلانات مجاناً', 'إدارة المتقدمين بسهولة', 'لوحة تحكم متكاملة'].map(b => (
-                      <div key={b} className="flex items-center gap-2 text-xs text-gray-500">
-                        <CheckCircle className="w-3.5 h-3.5 shrink-0 text-red-400" /> {b}
-                      </div>
-                    ))}
-                  </div>
-                  <Link to="/register?role=company"
-                    className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-l from-red-600 to-red-500 text-white font-black rounded-xl hover:from-red-500 hover:to-red-400 transition-all shadow-lg shadow-red-500/20 text-sm">
-                    سجّل شركتك ←
-                  </Link>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* ══════════════════════════════════════════════════
           HOW IT WORKS
       ══════════════════════════════════════════════════ */}
       <section className="py-20 px-4 bg-gray-900/30 border-y border-red-900/10">
