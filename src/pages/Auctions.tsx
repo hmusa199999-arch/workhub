@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, Phone, Gavel, Clock, ChevronLeft, Plus, MapPin, Tag } from 'lucide-react';
+import { Search, Phone, Gavel, Clock, ChevronLeft, Plus, MapPin, Tag, TrendingUp } from 'lucide-react';
 import PostAuctionModal from '../components/PostAuctionModal';
+import AuctionBidModal from '../components/AuctionBidModal';
 import { subscribeToAdsByCategory, type FirestoreAd } from '../utils/firestoreAds';
+import { subscribeToBids } from '../utils/firestoreBids';
 import { useAuth } from '../context/AuthContext';
 import { useLang } from '../context/LanguageContext';
 
@@ -22,91 +24,171 @@ const SUBCAT_LABELS: Record<string, string> = {
   scrap: '🔩 سكراب', bike: '🏍️ دراجات', watch: '⌚ ساعات', other: '📦 سلع أخرى',
 };
 
-function daysLeft(dateStr?: string): string | null {
-  if (!dateStr) return null;
-  const end = new Date(dateStr);
-  const now = new Date();
-  const diff = Math.ceil((end.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
-  if (diff <= 0) return 'انتهى المزاد';
-  if (diff === 1) return 'آخر يوم!';
-  return `${diff} يوم متبقي`;
+function pad(n: number) { return String(n).padStart(2, '0'); }
+
+// ── Live countdown hook ──────────────────────────────────────────────────────
+function useCountdown(endDateStr?: string) {
+  const calc = () => {
+    if (!endDateStr) return null;
+    const diff = new Date(endDateStr).getTime() - Date.now();
+    if (diff <= 0) return { days: 0, hours: 0, minutes: 0, seconds: 0, ended: true };
+    return {
+      days:    Math.floor(diff / 86400000),
+      hours:   Math.floor((diff % 86400000) / 3600000),
+      minutes: Math.floor((diff % 3600000)  / 60000),
+      seconds: Math.floor((diff % 60000)    / 1000),
+      ended: false,
+    };
+  };
+  const [time, setTime] = useState(calc);
+  useEffect(() => {
+    const t = setInterval(() => setTime(calc()), 1000);
+    return () => clearInterval(t);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [endDateStr]);
+  return time;
 }
 
-function AuctionCard({ ad }: { ad: FirestoreAd }) {
+// ── Auction card ──────────────────────────────────────────────────────────────
+function AuctionCard({ ad, onBid }: { ad: FirestoreAd; onBid: () => void }) {
   const img = ad.images?.[0];
-  const remaining = daysLeft(ad.auctionEndDate);
   const subLabel = SUBCAT_LABELS[ad.auctionSubCat || ''] || '📦 سلع أخرى';
+  const countdown = useCountdown(ad.auctionEndDate);
+  const [highestBid, setHighestBid] = useState<number>(ad.auctionStartPrice || 0);
+  const [bidCount, setBidCount] = useState(0);
+
+  // Subscribe to highest bid for this auction
+  useEffect(() => {
+    const unsub = subscribeToBids(ad.id, (bids) => {
+      setBidCount(bids.length);
+      if (bids.length > 0) {
+        setHighestBid(Math.max(...bids.map(b => b.amount)));
+      } else {
+        setHighestBid(ad.auctionStartPrice || 0);
+      }
+    });
+    return unsub;
+  }, [ad.id, ad.auctionStartPrice]);
+
+  const isEnded = countdown?.ended ?? false;
 
   return (
     <div className="bg-gray-900 rounded-2xl border-2 border-yellow-900/40 shadow hover:shadow-xl hover:border-yellow-600/50 transition-all duration-300 overflow-hidden flex flex-col">
       {/* Image */}
-      <div className="relative h-48 bg-gradient-to-br from-yellow-950/30 to-gray-900 overflow-hidden">
+      <div className="relative h-44 bg-gradient-to-br from-yellow-950/30 to-gray-900 overflow-hidden">
         {img ? (
           <img src={img} alt={ad.title} className="w-full h-full object-cover" />
         ) : (
-          <div className="w-full h-full flex items-center justify-center text-7xl opacity-40">🏷️</div>
+          <div className="w-full h-full flex items-center justify-center text-6xl opacity-30">🏷️</div>
         )}
-        {/* Badges */}
-        <div className="absolute top-2 right-2 flex flex-col gap-1.5">
-          <span className="bg-yellow-500 text-black text-[10px] font-black px-2 py-0.5 rounded-full shadow">
+        {/* Top badges */}
+        <div className="absolute top-2 right-2 flex flex-col gap-1">
+          <span className="bg-yellow-500 text-black text-[9px] font-black px-2 py-0.5 rounded-full shadow">
             🔨 مزاد
           </span>
-          <span className="bg-gray-800/90 text-yellow-300 text-[10px] font-bold px-2 py-0.5 rounded-full border border-yellow-900/50">
+          <span className="bg-gray-900/90 text-yellow-300 text-[9px] font-bold px-2 py-0.5 rounded-full border border-yellow-900/50">
             {subLabel}
           </span>
         </div>
-        {remaining && (
-          <div className={`absolute bottom-2 left-2 flex items-center gap-1 text-[10px] font-bold px-2 py-1 rounded-full ${
-            remaining === 'انتهى المزاد' ? 'bg-red-800/90 text-red-200' :
-            remaining === 'آخر يوم!' ? 'bg-red-600/90 text-white animate-pulse' :
-            'bg-gray-800/90 text-yellow-300 border border-yellow-900/50'
-          }`}>
-            <Clock className="w-3 h-3" /> {remaining}
+        {/* Bid count badge */}
+        {bidCount > 0 && (
+          <div className="absolute top-2 left-2 bg-yellow-500/90 text-black text-[9px] font-black px-2 py-0.5 rounded-full">
+            {bidCount} سومة
           </div>
         )}
       </div>
 
-      <div className="p-4 flex flex-col flex-1 gap-2">
+      {/* Countdown bar */}
+      {ad.auctionEndDate && (
+        <div className={`px-3 py-2 flex items-center justify-center gap-2 border-b ${
+          isEnded
+            ? 'bg-red-900/30 border-red-900/30'
+            : countdown && countdown.days === 0 && countdown.hours < 6
+            ? 'bg-red-900/20 border-red-900/20 animate-pulse'
+            : 'bg-yellow-900/20 border-yellow-900/20'
+        }`}>
+          <Clock className={`w-3 h-3 shrink-0 ${isEnded ? 'text-red-400' : 'text-yellow-400'}`} />
+          {isEnded ? (
+            <span className="text-red-400 text-xs font-black">انتهى المزاد</span>
+          ) : countdown ? (
+            <div className="flex items-center gap-1 text-xs font-black">
+              {[
+                { v: countdown.days,    l: 'يوم' },
+                { v: countdown.hours,   l: 'سا' },
+                { v: countdown.minutes, l: 'دق' },
+                { v: countdown.seconds, l: 'ث' },
+              ].map((u, i) => (
+                <span key={i} className="flex items-baseline gap-0.5">
+                  <span className="text-yellow-300">{pad(u.v)}</span>
+                  <span className="text-[9px] text-gray-500">{u.l}</span>
+                  {i < 3 && <span className="text-gray-600 mx-0.5">:</span>}
+                </span>
+              ))}
+            </div>
+          ) : null}
+        </div>
+      )}
+
+      <div className="p-3 flex flex-col flex-1 gap-2">
         <h3 className="font-black text-gray-100 text-sm leading-tight line-clamp-2">{ad.title || 'عنصر للمزاد'}</h3>
 
         {ad.auctionCondition && (
-          <span className="inline-flex items-center gap-1 text-xs text-gray-400 bg-gray-800 border border-gray-700 px-2 py-1 rounded-lg w-fit">
-            <Tag className="w-3 h-3" /> {ad.auctionCondition}
+          <span className="inline-flex items-center gap-1 text-[10px] text-gray-400 bg-gray-800 border border-gray-700 px-2 py-0.5 rounded-lg w-fit">
+            <Tag className="w-2.5 h-2.5" /> {ad.auctionCondition}
           </span>
         )}
 
-        {ad.desc && <p className="text-xs text-gray-500 line-clamp-2">{ad.desc}</p>}
-
-        <div className="mt-auto pt-2 border-t border-gray-800 flex items-center justify-between">
-          <div>
-            <div className="text-[10px] text-gray-500 mb-0.5">سعر البداية</div>
-            <div className="text-lg font-black text-yellow-400">
-              {ad.auctionStartPrice ? `${Number(ad.auctionStartPrice).toLocaleString()} AED` : 'يُحدَّد لاحقاً'}
+        {/* Price section */}
+        <div className="mt-auto pt-2 border-t border-gray-800">
+          <div className="flex items-end justify-between">
+            <div>
+              <div className="text-[9px] text-gray-600 mb-0.5 flex items-center gap-1">
+                <TrendingUp className="w-2.5 h-2.5" />
+                {bidCount > 0 ? 'أعلى سومة' : 'سعر البداية'}
+              </div>
+              <div className={`text-base font-black ${bidCount > 0 ? 'text-yellow-400' : 'text-gray-400'}`}>
+                {highestBid.toLocaleString()}
+                <span className="text-[10px] text-gray-500 font-normal mr-1">AED</span>
+              </div>
             </div>
+            {ad.location && (
+              <div className="flex items-center gap-1 text-[9px] text-gray-600 max-w-[45%]">
+                <MapPin className="w-2.5 h-2.5 shrink-0" />
+                <span className="truncate">{ad.location}</span>
+              </div>
+            )}
           </div>
-          {ad.location && (
-            <div className="flex items-center gap-1 text-[10px] text-gray-500 max-w-[40%] text-left">
-              <MapPin className="w-3 h-3 shrink-0" />
-              <span className="truncate">{ad.location}</span>
-            </div>
-          )}
         </div>
 
-        {/* Buttons */}
+        {/* Bid button */}
+        <button
+          onClick={onBid}
+          disabled={isEnded}
+          className={`w-full py-2.5 font-black text-sm rounded-xl transition-all flex items-center justify-center gap-2 ${
+            isEnded
+              ? 'bg-gray-800 text-gray-500 cursor-not-allowed'
+              : 'bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-400 hover:to-orange-400 text-black shadow-lg shadow-yellow-500/20'
+          }`}
+        >
+          <Gavel className="w-4 h-4" />
+          {isEnded ? 'انتهى المزاد' : 'زايد الآن'}
+        </button>
+
+        {/* Contact fallback */}
         {ad.phone && (
-          <div className="flex gap-2 mt-1">
+          <div className="flex gap-1.5">
             <a href={`https://wa.me/${ad.phone.replace(/\D/g, '')}`} target="_blank" rel="noopener noreferrer"
-              className="flex-1 py-2 bg-green-500 hover:bg-green-600 text-white text-xs font-bold rounded-xl text-center transition">
+              className="flex-1 py-1.5 bg-green-600/20 hover:bg-green-600/30 text-green-400 text-[10px] font-bold rounded-xl text-center transition border border-green-600/20">
               واتساب
             </a>
             <a href={`tel:${ad.phone}`}
-              className="flex items-center gap-1 px-3 py-2 border-2 border-gray-700 hover:bg-gray-800 text-xs font-semibold rounded-xl transition text-gray-300">
-              <Phone className="w-3.5 h-3.5" />
+              className="flex items-center gap-1 px-3 py-1.5 border border-gray-700 hover:bg-gray-800 text-[10px] font-semibold rounded-xl transition text-gray-400">
+              <Phone className="w-3 h-3" />
             </a>
           </div>
         )}
 
-        <div className="text-[10px] text-gray-600 text-center">
+        <div className="text-[9px] text-gray-700 text-center">
           {ad.name} • {new Date(ad.createdAt).toLocaleDateString('ar-AE')}
         </div>
       </div>
@@ -121,6 +203,7 @@ export default function Auctions() {
 
   const [ads, setAds] = useState<FirestoreAd[]>([]);
   const [showModal, setShowModal] = useState(false);
+  const [selectedAuction, setSelectedAuction] = useState<FirestoreAd | null>(null);
   const [search, setSearch] = useState('');
   const [activeSubCat, setActiveSubCat] = useState('all');
 
@@ -257,7 +340,16 @@ export default function Auctions() {
         {/* Grid */}
         {filtered.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
-            {filtered.map(ad => <AuctionCard key={ad.id} ad={ad} />)}
+            {filtered.map(ad => (
+              <AuctionCard
+                key={ad.id}
+                ad={ad}
+                onBid={() => {
+                  if (!user) { navigate('/login'); return; }
+                  setSelectedAuction(ad);
+                }}
+              />
+            ))}
           </div>
         ) : (
           <div className="text-center py-20">
@@ -298,6 +390,13 @@ export default function Auctions() {
         <PostAuctionModal
           onClose={() => setShowModal(false)}
           onSuccess={() => setShowModal(false)}
+        />
+      )}
+
+      {selectedAuction && (
+        <AuctionBidModal
+          auction={selectedAuction}
+          onClose={() => setSelectedAuction(null)}
         />
       )}
     </div>
