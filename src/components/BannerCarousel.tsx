@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { ChevronLeft, ChevronRight, ExternalLink } from 'lucide-react';
-import { getActiveBannerAds, type BannerAd } from '../utils/bannerStore';
+import { getActiveBannerAds, type BannerAd } from '../utils/cloudBannerStore';
 
 // Extract YouTube video ID from any YouTube URL
 function getYoutubeId(url: string): string | null {
@@ -23,14 +23,18 @@ export default function BannerCarousel() {
   const [paused, setPaused]   = useState(false);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const reload = useCallback(() => {
-    const fresh = getActiveBannerAds();
-    setAds(prev => {
-      if (JSON.stringify(prev.map(a => a.id)) !== JSON.stringify(fresh.map(a => a.id))) {
-        setCurrent(0);
-      }
-      return fresh;
-    });
+  const reload = useCallback(async () => {
+    try {
+      const fresh = await getActiveBannerAds();
+      setAds(prev => {
+        if (JSON.stringify(prev.map(a => a.id)) !== JSON.stringify(fresh.map(a => a.id))) {
+          setCurrent(0);
+        }
+        return fresh;
+      });
+    } catch (error) {
+      console.error('Failed to load banners:', error);
+    }
   }, []);
 
   useEffect(() => {

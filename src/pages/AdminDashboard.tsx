@@ -9,9 +9,9 @@ import {
   Pencil, ToggleLeft, ToggleRight, Video, Type,
 } from 'lucide-react';
 import {
-  getBannerAds, addBannerAd, updateBannerAd, deleteBannerAd,
+  getBannerAds, addBannerAd, updateBannerAd, deleteBannerAd, generateBannersDownload,
   type BannerAd,
-} from '../utils/bannerStore';
+} from '../utils/cloudBannerStore';
 import { useAuth } from '../context/AuthContext';
 import { useApplications } from '../context/ApplicationsContext';
 import { mockJobs } from '../data/mockData';
@@ -131,7 +131,9 @@ export default function AdminDashboard() {
     setUsersDB(getUsersDB());
     setAnalytics(getAnalytics());
     setAdsData(getAllAdsAdmin());
-    setBannerAds(getBannerAds());
+    
+    // Load banners async
+    getBannerAds().then(setBannerAds).catch(console.error);
   }, [refreshKey]);
 
   const openBannerForm = (b?: BannerAd) => {
@@ -179,25 +181,40 @@ export default function AdminDashboard() {
     reader.readAsDataURL(file);
   };
 
-  const saveBanner = () => {
+  const saveBanner = async () => {
     if (!bannerForm.title.trim() || !bannerForm.endDate) return;
-    if (editingBanner) {
-      updateBannerAd(editingBanner.id, { ...bannerForm });
-    } else {
-      addBannerAd({ ...bannerForm });
+    try {
+      if (editingBanner) {
+        await updateBannerAd(editingBanner.id, { ...bannerForm });
+      } else {
+        await addBannerAd({ ...bannerForm });
+      }
+      const updated = await getBannerAds();
+      setBannerAds(updated);
+      setShowBannerForm(false);
+    } catch (error) {
+      console.error('Failed to save banner:', error);
     }
-    setBannerAds(getBannerAds());
-    setShowBannerForm(false);
   };
 
-  const toggleBannerActive = (id: string, active: boolean) => {
-    updateBannerAd(id, { active });
-    setBannerAds(getBannerAds());
+  const toggleBannerActive = async (id: string, active: boolean) => {
+    try {
+      await updateBannerAd(id, { active });
+      const updated = await getBannerAds();
+      setBannerAds(updated);
+    } catch (error) {
+      console.error('Failed to toggle banner:', error);
+    }
   };
 
-  const handleDeleteBanner = (id: string) => {
-    deleteBannerAd(id);
-    setBannerAds(getBannerAds());
+  const handleDeleteBanner = async (id: string) => {
+    try {
+      await deleteBannerAd(id);
+      const updated = await getBannerAds();
+      setBannerAds(updated);
+    } catch (error) {
+      console.error('Failed to delete banner:', error);
+    }
   };
 
   if (!user || user.role !== 'admin') {
@@ -1031,11 +1048,23 @@ export default function AdminDashboard() {
                 <div>
                   <h2 className="text-lg font-bold text-white">إعلانات الصفحة الرئيسية</h2>
                   <p className="text-xs text-gray-500 mt-0.5">تظهر كشريط متحرك أعلى الصفحة الرئيسية</p>
+                  <div className="mt-2 p-2 bg-yellow-900/20 border border-yellow-700/30 rounded-lg">
+                    <p className="text-xs text-yellow-300">
+                      💡 <strong>ملاحظة:</strong> بعد إضافة الإعلانات، اضغط "تحميل JSON" وارفع الملف في مجلد public/banners.json لتظهر لجميع الزوار
+                    </p>
+                  </div>
                 </div>
-                <button onClick={() => openBannerForm()}
-                  className="flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-500 text-white text-sm font-bold rounded-xl transition-all">
-                  <Plus className="w-4 h-4" /> إضافة إعلان
-                </button>
+                <div className="flex gap-2">
+                  <button onClick={generateBannersDownload}
+                    title="تحميل ملف JSON لرفعه على السيرفر"
+                    className="flex items-center gap-2 px-3 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-semibold transition-all">
+                    📥 تحميل JSON
+                  </button>
+                  <button onClick={() => openBannerForm()}
+                    className="flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-500 text-white text-sm font-bold rounded-xl transition-all">
+                    <Plus className="w-4 h-4" /> إضافة إعلان
+                  </button>
+                </div>
               </div>
 
               {/* Form */}
