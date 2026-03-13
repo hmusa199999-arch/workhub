@@ -90,7 +90,7 @@ export default function Home() {
           </div>
 
           {/* ── Admin Banner Carousel (visible to all) ── */}
-          <div className="w-full max-w-4xl mx-auto mb-8 rounded-2xl overflow-hidden shadow-2xl shadow-red-900/30">
+          <div className="w-full max-w-4xl mx-auto mb-8 rounded-2xl overflow-hidden border border-red-700/40 shadow-2xl shadow-red-500/20">
             <BannerCarousel />
           </div>
 

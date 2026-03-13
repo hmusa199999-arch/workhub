@@ -50,14 +50,14 @@ export default function BannerCarousel() {
     return (
       <div
         className="relative w-full overflow-hidden flex items-center justify-center"
-        style={{ height: '260px', background: 'linear-gradient(135deg, #1a0505 0%, #2d0a0a 50%, #1a0505 100%)' }}
+        style={{ height: '260px', background: 'linear-gradient(135deg, #1c0202 0%, #2d0707 50%, #1c0202 100%)' }}
       >
-        <div className="absolute inset-0 opacity-[0.04]"
+        <div className="absolute inset-0 opacity-[0.06]"
           style={{ backgroundImage: 'linear-gradient(#dc2626 1px, transparent 1px), linear-gradient(90deg, #dc2626 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
         <div className="relative text-center px-6">
           <div className="text-5xl mb-3">📢</div>
-          <p className="text-red-400/70 font-bold text-lg">مساحة إعلانية</p>
-          <p className="text-gray-600 text-sm mt-1">تُدار من لوحة تحكم الأدمن</p>
+          <p className="text-red-400 font-bold text-xl">مساحة إعلانية</p>
+          <p className="text-gray-500 text-sm mt-2">تُضاف من لوحة الأدمن ← إعلانات الصفحة</p>
         </div>
       </div>
     );
@@ -86,16 +86,19 @@ export default function BannerCarousel() {
         />
       );
     }
-    // text / color banner
+    // text / color banner — use strong gradient so it's visible
     return (
       <div
         className="absolute inset-0"
-        style={{ background: ad.bgColor
-          ? ad.bgColor
-          : 'linear-gradient(135deg, #7f1d1d, #450a0a)' }}
+        style={{
+          background: `linear-gradient(135deg, ${ad.bgColor || '#b91c1c'} 0%, #1a0202 100%)`,
+        }}
       />
     );
   };
+
+  // only apply dark overlay for image/video to keep text readable
+  const needsOverlay = ad.type === 'image' || ad.type === 'video';
 
   return (
     <div
@@ -107,18 +110,19 @@ export default function BannerCarousel() {
       {/* Media */}
       {renderMedia()}
 
-      {/* Dark overlay */}
-      <div className="absolute inset-0 bg-black/45" />
+      {/* Dark overlay — only for image/video */}
+      {needsOverlay && <div className="absolute inset-0 bg-black/45" />}
 
       {/* Text content */}
       <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-8 z-10">
         {ad.title && (
-          <h2 className="text-white font-black text-xl md:text-3xl drop-shadow-lg mb-1 max-w-3xl leading-snug">
+          <h2 className="text-white font-black text-2xl md:text-4xl drop-shadow-2xl mb-2 max-w-3xl leading-snug"
+            style={{ textShadow: '0 2px 20px rgba(0,0,0,0.8)' }}>
             {ad.title}
           </h2>
         )}
         {ad.subtitle && (
-          <p className="text-white/80 text-sm md:text-base drop-shadow mt-1 max-w-xl">
+          <p className="text-white/90 text-base md:text-lg drop-shadow mt-1 max-w-xl font-medium">
             {ad.subtitle}
           </p>
         )}
