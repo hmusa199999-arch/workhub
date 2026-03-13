@@ -902,11 +902,12 @@ export default function AdminDashboard() {
                 <select value={adsCatFilter} onChange={e => setAdsCatFilter(e.target.value as typeof adsCatFilter)}
                   className="px-3 py-2 bg-gray-900 border border-gray-700 rounded-xl text-sm text-white focus:outline-none">
                   <option value="all">كل الفئات</option>
-                  <option value="car">سيارات</option>
-                  <option value="realestate">عقارات</option>
-                  <option value="service">خدمات</option>
-                  <option value="plate">أرقام سيارات</option>
-                  <option value="job_seeker">باحثو العمل</option>
+                  <option value="car">🚗 سيارات</option>
+                  <option value="realestate">🏡 عقارات</option>
+                  <option value="service">🛠️ خدمات</option>
+                  <option value="plate">🚘 أرقام سيارات</option>
+                  <option value="job_seeker">👤 باحثو العمل</option>
+                  <option value="auction">🔨 مزادات</option>
                 </select>
               </div>
 
@@ -957,6 +958,12 @@ export default function AdminDashboard() {
                               <div><span className="text-gray-500">السعر:</span><p className="text-amber-400 font-bold">{ad.price.toLocaleString()} AED</p></div>
                             )}
                             <div><span className="text-gray-500">التاريخ:</span><p className="text-gray-300">{new Date(ad.createdAt).toLocaleDateString('ar-AE')}</p></div>
+                            {ad.category === 'auction' && (ad as any).auctionSubCat && (
+                              <div><span className="text-gray-500">فئة المزاد:</span><p className="text-yellow-400 font-bold">{(ad as any).auctionSubCat}</p></div>
+                            )}
+                            {ad.category === 'auction' && (ad as any).auctionEndDate && (
+                              <div><span className="text-gray-500">انتهاء المزاد:</span><p className="text-orange-400">{(ad as any).auctionEndDate}</p></div>
+                            )}
                           </div>
 
                           {ad.desc && (

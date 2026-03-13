@@ -4,7 +4,7 @@ export type AdStatus = 'pending' | 'approved' | 'rejected';
 
 export interface StoredAd {
   id: string;
-  category: 'car' | 'realestate' | 'service' | 'plate' | 'job_seeker';
+  category: 'car' | 'realestate' | 'service' | 'plate' | 'job_seeker' | 'auction';
   // offer = إعلان عرض، request = طلب شخصي
   intent?: 'offer' | 'request';
   status: AdStatus;
@@ -46,6 +46,12 @@ export interface StoredAd {
   jsType?: string;        // نوع الدوام
   jsNationality?: string; // الجنسية
   jsCv?: string;          // base64 صورة السيرة الذاتية
+  // auction
+  auctionSubCat?: string;
+  auctionStartPrice?: number;
+  auctionCondition?: string;
+  auctionEndDate?: string;
+  title?: string;
   // shared
   location?: string;
 }
@@ -115,6 +121,7 @@ export function getAdLabel(ad: StoredAd): string {
   if (ad.category === 'service') return ad.svcTitle || 'خدمة';
   if (ad.category === 'plate') return `رقم ${ad.plateNum || ''}${ad.plateCode ? ` / ${ad.plateCode}` : ''}`;
   if (ad.category === 'job_seeker') return ad.jsTitle || 'باحث عن عمل';
+  if (ad.category === 'auction') return (ad as any).title || 'مزاد';
   return 'إعلان';
 }
 
@@ -125,6 +132,7 @@ export function getCategoryLabel(cat: StoredAd['category']): string {
     service: '🛠️ خدمة',
     plate: '🚘 رقم سيارة',
     job_seeker: '👤 باحث عمل',
+    auction: '🔨 مزاد',
   };
   return map[cat];
 }

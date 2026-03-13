@@ -18,6 +18,7 @@ export default function Navbar() {
     { to: '/real-estate', label: t('عقارات', 'Real Estate'),  icon: '🏡' },
     { to: '/services',    label: t('خدمات', 'Services'),      icon: '🛠️' },
     { to: '/car-plates',  label: t('أرقام', 'Plates'),        icon: '🚘' },
+    { to: '/auctions',    label: t('مزادات', 'Auctions'),     icon: '🔨' },
   ];
 
   const handleLogout = () => {

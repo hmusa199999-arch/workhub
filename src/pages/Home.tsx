@@ -25,11 +25,12 @@ export default function Home() {
 
   // Live counts per category
   const liveCounts = {
-    jobs:      liveAds.filter(a => a.category !== 'car' && a.category !== 'realestate' && a.category !== 'service' && a.category !== 'plate' && a.category !== 'job_seeker').length,
+    jobs:      liveAds.filter(a => a.category !== 'car' && a.category !== 'realestate' && a.category !== 'service' && a.category !== 'plate' && a.category !== 'job_seeker' && a.category !== 'auction').length,
     cars:      liveAds.filter(a => a.category === 'car').length,
     realestate:liveAds.filter(a => a.category === 'realestate').length,
     services:  liveAds.filter(a => a.category === 'service').length,
     plates:    liveAds.filter(a => a.category === 'plate').length,
+    auctions:  liveAds.filter(a => a.category === 'auction').length,
   };
 
   // Animated counter for hero
@@ -54,11 +55,12 @@ export default function Home() {
   };
 
   const categories = [
-    { to: '/jobs',        icon: '💼', label: 'وظائف',        liveCount: mockJobs.length + liveCounts.jobs,      glow: 'hover:shadow-red-500/20'  },
+    { to: '/jobs',        icon: '💼', label: 'وظائف',        liveCount: mockJobs.length + liveCounts.jobs,      glow: 'hover:shadow-red-500/20'    },
     { to: '/cars',        icon: '🚗', label: 'سيارات',       liveCount: liveCounts.cars,                        glow: 'hover:shadow-orange-500/20' },
-    { to: '/real-estate', icon: '🏡', label: 'عقارات',       liveCount: liveCounts.realestate,                  glow: 'hover:shadow-emerald-500/20' },
-    { to: '/services',    icon: '🛠️', label: 'خدمات',        liveCount: liveCounts.services,                    glow: 'hover:shadow-rose-500/20'  },
-    { to: '/car-plates',  icon: '🚘', label: 'أرقام سيارات', liveCount: liveCounts.plates,                      glow: 'hover:shadow-amber-500/20' },
+    { to: '/real-estate', icon: '🏡', label: 'عقارات',       liveCount: liveCounts.realestate,                  glow: 'hover:shadow-emerald-500/20'},
+    { to: '/services',    icon: '🛠️', label: 'خدمات',        liveCount: liveCounts.services,                    glow: 'hover:shadow-rose-500/20'   },
+    { to: '/car-plates',  icon: '🚘', label: 'أرقام سيارات', liveCount: liveCounts.plates,                      glow: 'hover:shadow-amber-500/20'  },
+    { to: '/auctions',    icon: '🔨', label: 'مزادات',       liveCount: liveCounts.auctions,                    glow: 'hover:shadow-yellow-500/20' },
   ];
 
   const features = [

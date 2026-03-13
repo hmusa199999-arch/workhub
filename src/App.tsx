@@ -23,6 +23,7 @@ import CarPlates from './pages/CarPlates';
 import About from './pages/About';
 import Privacy from './pages/Privacy';
 import Terms from './pages/Terms';
+import Auctions from './pages/Auctions';
 import IntroSplash from './components/IntroSplash';
 import { trackPageView, seedVisitsIfEmpty } from './utils/analytics';
 
@@ -95,6 +96,7 @@ export default function App() {
             <Route path="/about" element={<Layout><About /></Layout>} />
             <Route path="/privacy" element={<Layout><Privacy /></Layout>} />
             <Route path="/terms" element={<Layout><Terms /></Layout>} />
+            <Route path="/auctions" element={<Layout><Auctions /></Layout>} />
           </Routes>
         </BrowserRouter>
       </ApplicationsProvider>
