@@ -25,7 +25,7 @@ function Field({ label, children, required }: { label: string; children: React.R
   );
 }
 
-const inputCls = 'w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-red-500 text-sm bg-white';
+const inputCls = 'w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-red-500 text-sm bg-white text-gray-900 placeholder-gray-400';
 const selectCls = `${inputCls} cursor-pointer`;
 
 const MAX_IMAGES = 8;

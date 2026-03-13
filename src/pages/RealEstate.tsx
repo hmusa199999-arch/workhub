@@ -10,8 +10,19 @@ import { useAuth } from '../context/AuthContext';
 const mockProperties: any[] = [];
 
 const propTypes = ['الكل', 'شقة', 'فيلا', 'استوديو', 'مكتب', 'أرض', 'بنتهاوس'];
-const UAE_EMIRATES = ['كل الإمارات', 'دبي', 'أبوظبي', 'الشارقة', 'عجمان', 'أم القيوين', 'رأس الخيمة', 'الفجيرة'];
 const purposeOptions = ['الكل', 'للإيجار', 'للبيع'];
+
+const EMIRATE_CARDS = [
+  { id: '', label: 'الكل', emoji: '🇦🇪' },
+  { id: 'دبي', label: 'دبي', emoji: '🏙️' },
+  { id: 'أبوظبي', label: 'أبوظبي', emoji: '🕌' },
+  { id: 'الشارقة', label: 'الشارقة', emoji: '🌆' },
+  { id: 'عجمان', label: 'عجمان', emoji: '🏘️' },
+  { id: 'أم القيوين', label: 'أم القيوين', emoji: '🌊' },
+  { id: 'رأس الخيمة', label: 'رأس الخيمة', emoji: '⛰️' },
+  { id: 'الفجيرة', label: 'الفجيرة', emoji: '🌊' },
+  { id: 'العين', label: 'العين', emoji: '🌴' },
+];
 
 function UserPropCard({ ad }: { ad: StoredAd }) {
   const img = ad.images?.[0];
@@ -53,7 +64,7 @@ export default function RealEstate() {
   const [showModal, setShowModal] = useState(false);
   const [userAds, setUserAds] = useState<StoredAd[]>([]);
   const [search, setSearch] = useState('');
-  const [emirate, setEmirate] = useState('كل الإمارات');
+  const [emirate, setEmirate] = useState('');
   const [propType, setPropType] = useState('الكل');
   const [purpose, setPurpose] = useState('الكل');
 
@@ -66,7 +77,7 @@ export default function RealEstate() {
   }, []);
 
   const filteredMock = mockProperties.filter(p => {
-    const matchEmirate = emirate === 'كل الإمارات' || p.location === emirate;
+    const matchEmirate = !emirate || p.location === emirate;
     const matchType = propType === 'الكل' || p.type === propType;
     const matchPurpose = purpose === 'الكل' || (purpose === 'للإيجار' ? p.forRent : !p.forRent);
     const matchSearch = !search || p.title.includes(search) || p.location.includes(search);
@@ -74,7 +85,7 @@ export default function RealEstate() {
   });
 
   const filteredUser = userAds.filter(p => {
-    const matchEmirate = emirate === 'كل الإمارات' || p.location === emirate;
+    const matchEmirate = !emirate || (p.location || '').includes(emirate);
     const matchType = propType === 'الكل' || p.reType === propType;
     const matchPurpose = purpose === 'الكل' || p.rePurpose === purpose;
     const matchSearch = !search || (p.reTitle || '').includes(search) || (p.location || '').includes(search);
@@ -125,13 +136,6 @@ export default function RealEstate() {
             />
           </div>
           <select
-            value={emirate}
-            onChange={e => setEmirate(e.target.value)}
-            className="px-3 py-2.5 rounded-xl bg-gray-800 border border-gray-700 text-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-red-500"
-          >
-            {UAE_EMIRATES.map(em => <option key={em}>{em}</option>)}
-          </select>
-          <select
             value={propType}
             onChange={e => setPropType(e.target.value)}
             className="px-3 py-2.5 rounded-xl bg-gray-800 border border-gray-700 text-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-red-500"
@@ -146,6 +150,28 @@ export default function RealEstate() {
                 className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${purpose === p ? 'bg-red-600 text-white shadow-sm' : 'text-gray-400 hover:text-white'}`}
               >
                 {p}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Emirate Cards */}
+      <div className="bg-gray-900/60 border-b border-red-900/20 px-4 py-6">
+        <div className="max-w-6xl mx-auto">
+          <h2 className="text-sm font-black text-gray-400 mb-4 tracking-wide">تصفح حسب الإمارة</h2>
+          <div className="grid grid-cols-3 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-9 gap-3">
+            {EMIRATE_CARDS.map(em => (
+              <button
+                key={em.id}
+                onClick={() => setEmirate(em.id)}
+                className={`flex flex-col items-center justify-center gap-2 p-4 rounded-2xl border-2 transition-all duration-200 hover:scale-105 group
+                  ${emirate === em.id
+                    ? 'bg-gradient-to-br from-red-600 to-red-800 border-red-500 text-white shadow-lg shadow-red-500/30'
+                    : 'bg-gray-800/80 border-gray-700 text-gray-400 hover:border-red-500/50 hover:bg-gray-800'}`}
+              >
+                <span className="text-2xl">{em.emoji}</span>
+                <span className="text-xs font-black leading-tight text-center">{em.label}</span>
               </button>
             ))}
           </div>
