@@ -86,7 +86,8 @@ export async function saveAd(ad: Record<string, any>): Promise<string> {
   const { id: _id, ...adWithoutId } = ad;
   const adData = {
     ...adWithoutId,
-    status: 'approved',
+    // Respect the status passed in — auctions use 'pending', others use 'approved'
+    status: adWithoutId.status || 'approved',
     createdAt: adWithoutId.createdAt || new Date().toISOString(),
   };
   const docRef = await addDoc(collection(db, ADS_COLLECTION), adData);
