@@ -26,7 +26,7 @@ import {
   getAllAdsAdmin, updateAdStatus, deleteAd, getAdLabel, getCategoryLabel,
   type StoredAd,
 } from '../utils/adsStore';
-import { subscribeToAds, updateAdStatus as updateAdStatusCloud, deleteAd as deleteAdCloud, type FirestoreAd } from '../utils/firestoreAds';
+import { subscribeToAds, updateAdStatus as updateAdStatusCloud, deleteAd as deleteAdCloud, saveAd as saveAdCloud, type FirestoreAd } from '../utils/firestoreAds';
 import type { ApplicationStatus } from '../types';
 
 // ─── Sidebar Tabs ───────────────────────────────────────────────────────
@@ -276,10 +276,26 @@ export default function AdminDashboard() {
     setUsersDB(updated);
   };
 
-  const handleAdStatus = (id: string, status: StoredAd['status']) => {
+  const handleAdStatus = async (id: string, status: StoredAd['status']) => {
+    // Update in localStorage first
     updateAdStatus(id, status);
-    updateAdStatusCloud(id, status as 'approved' | 'rejected').catch(console.error);
     setAdsData(getAllAdsAdmin());
+
+    // Try to update in Firebase
+    try {
+      await updateAdStatusCloud(id, status as 'approved' | 'rejected');
+    } catch {
+      // If doc doesn't exist in Firebase yet, save the full ad then update status
+      const localAd = getAllAdsAdmin().find(a => a.id === id);
+      if (localAd) {
+        try {
+          await saveAdCloud({ ...localAd, status });
+          console.log('Ad saved to Firebase:', id);
+        } catch (err) {
+          console.error('Failed to save ad to Firebase:', err);
+        }
+      }
+    }
   };
 
   const handleDeleteAd = (id: string) => {
@@ -807,6 +823,28 @@ export default function AdminDashboard() {
                     <p className="font-bold text-red-400">{pendingAds.length} إعلان بانتظار موافقتك</p>
                     <p className="text-xs text-red-400/70 mt-0.5">راجع الإعلانات واعتمدها أو ارفضها قبل نشرها للعموم</p>
                   </div>
+                </div>
+              )}
+
+              {/* Sync old local ads to Firebase */}
+              {getAllAdsAdmin().length > 0 && (
+                <div className="p-3 bg-blue-900/20 border border-blue-700/30 rounded-xl flex items-center justify-between gap-3">
+                  <div>
+                    <p className="text-xs text-blue-300 font-bold">⬆️ إعلانات محلية غير محمّلة لـ Firebase</p>
+                    <p className="text-xs text-gray-500 mt-0.5">انشرها للجميع بضغطة واحدة</p>
+                  </div>
+                  <button
+                    onClick={async () => {
+                      const localAds = getAllAdsAdmin();
+                      let count = 0;
+                      for (const ad of localAds) {
+                        try { await saveAdCloud({ ...ad }); count++; } catch { /* skip */ }
+                      }
+                      alert(`✅ تم رفع ${count} إعلان إلى Firebase`);
+                    }}
+                    className="shrink-0 px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold rounded-xl transition-all">
+                    رفع الكل
+                  </button>
                 </div>
               )}
 
