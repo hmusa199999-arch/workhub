@@ -9,9 +9,9 @@ import {
   Pencil, ToggleLeft, ToggleRight, Video, Type,
 } from 'lucide-react';
 import {
-  getBannerAds, addBannerAd, updateBannerAd, deleteBannerAd, exportBannersForUpload, autoUploadBanners,
+  getAllBanners as getBannerAds, addBanner as addBannerAd, updateBanner as updateBannerAd, deleteBanner as deleteBannerAd,
   type BannerAd,
-} from '../utils/simpleBannerStore';
+} from '../utils/directBannerStore';
 import { useAuth } from '../context/AuthContext';
 import { useApplications } from '../context/ApplicationsContext';
 import { mockJobs } from '../data/mockData';
@@ -131,9 +131,7 @@ export default function AdminDashboard() {
     setUsersDB(getUsersDB());
     setAnalytics(getAnalytics());
     setAdsData(getAllAdsAdmin());
-    
-    // Load banners async
-    getBannerAds().then(setBannerAds).catch(console.error);
+    setBannerAds(getBannerAds());
   }, [refreshKey]);
 
   const openBannerForm = (b?: BannerAd) => {
@@ -181,51 +179,32 @@ export default function AdminDashboard() {
     reader.readAsDataURL(file);
   };
 
-  const saveBanner = async () => {
+  const saveBanner = () => {
     if (!bannerForm.title.trim() || !bannerForm.endDate) return;
-    try {
-      if (editingBanner) {
-        updateBannerAd(editingBanner.id, { ...bannerForm });
-      } else {
-        addBannerAd({ ...bannerForm });
-      }
-      
-      // Try auto-upload first
-      const uploaded = await autoUploadBanners();
-      if (uploaded) {
-        alert('✅ تم حفظ الإعلان ونشره للجميع تلقائياً!');
-      } else {
-        alert('💾 تم حفظ الإعلان محلياً. اضغط "رفع للسيرفر" لنشره للجميع.');
-      }
-      
-      const updated = await getBannerAds();
-      setBannerAds(updated);
-      setShowBannerForm(false);
-    } catch (error) {
-      console.error('Failed to save banner:', error);
+    
+    if (editingBanner) {
+      updateBannerAd(editingBanner.id, { ...bannerForm });
+    } else {
+      addBannerAd({ ...bannerForm });
     }
+    
+    setBannerAds(getBannerAds());
+    setShowBannerForm(false);
+    
+    // Show success message
+    setTimeout(() => {
+      alert('✅ تم حفظ الإعلان! يظهر للجميع الآن مباشرة!');
+    }, 100);
   };
 
-  const toggleBannerActive = async (id: string, active: boolean) => {
-    try {
-      updateBannerAd(id, { active });
-      await autoUploadBanners();
-      const updated = await getBannerAds();
-      setBannerAds(updated);
-    } catch (error) {
-      console.error('Failed to toggle banner:', error);
-    }
+  const toggleBannerActive = (id: string, active: boolean) => {
+    updateBannerAd(id, { active });
+    setBannerAds(getBannerAds());
   };
 
-  const handleDeleteBanner = async (id: string) => {
-    try {
-      deleteBannerAd(id);
-      await autoUploadBanners();
-      const updated = await getBannerAds();
-      setBannerAds(updated);
-    } catch (error) {
-      console.error('Failed to delete banner:', error);
-    }
+  const handleDeleteBanner = (id: string) => {
+    deleteBannerAd(id);
+    setBannerAds(getBannerAds());
   };
 
   if (!user || user.role !== 'admin') {
@@ -1061,21 +1040,14 @@ export default function AdminDashboard() {
                   <p className="text-xs text-gray-500 mt-0.5">تظهر كشريط متحرك أعلى الصفحة الرئيسية</p>
                   <div className="mt-2 p-2 bg-green-900/20 border border-green-700/30 rounded-lg">
                     <p className="text-xs text-green-300">
-                      🚀 <strong>تلقائي:</strong> الإعلانات تحاول الرفع تلقائياً. إذا فشل، استخدم "رفع للسيرفر" وضع الملف في public/banners.json
+                      ⚡ <strong>مباشر:</strong> أي إعلان تضيفه هنا يظهر للجميع فوراً على جميع الأجهزة!
                     </p>
                   </div>
                 </div>
-                <div className="flex gap-2">
-                  <button onClick={exportBannersForUpload}
-                    title="تحميل ملف JSON لرفعه على السيرفر"
-                    className="flex items-center gap-2 px-3 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-semibold transition-all">
-                    📥 رفع للسيرفر
-                  </button>
-                  <button onClick={() => openBannerForm()}
-                    className="flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-500 text-white text-sm font-bold rounded-xl transition-all">
-                    <Plus className="w-4 h-4" /> إضافة إعلان
-                  </button>
-                </div>
+                <button onClick={() => openBannerForm()}
+                  className="flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-500 text-white text-sm font-bold rounded-xl transition-all">
+                  <Plus className="w-4 h-4" /> إضافة إعلان
+                </button>
               </div>
 
               {/* Form */}

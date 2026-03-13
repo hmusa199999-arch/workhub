@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Search, MapPin, TrendingUp, Shield, Clock, Star, ChevronLeft, Zap, Users, CheckCircle } from 'lucide-react';
 import JobCard from '../components/JobCard';
-import BannerCarousel from '../components/BannerCarousel';
+import DirectBannerCarousel from '../components/DirectBannerCarousel';
 import { mockJobs } from '../data/mockData';
 import { useAuth } from '../context/AuthContext';
 
@@ -91,7 +91,7 @@ export default function Home() {
 
           {/* ── Admin Banner Carousel (visible to all) ── */}
           <div className="w-full max-w-4xl mx-auto mb-8 rounded-2xl overflow-hidden border border-red-700/40 shadow-2xl shadow-red-500/20">
-            <BannerCarousel />
+            <DirectBannerCarousel />
           </div>
 
           {/* Main Headline */}
