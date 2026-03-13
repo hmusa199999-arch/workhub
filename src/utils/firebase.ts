@@ -1,21 +1,14 @@
 import { initializeApp, getApps } from 'firebase/app';
-import { getFirestore, enableNetwork, disableNetwork } from 'firebase/firestore';
+import { getFirestore } from 'firebase/firestore';
 
-// Firebase config - loaded from environment variables
 const firebaseConfig = {
-  apiKey:            import.meta.env.VITE_FIREBASE_API_KEY,
-  authDomain:        import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
-  projectId:         import.meta.env.VITE_FIREBASE_PROJECT_ID,
-  storageBucket:     import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-  appId:             import.meta.env.VITE_FIREBASE_APP_ID,
+  apiKey: "AIzaSyB7LLGwZ7GNeRMV0tDQW74ZGvEz9yXyJ0U",
+  authDomain: "work-9c5d0.firebaseapp.com",
+  projectId: "work-9c5d0",
+  storageBucket: "work-9c5d0.firebasestorage.app",
+  messagingSenderId: "1000902118491",
+  appId: "1:1000902118491:web:c6ff9bb8c4e3472f5cc37e",
 };
 
-// Prevent duplicate initialization
-const app = getApps().length === 0
-  ? initializeApp(firebaseConfig)
-  : getApps()[0];
-
+const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
 export const db = getFirestore(app);
-
-export { enableNetwork, disableNetwork };
