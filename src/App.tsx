@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { BrowserRouter, Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { ApplicationsProvider } from './context/ApplicationsContext';
@@ -19,6 +19,7 @@ import Cars from './pages/Cars';
 import RealEstate from './pages/RealEstate';
 import Services from './pages/Services';
 import CarPlates from './pages/CarPlates';
+import IntroSplash from './components/IntroSplash';
 import { trackPageView, seedVisitsIfEmpty } from './utils/analytics';
 
 function Layout({ children }: { children: React.ReactNode }) {
@@ -48,7 +49,21 @@ function PageTracker() {
 }
 
 export default function App() {
+  const [showIntro, setShowIntro] = useState(() => {
+    // Show intro if user hasn't seen it before
+    return !localStorage.getItem('work1m_intro_seen');
+  });
+
   useEffect(() => { seedVisitsIfEmpty(); }, []);
+
+  const handleIntroComplete = () => {
+    localStorage.setItem('work1m_intro_seen', 'true');
+    setShowIntro(false);
+  };
+
+  if (showIntro) {
+    return <IntroSplash onComplete={handleIntroComplete} />;
+  }
 
   return (
     <AuthProvider>
