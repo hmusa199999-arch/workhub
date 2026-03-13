@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { Menu, X, Bell, ChevronDown, LogOut, User, LayoutDashboard, Flame } from 'lucide-react';
+import { Menu, X, Bell, ChevronDown, LogOut, User, LayoutDashboard, Flame, Globe } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useLang } from '../context/LanguageContext';
 
 const mainLinks = [
   { to: '/jobs', label: 'وظائف', icon: '💼' },
@@ -15,6 +16,7 @@ export default function Navbar() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const { lang, setLang } = useLang();
   const [menuOpen, setMenuOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
 
@@ -121,6 +123,24 @@ export default function Navbar() {
                 </Link>
               </div>
             )}
+
+            {/* Language Toggle */}
+            <div className="flex items-center gap-0.5 p-1 bg-gray-900 border border-gray-700/60 rounded-xl">
+              <button
+                onClick={() => setLang('ar')}
+                className={`flex items-center gap-1 px-2 py-1 text-xs font-black rounded-lg transition-all ${lang === 'ar' ? 'bg-red-600 text-white shadow' : 'text-gray-500 hover:text-gray-300'}`}
+                title="العربية"
+              >
+                <Globe className="w-3 h-3" /> AR
+              </button>
+              <button
+                onClick={() => setLang('en')}
+                className={`flex items-center gap-1 px-2 py-1 text-xs font-black rounded-lg transition-all ${lang === 'en' ? 'bg-red-600 text-white shadow' : 'text-gray-500 hover:text-gray-300'}`}
+                title="English"
+              >
+                EN
+              </button>
+            </div>
 
             {/* Mobile Menu Toggle */}
             <button className="md:hidden p-2 text-gray-400 hover:text-white hover:bg-white/5 rounded-xl transition-colors" onClick={() => setMenuOpen(!menuOpen)}>

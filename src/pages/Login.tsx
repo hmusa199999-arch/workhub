@@ -1,20 +1,21 @@
 import { useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { Flame, Loader2, ShieldCheck, LockKeyhole, User as UserIcon } from 'lucide-react';
+import { Flame, Loader2, ShieldCheck, LockKeyhole, User as UserIcon, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useLang } from '../context/LanguageContext';
 
 export default function Login() {
   const { login } = useAuth();
   const navigate = useNavigate();
   const [params] = useSearchParams();
+  const { lang, setLang, t, isAr } = useLang();
 
   const [role, setRole] = useState<'seeker' | 'company'>(
     (params.get('role') as 'seeker' | 'company') || 'seeker'
   );
-
   const [username, setUsername]     = useState('');
   const [password, setPassword]     = useState('');
-  const [phone, setPhone]           = useState('');
+  const [showPass, setShowPass]     = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError]           = useState('');
 
@@ -24,172 +25,210 @@ export default function Login() {
     e.preventDefault();
     setError('');
     if (!username.trim() || !password) {
-      setError('أدخل اسم المستخدم وكلمة المرور');
+      setError(t('أدخل اسم المستخدم وكلمة المرور', 'Please enter username and password'));
       return;
     }
     setSubmitting(true);
     const ok = await login({ username, password });
     setSubmitting(false);
     if (!ok) {
-      setError('بيانات الدخول غير صحيحة');
+      setError(t('بيانات الدخول غير صحيحة', 'Invalid username or password'));
       return;
     }
-    if (isAdminCreds) {
-      navigate('/dashboard/admin');
-    } else {
-      navigate(role === 'seeker' ? '/dashboard/seeker' : '/dashboard/company');
-    }
+    if (isAdminCreds) navigate('/dashboard/admin');
+    else navigate(role === 'seeker' ? '/dashboard/seeker' : '/dashboard/company');
   };
 
   return (
-    <div className="min-h-[calc(100vh-64px)] bg-gray-950 flex items-center justify-center px-4 py-10 relative overflow-hidden">
-      {/* Animated background intro */}
+    <div
+      className="min-h-[calc(100vh-64px)] bg-gray-950 flex items-center justify-center px-3 py-8 relative overflow-hidden"
+      dir={isAr ? 'rtl' : 'ltr'}
+    >
+      {/* BG effects */}
       <div className="pointer-events-none absolute inset-0">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(248,113,113,0.12),_transparent_65%)] animate-pulse-slow" />
-        <div className="absolute -left-40 top-1/3 w-80 h-80 bg-red-600/10 blur-3xl rounded-full animate-float-slow" />
-        <div className="absolute -right-40 bottom-0 w-96 h-96 bg-red-900/40 blur-3xl rounded-full animate-float-slow delay-150" />
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[480px] h-px bg-gradient-to-l from-transparent via-red-500/60 to-transparent" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(220,38,38,0.10),_transparent_60%)]" />
+        <div className="absolute -left-32 top-1/3 w-72 h-72 bg-red-600/8 blur-3xl rounded-full" />
+        <div className="absolute -right-32 bottom-1/4 w-80 h-80 bg-red-900/20 blur-3xl rounded-full" />
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-lg h-px bg-gradient-to-r from-transparent via-red-500/50 to-transparent" />
       </div>
 
-      <div className="w-full max-w-5xl relative z-10 flex flex-col lg:flex-row items-stretch gap-10">
+      <div className="w-full max-w-md relative z-10">
 
-        {/* Intro panel */}
-        <div className="hidden lg:flex flex-1 flex-col justify-center text-right pr-4 animate-fade-in-up">
-          <Link to="/" className="inline-flex items-center gap-2 mb-6 self-start lg:self-end">
-            <div className="w-11 h-11 bg-gradient-to-br from-red-500 to-red-700 rounded-2xl flex items-center justify-center shadow-xl shadow-red-500/40">
-              <Flame className="w-6 h-6 text-white" />
-            </div>
-            <span className="text-2xl font-black text-white">
-              work<span className="text-red-400">1m</span>
-            </span>
-          </Link>
-          <h1 className="text-3xl xl:text-4xl font-black text-white mb-4 leading-snug">
-            بوابتك الذكية<br />للإعلانات والوظائف في العالم العربي
-          </h1>
-          <p className="text-gray-400 text-sm leading-relaxed mb-6 max-w-md self-start lg:self-end">
-            ادخل لوحة التحكم الخاصة بك كـ باحث أو شركة وابدأ بنشر الوظائف والإعلانات خلال ثوانٍ،
-            مع تجربة مبسّطة وسريعة بالكامل باللغة العربية.
-          </p>
-          <div className="flex flex-wrap justify-start lg:justify-end gap-3 text-xs">
-            <div className="px-3 py-2 rounded-xl bg-red-500/10 border border-red-500/30 text-red-200 font-semibold">
-              تسجيل مجاني 100%
-            </div>
-            <div className="px-3 py-2 rounded-xl bg-gray-900/70 border border-red-900/40 text-gray-300">
-              لوحة تحكم للباحثين والشركات
-            </div>
-            <div className="px-3 py-2 rounded-xl bg-gray-900/70 border border-red-900/40 text-gray-300">
-              إعلانات سيارات، عقار، خدمات، أرقام
-            </div>
+        {/* Language toggle */}
+        <div className="flex justify-end mb-4">
+          <div className="flex items-center gap-1 p-1 bg-gray-900 border border-gray-700 rounded-xl">
+            <button
+              onClick={() => setLang('ar')}
+              className={`px-3 py-1.5 text-xs font-black rounded-lg transition-all ${
+                lang === 'ar'
+                  ? 'bg-red-600 text-white shadow-md'
+                  : 'text-gray-500 hover:text-gray-300'
+              }`}
+            >
+              عربي
+            </button>
+            <button
+              onClick={() => setLang('en')}
+              className={`px-3 py-1.5 text-xs font-black rounded-lg transition-all ${
+                lang === 'en'
+                  ? 'bg-red-600 text-white shadow-md'
+                  : 'text-gray-500 hover:text-gray-300'
+              }`}
+            >
+              EN
+            </button>
           </div>
         </div>
 
-        {/* Login card */}
-        <div className="flex-1 max-w-lg mx-auto bg-gray-900/95 border border-red-900/40 rounded-3xl shadow-2xl shadow-red-900/40 p-7 lg:p-8 backdrop-blur-xl animate-fade-in-up delay-100">
-          {/* Top glow line */}
-          <div className="flex lg:hidden items-center justify-center mb-5">
-            <Link to="/" className="inline-flex items-center gap-2.5">
-              <div className="w-11 h-11 bg-gradient-to-br from-red-500 to-red-700 rounded-2xl flex items-center justify-center shadow-xl shadow-red-500/30">
-                <Flame className="w-6 h-6 text-white" />
+        {/* Card */}
+        <div className="bg-gray-900 border border-red-900/30 rounded-3xl shadow-2xl shadow-red-900/20 overflow-hidden">
+
+          {/* Header strip */}
+          <div className="bg-gradient-to-r from-red-900/60 via-red-800/40 to-red-900/60 px-6 py-5 border-b border-red-900/30">
+            <div className="flex items-center justify-between">
+              <Link to="/" className="flex items-center gap-2.5">
+                <div className="w-10 h-10 bg-gradient-to-br from-red-500 to-red-700 rounded-2xl flex items-center justify-center shadow-lg shadow-red-500/30">
+                  <Flame className="w-5 h-5 text-white" />
+                </div>
+                <span className="text-xl font-black text-white">
+                  work<span className="text-red-300">1m</span>
+                </span>
+              </Link>
+              <div className="text-right">
+                <p className="text-white font-black text-sm">{t('مرحباً بعودتك', 'Welcome back')}</p>
+                <p className="text-red-300/60 text-xs">{t('سجّل دخولك للمتابعة', 'Sign in to continue')}</p>
               </div>
-              <span className="text-2xl font-black text-white">
-                work<span className="text-red-400">1m</span>
-              </span>
-            </Link>
+            </div>
           </div>
-          <div className="h-px bg-gradient-to-l from-transparent via-red-500/40 to-transparent mb-5" />
-          {/* Role toggle */}
-          {!isAdminCreds && (
-            <div className="flex gap-1 p-1 bg-gray-800/80 rounded-xl mb-5 border border-gray-700/40">
-              {(['seeker', 'company'] as const).map(r => (
-                <button key={r} onClick={() => setRole(r)}
-                  className={`flex-1 py-2.5 text-sm font-bold rounded-lg transition-all ${
-                    role === r
-                      ? 'bg-gradient-to-l from-red-600 to-red-500 text-white shadow-md shadow-red-500/20'
-                      : 'text-gray-500 hover:text-gray-300'
-                  }`}>
-                  {r === 'seeker' ? '👤 مقيم / باحث' : '🏢 شركة'}
-                </button>
-              ))}
-            </div>
-          )}
 
-          {/* Admin indicator */}
-          {isAdminCreds && (
-            <div className="flex items-center gap-3 mb-5 p-3.5 bg-amber-500/10 border border-amber-500/30 rounded-xl">
-              <ShieldCheck className="w-5 h-5 text-amber-400 shrink-0" />
-              <p className="text-sm font-black text-amber-300">دخول المدير</p>
-            </div>
-          )}
+          <div className="p-6 sm:p-8">
 
-          <form onSubmit={handleSubmit} className="space-y-4 mt-4" autoComplete="off">
-            <div>
-              <label className="block text-sm font-semibold text-gray-400 mb-2">اسم المستخدم</label>
-              <div className="flex items-center gap-2 px-3 py-2.5 bg-gray-800 border border-gray-700 rounded-xl">
-                <UserIcon className="w-4 h-4 text-gray-500" />
-                <input
-                  type="text"
-                  value={username}
-                  onChange={e => { setUsername(e.target.value); setError(''); }}
-                  placeholder="اسم المستخدم"
-                  className="flex-1 bg-transparent border-none focus:outline-none text-sm text-white placeholder-gray-500"
-                  autoFocus
-                  autoComplete="username"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-semibold text-gray-400 mb-2">كلمة المرور</label>
-              <div className="flex items-center gap-2 px-3 py-2.5 bg-gray-800 border border-gray-700 rounded-xl">
-                <LockKeyhole className="w-4 h-4 text-gray-500" />
-                <input
-                  type="password"
-                  value={password}
-                  onChange={e => { setPassword(e.target.value); setError(''); }}
-                  placeholder="••••••••"
-                  className="flex-1 bg-transparent border-none focus:outline-none text-sm text-white placeholder-gray-500"
-                  autoComplete="current-password"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-semibold text-gray-400 mb-2">رقم الهاتف (اختياري)</label>
-              <input
-                type="tel"
-                value={phone}
-                onChange={e => setPhone(e.target.value)}
-                placeholder="للتواصل السريع"
-                className="w-full px-4 py-3 rounded-xl bg-gray-800 border border-gray-700 focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500/30 text-white placeholder-gray-600 text-sm"
-                dir="ltr"
-              />
-            </div>
-
-            {error && (
-              <div className="bg-red-500/10 text-red-400 text-sm px-4 py-3 rounded-xl border border-red-500/20">
-                {error}
+            {/* Role toggle */}
+            {!isAdminCreds && (
+              <div className="flex gap-1 p-1 bg-gray-800 border border-gray-700/50 rounded-2xl mb-6">
+                {(['seeker', 'company'] as const).map(r => (
+                  <button
+                    key={r}
+                    onClick={() => setRole(r)}
+                    className={`flex-1 flex items-center justify-center gap-1.5 py-3 text-sm font-black rounded-xl transition-all ${
+                      role === r
+                        ? 'bg-gradient-to-r from-red-600 to-red-500 text-white shadow-lg shadow-red-500/25'
+                        : 'text-gray-500 hover:text-gray-300 hover:bg-gray-700/50'
+                    }`}
+                  >
+                    <span>{r === 'seeker' ? '👤' : '🏢'}</span>
+                    <span>{r === 'seeker'
+                      ? t('مقيم / باحث', 'Resident / Seeker')
+                      : t('شركة', 'Company')
+                    }</span>
+                  </button>
+                ))}
               </div>
             )}
 
-            <button
-              type="submit"
-              disabled={submitting}
-              className="w-full py-3.5 bg-gradient-to-l from-red-600 to-red-500 text-white font-black rounded-xl hover:from-red-500 hover:to-red-400 disabled:opacity-40 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2 shadow-lg shadow-red-500/20 hover:shadow-red-500/30"
+            {/* Admin indicator */}
+            {isAdminCreds && (
+              <div className="flex items-center gap-3 mb-5 p-3.5 bg-amber-500/10 border border-amber-500/30 rounded-xl">
+                <ShieldCheck className="w-5 h-5 text-amber-400 shrink-0" />
+                <p className="text-sm font-black text-amber-300">{t('دخول المدير', 'Admin Login')}</p>
+              </div>
+            )}
+
+            <form onSubmit={handleSubmit} className="space-y-4" autoComplete="off">
+
+              {/* Username */}
+              <div>
+                <label className="block text-sm font-bold text-gray-300 mb-2">
+                  {t('اسم المستخدم', 'Username')}
+                </label>
+                <div className={`flex items-center gap-3 px-4 py-3.5 bg-gray-800 border border-gray-700 rounded-2xl focus-within:border-red-500 focus-within:ring-1 focus-within:ring-red-500/20 transition-all`}>
+                  <UserIcon className="w-4 h-4 text-gray-500 shrink-0" />
+                  <input
+                    type="text"
+                    value={username}
+                    onChange={e => { setUsername(e.target.value); setError(''); }}
+                    placeholder={t('أدخل اسم المستخدم', 'Enter your username')}
+                    className="flex-1 bg-transparent border-none focus:outline-none text-sm text-white placeholder-gray-500"
+                    autoFocus
+                    autoComplete="username"
+                    dir="ltr"
+                    style={{ textAlign: isAr ? 'right' : 'left' }}
+                  />
+                </div>
+              </div>
+
+              {/* Password */}
+              <div>
+                <label className="block text-sm font-bold text-gray-300 mb-2">
+                  {t('كلمة المرور', 'Password')}
+                </label>
+                <div className="flex items-center gap-3 px-4 py-3.5 bg-gray-800 border border-gray-700 rounded-2xl focus-within:border-red-500 focus-within:ring-1 focus-within:ring-red-500/20 transition-all">
+                  <LockKeyhole className="w-4 h-4 text-gray-500 shrink-0" />
+                  <input
+                    type={showPass ? 'text' : 'password'}
+                    value={password}
+                    onChange={e => { setPassword(e.target.value); setError(''); }}
+                    placeholder="••••••••"
+                    className="flex-1 bg-transparent border-none focus:outline-none text-sm text-white placeholder-gray-500"
+                    autoComplete="current-password"
+                    dir="ltr"
+                  />
+                  <button type="button" onClick={() => setShowPass(!showPass)} className="text-gray-500 hover:text-gray-300 transition-colors">
+                    {showPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
+              </div>
+
+              {/* Error */}
+              {error && (
+                <div className="bg-red-500/10 text-red-400 text-sm px-4 py-3 rounded-xl border border-red-500/20 flex items-center gap-2">
+                  <span className="text-base">⚠️</span> {error}
+                </div>
+              )}
+
+              {/* Submit */}
+              <button
+                type="submit"
+                disabled={submitting}
+                className="w-full py-4 bg-gradient-to-r from-red-600 to-red-500 text-white font-black rounded-2xl hover:from-red-500 hover:to-red-400 disabled:opacity-40 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2 shadow-xl shadow-red-500/25 hover:shadow-red-500/35 text-base mt-2"
+              >
+                {submitting
+                  ? <><Loader2 className="w-5 h-5 animate-spin" /> {t('جاري الدخول...', 'Signing in...')}</>
+                  : t('تسجيل الدخول', 'Sign In')
+                }
+              </button>
+            </form>
+
+            {/* Divider */}
+            <div className="flex items-center gap-3 my-5">
+              <div className="flex-1 h-px bg-gray-800" />
+              <span className="text-xs text-gray-600 font-semibold">{t('أو', 'OR')}</span>
+              <div className="flex-1 h-px bg-gray-800" />
+            </div>
+
+            {/* Register link */}
+            <Link
+              to={`/register?role=${role}`}
+              className="flex items-center justify-center w-full py-3.5 border-2 border-gray-700 hover:border-red-500/50 text-gray-300 hover:text-white font-black rounded-2xl transition-all text-sm hover:bg-gray-800/50"
             >
-              {submitting && <Loader2 className="w-4 h-4 animate-spin" />}
-              دخول
-            </button>
-          </form>
-
-          <div className="h-px bg-gradient-to-l from-transparent via-red-900/20 to-transparent mt-6 mb-4" />
-
-          <p className="text-center text-sm text-gray-600">
-            ليس لديك حساب؟{' '}
-            <Link to={`/register?role=${role}`} className="text-red-400 font-black hover:text-red-300 transition-colors">
-              إنشاء حساب مجاناً
+              {t('إنشاء حساب جديد مجاناً', 'Create a free account')} →
             </Link>
-          </p>
+
+            {/* Trust badges */}
+            <div className="flex items-center justify-center gap-4 mt-5 text-xs text-gray-600">
+              <span className="flex items-center gap-1">🔒 {t('آمن ومشفر', 'Secure')}</span>
+              <span className="flex items-center gap-1">🆓 {t('مجاني', 'Free')}</span>
+              <span className="flex items-center gap-1">⚡ {t('فوري', 'Instant')}</span>
+            </div>
+          </div>
         </div>
+
+        {/* Back to home */}
+        <p className="text-center mt-5 text-xs text-gray-600">
+          <Link to="/" className="hover:text-red-400 transition-colors">
+            ← {t('العودة للرئيسية', 'Back to Home')}
+          </Link>
+        </p>
       </div>
     </div>
   );

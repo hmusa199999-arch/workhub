@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { BrowserRouter, Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { ApplicationsProvider } from './context/ApplicationsContext';
+import { LanguageProvider } from './context/LanguageContext';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Home from './pages/Home';
@@ -69,6 +70,7 @@ export default function App() {
   }
 
   return (
+    <LanguageProvider>
     <AuthProvider>
       <ApplicationsProvider>
         <BrowserRouter>
@@ -96,5 +98,6 @@ export default function App() {
         </BrowserRouter>
       </ApplicationsProvider>
     </AuthProvider>
+    </LanguageProvider>
   );
 }

@@ -1,240 +1,329 @@
 import { useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { Flame, Loader2, CheckCircle, LockKeyhole, User as UserIcon } from 'lucide-react';
+import { Flame, Loader2, CheckCircle, LockKeyhole, User as UserIcon, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useLang } from '../context/LanguageContext';
 
 export default function Register() {
   const { register } = useAuth();
   const navigate = useNavigate();
   const [params] = useSearchParams();
+  const { lang, setLang, t, isAr } = useLang();
 
   const [role, setRole] = useState<'seeker' | 'company'>(
     (params.get('role') as 'seeker' | 'company') || 'seeker'
   );
-
   const [name, setName]             = useState('');
   const [username, setUsername]     = useState('');
   const [password, setPassword]     = useState('');
+  const [showPass, setShowPass]     = useState(false);
   const [phone, setPhone]           = useState('');
   const [targetCountry, setCountry] = useState('');
   const [targetCity, setCity]       = useState('');
   const [cvFileName, setCvFileName] = useState('');
   const [submitting, setSubmitting] = useState(false);
-  const [error, setError]       = useState('');
+  const [error, setError]           = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     if (!name.trim() || !username.trim() || !password) {
-      setError('الاسم واسم المستخدم وكلمة المرور مطلوبة');
+      setError(t('الاسم واسم المستخدم وكلمة المرور مطلوبة', 'Name, username and password are required'));
       return;
     }
     setSubmitting(true);
-    const ok = await register({
-      name,
-      username,
-      password,
-      phone: phone || undefined,
-      role,
-      targetCountry,
-      targetCity,
-      cvFileName,
-    });
+    const ok = await register({ name, username, password, phone: phone || undefined, role, targetCountry, targetCity, cvFileName });
     setSubmitting(false);
     if (!ok) {
-      setError('اسم المستخدم مستخدم بالفعل، اختر اسماً آخر');
+      setError(t('اسم المستخدم مستخدم بالفعل، اختر اسماً آخر', 'Username already taken, please choose another'));
       return;
     }
     navigate(role === 'seeker' ? '/dashboard/seeker' : '/dashboard/company');
   };
 
-  const benefits = {
-    seeker:  ['تصفح آلاف الوظائف', 'ملف شخصي احترافي', 'تنبيهات فورية', 'تقديم سريع'],
+  const benefitsAr = {
+    seeker: ['تصفح آلاف الوظائف', 'ملف شخصي احترافي', 'نشر إعلان باحث عن عمل', 'تقديم سريع'],
     company: ['نشر إعلانات مجاناً', 'إدارة المتقدمين', 'لوحة تحكم متكاملة', 'موافقة فورية'],
   };
+  const benefitsEn = {
+    seeker: ['Browse 1000s of jobs', 'Professional profile', 'Post job-seeker ads', 'Quick apply'],
+    company: ['Post ads for free', 'Manage applicants', 'Full dashboard', 'Instant approval'],
+  };
+  const benefits = isAr ? benefitsAr[role] : benefitsEn[role];
+
+  const arabCountries = isAr
+    ? ['الإمارات', 'السعودية', 'قطر', 'الكويت', 'البحرين', 'عُمان', 'مصر', 'الأردن', 'المغرب', 'تونس', 'الجزائر', 'لبنان', 'العراق', 'سوريا', 'ليبيا', 'اليمن', 'السودان']
+    : ['UAE', 'Saudi Arabia', 'Qatar', 'Kuwait', 'Bahrain', 'Oman', 'Egypt', 'Jordan', 'Morocco', 'Tunisia', 'Algeria', 'Lebanon', 'Iraq', 'Syria', 'Libya', 'Yemen', 'Sudan'];
 
   return (
-    <div className="min-h-[calc(100vh-64px)] bg-gray-950 flex items-center justify-center px-4 py-12 relative overflow-hidden">
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_rgba(220,38,38,0.06)_0%,_transparent_60%)]" />
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-96 h-px bg-gradient-to-l from-transparent via-red-500/50 to-transparent" />
+    <div
+      className="min-h-[calc(100vh-64px)] bg-gray-950 flex items-center justify-center px-3 py-8 relative overflow-hidden"
+      dir={isAr ? 'rtl' : 'ltr'}
+    >
+      {/* BG effects */}
+      <div className="pointer-events-none absolute inset-0">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_rgba(220,38,38,0.07)_0%,_transparent_60%)]" />
+        <div className="absolute -left-32 top-1/4 w-64 h-64 bg-red-600/8 blur-3xl rounded-full" />
+        <div className="absolute -right-32 bottom-1/3 w-72 h-72 bg-red-900/15 blur-3xl rounded-full" />
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-lg h-px bg-gradient-to-r from-transparent via-red-500/50 to-transparent" />
+      </div>
 
       <div className="w-full max-w-md relative z-10">
 
-        {/* Logo */}
-        <div className="text-center mb-8">
-          <Link to="/" className="inline-flex items-center gap-2.5 mb-5">
-            <div className="w-12 h-12 bg-gradient-to-br from-red-500 to-red-700 rounded-2xl flex items-center justify-center shadow-xl shadow-red-500/30">
-              <Flame className="w-6 h-6 text-white" />
-            </div>
-            <span className="text-2xl font-black text-white">work<span className="text-red-500">1m</span></span>
-          </Link>
-          <h1 className="text-2xl font-black text-white">إنشاء حساب مجاني</h1>
-          <p className="text-gray-500 mt-1 text-sm">بدون اشتراك — ابدأ بحساب وكلمة مرور</p>
+        {/* Language toggle */}
+        <div className="flex justify-end mb-4">
+          <div className="flex items-center gap-1 p-1 bg-gray-900 border border-gray-700 rounded-xl">
+            <button
+              onClick={() => setLang('ar')}
+              className={`px-3 py-1.5 text-xs font-black rounded-lg transition-all ${lang === 'ar' ? 'bg-red-600 text-white shadow-md' : 'text-gray-500 hover:text-gray-300'}`}
+            >
+              عربي
+            </button>
+            <button
+              onClick={() => setLang('en')}
+              className={`px-3 py-1.5 text-xs font-black rounded-lg transition-all ${lang === 'en' ? 'bg-red-600 text-white shadow-md' : 'text-gray-500 hover:text-gray-300'}`}
+            >
+              EN
+            </button>
+          </div>
         </div>
 
-        <div className="bg-gray-900 border border-red-900/30 rounded-3xl shadow-2xl shadow-red-900/10 p-7 backdrop-blur">
-          <div className="h-px bg-gradient-to-l from-transparent via-red-500/40 to-transparent mb-6" />
+        {/* Card */}
+        <div className="bg-gray-900 border border-red-900/30 rounded-3xl shadow-2xl shadow-red-900/20 overflow-hidden">
 
-          {/* Role toggle */}
-          <div className="flex gap-1 p-1 bg-gray-800/80 rounded-xl mb-5 border border-gray-700/40">
-            {(['seeker', 'company'] as const).map(r => (
-              <button key={r} onClick={() => setRole(r)}
-                className={`flex-1 py-2.5 text-sm font-bold rounded-lg transition-all ${
-                  role === r
-                    ? 'bg-gradient-to-l from-red-600 to-red-500 text-white shadow-md shadow-red-500/20'
-                    : 'text-gray-500 hover:text-gray-300'
-                }`}>
-                {r === 'seeker' ? '👤 مقيم / باحث عمل' : '🏢 شركة / صاحب عمل'}
-              </button>
-            ))}
+          {/* Header strip */}
+          <div className="bg-gradient-to-r from-red-900/60 via-red-800/40 to-red-900/60 px-6 py-5 border-b border-red-900/30">
+            <div className="flex items-center justify-between">
+              <Link to="/" className="flex items-center gap-2.5">
+                <div className="w-10 h-10 bg-gradient-to-br from-red-500 to-red-700 rounded-2xl flex items-center justify-center shadow-lg shadow-red-500/30">
+                  <Flame className="w-5 h-5 text-white" />
+                </div>
+                <span className="text-xl font-black text-white">work<span className="text-red-300">1m</span></span>
+              </Link>
+              <div className={isAr ? 'text-right' : 'text-left'}>
+                <p className="text-white font-black text-sm">{t('إنشاء حساب', 'Create Account')}</p>
+                <p className="text-red-300/60 text-xs">{t('مجاني تماماً', '100% Free')}</p>
+              </div>
+            </div>
           </div>
 
-          {/* Benefits */}
-          <div className="mb-5 p-3.5 bg-red-500/5 rounded-xl border border-red-500/10">
-            <div className="grid grid-cols-2 gap-1.5">
-              {benefits[role].map(b => (
-                <div key={b} className="flex items-center gap-1.5 text-xs text-red-300/80">
-                  <CheckCircle className="w-3.5 h-3.5 text-red-400 shrink-0" />
-                  {b}
-                </div>
+          <div className="p-6 sm:p-7">
+
+            {/* Role toggle */}
+            <div className="flex gap-1 p-1 bg-gray-800 border border-gray-700/50 rounded-2xl mb-5">
+              {(['seeker', 'company'] as const).map(r => (
+                <button
+                  key={r}
+                  onClick={() => setRole(r)}
+                  className={`flex-1 flex items-center justify-center gap-1.5 py-3 text-sm font-black rounded-xl transition-all ${
+                    role === r
+                      ? 'bg-gradient-to-r from-red-600 to-red-500 text-white shadow-lg shadow-red-500/25'
+                      : 'text-gray-500 hover:text-gray-300 hover:bg-gray-700/50'
+                  }`}
+                >
+                  <span>{r === 'seeker' ? '👤' : '🏢'}</span>
+                  <span className="text-xs sm:text-sm">
+                    {r === 'seeker'
+                      ? t('مقيم / باحث عمل', 'Resident / Seeker')
+                      : t('شركة / صاحب عمل', 'Company / Employer')
+                    }
+                  </span>
+                </button>
               ))}
             </div>
-          </div>
 
-          <form onSubmit={handleSubmit} className="space-y-4" autoComplete="off">
-            <div>
-              <label className="block text-sm font-semibold text-gray-400 mb-2">
-                {role === 'seeker' ? 'الاسم الكامل' : 'اسم الشركة'} *
-              </label>
-              <input
-                type="text"
-                value={name}
-                onChange={e => { setName(e.target.value); setError(''); }}
-                placeholder={role === 'seeker' ? 'محمد أحمد' : 'شركة الأمل للتقنية'}
-                className="w-full px-4 py-3 rounded-xl bg-gray-800 border border-gray-700 focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500/30 text-white placeholder-gray-600 text-sm"
-                autoFocus
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-semibold text-gray-400 mb-2">اسم المستخدم *</label>
-              <div className="flex items-center gap-2 px-3 py-2.5 bg-gray-800 border border-gray-700 rounded-xl">
-                <UserIcon className="w-4 h-4 text-gray-500" />
-                <input
-                  type="text"
-                  value={username}
-                  onChange={e => { setUsername(e.target.value); setError(''); }}
-                  placeholder="اختر اسم مستخدم فريد"
-                  className="flex-1 bg-transparent border-none focus:outline-none text-sm text-white placeholder-gray-500"
-                  autoComplete="new-username"
-                />
+            {/* Benefits */}
+            <div className="mb-5 p-4 bg-red-500/5 rounded-2xl border border-red-500/10">
+              <div className="grid grid-cols-2 gap-2">
+                {benefits.map(b => (
+                  <div key={b} className="flex items-center gap-1.5 text-xs text-red-300/80">
+                    <CheckCircle className="w-3.5 h-3.5 text-red-400 shrink-0" /> {b}
+                  </div>
+                ))}
               </div>
             </div>
 
-            <div>
-              <label className="block text-sm font-semibold text-gray-400 mb-2">كلمة المرور *</label>
-              <div className="flex items-center gap-2 px-3 py-2.5 bg-gray-800 border border-gray-700 rounded-xl">
-                <LockKeyhole className="w-4 h-4 text-gray-500" />
-                <input
-                  type="password"
-                  value={password}
-                  onChange={e => { setPassword(e.target.value); setError(''); }}
-                  placeholder="••••••••"
-                  className="flex-1 bg-transparent border-none focus:outline-none text-sm text-white placeholder-gray-500"
-                  autoComplete="new-password"
-                />
-              </div>
-              <p className="mt-1 text-[11px] text-gray-500">يفضّل استخدام كلمة مرور قوية تحتوي على أحرف وأرقام ورموز.</p>
-            </div>
+            <form onSubmit={handleSubmit} className="space-y-4" autoComplete="off">
 
-            <div>
-              <label className="block text-sm font-semibold text-gray-400 mb-2">رقم الهاتف (اختياري)</label>
-              <input
-                type="tel"
-                value={phone}
-                onChange={e => setPhone(e.target.value)}
-                placeholder="+9715..., +2010..., +90..."
-                className="w-full px-4 py-3 rounded-xl bg-gray-800 border border-gray-700 focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500/30 text-white placeholder-gray-600 text-sm"
-                dir="ltr"
-              />
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {/* Name */}
               <div>
-                <label className="block text-sm font-semibold text-gray-400 mb-2">الدولة المفضلة للعمل</label>
-                <select
-                  value={targetCountry}
-                  onChange={e => setCountry(e.target.value)}
-                  className="w-full px-4 py-3 rounded-xl bg-gray-800 border border-gray-700 focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500/30 text-sm text-white"
-                >
-                  <option value="">اختر دولة</option>
-                  <option value="الإمارات">الإمارات</option>
-                  <option value="السعودية">السعودية</option>
-                  <option value="قطر">قطر</option>
-                  <option value="الكويت">الكويت</option>
-                  <option value="البحرين">البحرين</option>
-                  <option value="عمان">عُمان</option>
-                  <option value="مصر">مصر</option>
-                  <option value="الأردن">الأردن</option>
-                  <option value="المغرب">المغرب</option>
-                  <option value="تونس">تونس</option>
-                  <option value="الجزائر">الجزائر</option>
-                  <option value="لبنان">لبنان</option>
-                </select>
+                <label className="block text-sm font-bold text-gray-300 mb-2">
+                  {role === 'seeker' ? t('الاسم الكامل', 'Full Name') : t('اسم الشركة', 'Company Name')} *
+                </label>
+                <div className="flex items-center gap-3 px-4 py-3.5 bg-gray-800 border border-gray-700 rounded-2xl focus-within:border-red-500 focus-within:ring-1 focus-within:ring-red-500/20 transition-all">
+                  <UserIcon className="w-4 h-4 text-gray-500 shrink-0" />
+                  <input
+                    type="text"
+                    value={name}
+                    onChange={e => { setName(e.target.value); setError(''); }}
+                    placeholder={role === 'seeker' ? t('محمد أحمد', 'Mohammed Ahmed') : t('شركة الأمل', 'Al Amal Company')}
+                    className="flex-1 bg-transparent border-none focus:outline-none text-sm text-white placeholder-gray-500"
+                    autoFocus
+                  />
+                </div>
               </div>
+
+              {/* Username */}
               <div>
-                <label className="block text-sm font-semibold text-gray-400 mb-2">المدينة / الدولة بالتفصيل</label>
+                <label className="block text-sm font-bold text-gray-300 mb-2">
+                  {t('اسم المستخدم', 'Username')} *
+                </label>
+                <div className="flex items-center gap-3 px-4 py-3.5 bg-gray-800 border border-gray-700 rounded-2xl focus-within:border-red-500 focus-within:ring-1 focus-within:ring-red-500/20 transition-all">
+                  <span className="text-gray-500 text-sm font-bold shrink-0">@</span>
+                  <input
+                    type="text"
+                    value={username}
+                    onChange={e => { setUsername(e.target.value); setError(''); }}
+                    placeholder={t('اختر اسم مستخدم فريد', 'Choose a unique username')}
+                    className="flex-1 bg-transparent border-none focus:outline-none text-sm text-white placeholder-gray-500"
+                    autoComplete="new-username"
+                    dir="ltr"
+                    style={{ textAlign: isAr ? 'right' : 'left' }}
+                  />
+                </div>
+              </div>
+
+              {/* Password */}
+              <div>
+                <label className="block text-sm font-bold text-gray-300 mb-2">
+                  {t('كلمة المرور', 'Password')} *
+                </label>
+                <div className="flex items-center gap-3 px-4 py-3.5 bg-gray-800 border border-gray-700 rounded-2xl focus-within:border-red-500 focus-within:ring-1 focus-within:ring-red-500/20 transition-all">
+                  <LockKeyhole className="w-4 h-4 text-gray-500 shrink-0" />
+                  <input
+                    type={showPass ? 'text' : 'password'}
+                    value={password}
+                    onChange={e => { setPassword(e.target.value); setError(''); }}
+                    placeholder="••••••••"
+                    className="flex-1 bg-transparent border-none focus:outline-none text-sm text-white placeholder-gray-500"
+                    autoComplete="new-password"
+                    dir="ltr"
+                  />
+                  <button type="button" onClick={() => setShowPass(!showPass)} className="text-gray-500 hover:text-gray-300 transition-colors">
+                    {showPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
+                <p className="mt-1.5 text-[11px] text-gray-500">
+                  {t('استخدم أحرف وأرقام ورموز لكلمة مرور قوية', 'Use letters, numbers & symbols for a strong password')}
+                </p>
+              </div>
+
+              {/* Phone */}
+              <div>
+                <label className="block text-sm font-bold text-gray-300 mb-2">
+                  {t('رقم الهاتف (اختياري)', 'Phone (optional)')}
+                </label>
                 <input
-                  type="text"
-                  value={targetCity}
-                  onChange={e => setCity(e.target.value)}
-                  placeholder="مثال: دبي، الرياض، القاهرة..."
-                  className="w-full px-4 py-3 rounded-xl bg-gray-800 border border-gray-700 focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500/30 text-white placeholder-gray-600 text-sm"
+                  type="tel"
+                  value={phone}
+                  onChange={e => setPhone(e.target.value)}
+                  placeholder="+971 54..."
+                  className="w-full px-4 py-3.5 rounded-2xl bg-gray-800 border border-gray-700 focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500/20 text-white placeholder-gray-600 text-sm transition-all"
+                  dir="ltr"
                 />
               </div>
-            </div>
 
-            <div>
-              <label className="block text-sm font-semibold text-gray-400 mb-2">رفع السيرة الذاتية (اختياري)</label>
-              <input
-                type="file"
-                accept=".pdf,.doc,.docx"
-                onChange={e => {
-                  const file = e.target.files?.[0];
-                  setCvFileName(file ? file.name : '');
-                }}
-                className="w-full text-sm text-gray-400 file:mr-3 file:px-4 file:py-2.5 file:rounded-xl file:border-0 file:bg-red-600 file:text-white hover:file:bg-red-500 cursor-pointer"
-              />
-              {cvFileName && (
-                <p className="mt-1 text-xs text-gray-500">تم اختيار: {cvFileName}</p>
+              {/* Country & City */}
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-bold text-gray-400 mb-2">
+                    {t('الدولة المفضلة', 'Preferred Country')}
+                  </label>
+                  <select
+                    value={targetCountry}
+                    onChange={e => setCountry(e.target.value)}
+                    className="w-full px-3 py-3 rounded-xl bg-gray-800 border border-gray-700 focus:outline-none focus:border-red-500 text-sm text-white transition-all"
+                  >
+                    <option value="">{t('اختر', 'Select')}</option>
+                    {arabCountries.map(c => <option key={c} value={c}>{c}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-gray-400 mb-2">
+                    {t('المدينة', 'City')}
+                  </label>
+                  <input
+                    type="text"
+                    value={targetCity}
+                    onChange={e => setCity(e.target.value)}
+                    placeholder={t('دبي، الرياض...', 'Dubai, Riyadh...')}
+                    className="w-full px-3 py-3 rounded-xl bg-gray-800 border border-gray-700 focus:outline-none focus:border-red-500 text-white placeholder-gray-600 text-sm transition-all"
+                  />
+                </div>
+              </div>
+
+              {/* CV */}
+              <div>
+                <label className="block text-sm font-bold text-gray-300 mb-2">
+                  {t('السيرة الذاتية (اختياري)', 'CV / Resume (optional)')}
+                </label>
+                <label className="flex items-center gap-3 w-full px-4 py-3.5 border-2 border-dashed border-gray-700 rounded-2xl hover:border-red-500/50 hover:bg-red-500/5 cursor-pointer transition-all">
+                  <span className="text-xl">📄</span>
+                  <div className="flex-1 min-w-0">
+                    <span className="text-sm text-gray-500">
+                      {cvFileName || t('اضغط لرفع ملف PDF أو Word', 'Click to upload PDF or Word')}
+                    </span>
+                  </div>
+                  <input
+                    type="file"
+                    accept=".pdf,.doc,.docx"
+                    className="hidden"
+                    onChange={e => {
+                      const file = e.target.files?.[0];
+                      setCvFileName(file ? file.name : '');
+                    }}
+                  />
+                </label>
+              </div>
+
+              {/* Error */}
+              {error && (
+                <div className="bg-red-500/10 text-red-400 text-sm px-4 py-3 rounded-xl border border-red-500/20 flex items-center gap-2">
+                  <span className="text-base">⚠️</span> {error}
+                </div>
               )}
+
+              {/* Submit */}
+              <button
+                type="submit"
+                disabled={submitting}
+                className="w-full py-4 bg-gradient-to-r from-red-600 to-red-500 text-white font-black rounded-2xl hover:from-red-500 hover:to-red-400 disabled:opacity-40 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2 shadow-xl shadow-red-500/25 text-base mt-1"
+              >
+                {submitting
+                  ? <><Loader2 className="w-5 h-5 animate-spin" /> {t('جاري الإنشاء...', 'Creating...')}</>
+                  : t('إنشاء الحساب مجاناً', 'Create Free Account')
+                }
+              </button>
+            </form>
+
+            {/* Divider */}
+            <div className="flex items-center gap-3 my-5">
+              <div className="flex-1 h-px bg-gray-800" />
+              <span className="text-xs text-gray-600 font-semibold">{t('لديك حساب؟', 'Have an account?')}</span>
+              <div className="flex-1 h-px bg-gray-800" />
             </div>
 
-            {error && (
-              <div className="bg-red-500/10 text-red-400 text-sm px-4 py-3 rounded-xl border border-red-500/20">
-                {error}
-              </div>
-            )}
-
-            <button
-              type="submit"
-              disabled={submitting}
-              className="w-full py-3.5 bg-gradient-to-l from-red-600 to-red-500 text-white font-black rounded-xl hover:from-red-500 hover:to-red-400 disabled:opacity-40 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2 shadow-lg shadow-red-500/20"
+            <Link
+              to={`/login?role=${role}`}
+              className="flex items-center justify-center w-full py-3.5 border-2 border-gray-700 hover:border-red-500/50 text-gray-300 hover:text-white font-black rounded-2xl transition-all text-sm hover:bg-gray-800/50"
             >
-              {submitting && <Loader2 className="w-4 h-4 animate-spin" />}
-              إنشاء الحساب
-            </button>
-          </form>
-
-          <div className="h-px bg-gradient-to-l from-transparent via-red-900/20 to-transparent mt-6 mb-4" />
-
-          <p className="text-center text-sm text-gray-600">
-            لديك حساب؟{' '}
-            <Link to={`/login?role=${role}`} className="text-red-400 font-black hover:text-red-300 transition-colors">
-              تسجيل الدخول
+              {t('تسجيل الدخول', 'Sign In')} →
             </Link>
-          </p>
+
+            {/* Trust badges */}
+            <div className="flex items-center justify-center gap-4 mt-5 text-xs text-gray-600">
+              <span className="flex items-center gap-1">🔒 {t('آمن', 'Secure')}</span>
+              <span className="flex items-center gap-1">🆓 {t('مجاني', 'Free')}</span>
+              <span className="flex items-center gap-1">⚡ {t('فوري', 'Instant')}</span>
+            </div>
+          </div>
         </div>
+
+        <p className="text-center mt-5 text-xs text-gray-600">
+          <Link to="/" className="hover:text-red-400 transition-colors">
+            ← {t('العودة للرئيسية', 'Back to Home')}
+          </Link>
+        </p>
       </div>
     </div>
   );
