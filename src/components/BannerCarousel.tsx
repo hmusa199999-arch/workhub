@@ -1,31 +1,51 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { ChevronLeft, ChevronRight, ExternalLink } from 'lucide-react';
 import { getActiveBannerAds, type BannerAd } from '../utils/bannerStore';
 
 export default function BannerCarousel() {
-  const [ads, setAds] = useState<BannerAd[]>([]);
+  const [ads, setAds]       = useState<BannerAd[]>([]);
   const [current, setCurrent] = useState(0);
-  const [paused, setPaused] = useState(false);
+  const [paused, setPaused]   = useState(false);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  useEffect(() => {
-    setAds(getActiveBannerAds());
+  // ── reload whenever localStorage changes or tab gains focus ──────────
+  const reload = useCallback(() => {
+    const fresh = getActiveBannerAds();
+    setAds(prev => {
+      // only reset index if ad list actually changed
+      if (JSON.stringify(prev.map(a => a.id)) !== JSON.stringify(fresh.map(a => a.id))) {
+        setCurrent(0);
+      }
+      return fresh;
+    });
   }, []);
 
-  const startTimer = (_idx: number, dur: number) => {
+  useEffect(() => {
+    reload();
+    // refresh every 3 seconds so admin-added banners appear without page reload
+    const interval = setInterval(reload, 3000);
+    // also refresh when tab gets focus
+    window.addEventListener('focus', reload);
+    window.addEventListener('storage', reload);
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('focus', reload);
+      window.removeEventListener('storage', reload);
+    };
+  }, [reload]);
+
+  // ── auto-advance timer ────────────────────────────────────────────────
+  useEffect(() => {
+    if (ads.length <= 1 || paused) return;
+    const dur = ads[current]?.duration ?? 5;
     if (timerRef.current) clearTimeout(timerRef.current);
     timerRef.current = setTimeout(() => {
       setCurrent(prev => (prev + 1) % ads.length);
     }, dur * 1000);
-  };
-
-  useEffect(() => {
-    if (ads.length <= 1 || paused) return;
-    const dur = ads[current]?.duration ?? 5;
-    startTimer(current, dur);
     return () => { if (timerRef.current) clearTimeout(timerRef.current); };
   }, [current, ads, paused]);
 
+  // ── empty state ───────────────────────────────────────────────────────
   if (ads.length === 0) {
     return (
       <div
@@ -37,13 +57,13 @@ export default function BannerCarousel() {
         <div className="relative text-center px-6">
           <div className="text-5xl mb-3">📢</div>
           <p className="text-red-400/70 font-bold text-lg">مساحة إعلانية</p>
-          <p className="text-gray-600 text-sm mt-1">يمكن للإدارة إضافة إعلانات وفيديوهات وصور هنا</p>
+          <p className="text-gray-600 text-sm mt-1">تُدار من لوحة تحكم الأدمن</p>
         </div>
       </div>
     );
   }
 
-  const ad = ads[current];
+  const ad   = ads[current];
   const prev = () => setCurrent(i => (i - 1 + ads.length) % ads.length);
   const next = () => setCurrent(i => (i + 1) % ads.length);
 
@@ -61,19 +81,18 @@ export default function BannerCarousel() {
       return (
         <video
           src={ad.mediaData}
-          autoPlay
-          muted
-          loop
-          playsInline
+          autoPlay muted loop playsInline
           className="absolute inset-0 w-full h-full object-cover"
         />
       );
     }
-    // text banner
+    // text / color banner
     return (
       <div
         className="absolute inset-0"
-        style={{ background: ad.bgColor || 'linear-gradient(135deg, #7f1d1d, #450a0a)' }}
+        style={{ background: ad.bgColor
+          ? ad.bgColor
+          : 'linear-gradient(135deg, #7f1d1d, #450a0a)' }}
       />
     );
   };
@@ -85,16 +104,16 @@ export default function BannerCarousel() {
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
     >
-      {/* Media layer */}
+      {/* Media */}
       {renderMedia()}
 
-      {/* Overlay */}
-      <div className="absolute inset-0 bg-black/40" />
+      {/* Dark overlay */}
+      <div className="absolute inset-0 bg-black/45" />
 
-      {/* Content */}
+      {/* Text content */}
       <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-8 z-10">
         {ad.title && (
-          <h2 className="text-white font-black text-xl md:text-3xl drop-shadow-lg mb-1 max-w-2xl">
+          <h2 className="text-white font-black text-xl md:text-3xl drop-shadow-lg mb-1 max-w-3xl leading-snug">
             {ad.title}
           </h2>
         )}
@@ -108,7 +127,7 @@ export default function BannerCarousel() {
             href={ad.link}
             target="_blank"
             rel="noopener noreferrer"
-            className="mt-3 inline-flex items-center gap-2 px-5 py-2 bg-red-600 hover:bg-red-500 text-white text-sm font-bold rounded-xl transition-all shadow-lg"
+            className="mt-4 inline-flex items-center gap-2 px-6 py-2.5 bg-red-600 hover:bg-red-500 text-white text-sm font-bold rounded-xl transition-all shadow-lg shadow-red-900/40"
           >
             اعرف أكثر <ExternalLink className="w-4 h-4" />
           </a>
@@ -118,43 +137,41 @@ export default function BannerCarousel() {
       {/* Prev / Next */}
       {ads.length > 1 && (
         <>
-          <button
-            onClick={prev}
-            className="absolute right-3 top-1/2 -translate-y-1/2 z-20 w-8 h-8 rounded-full bg-black/50 hover:bg-black/70 text-white flex items-center justify-center transition-all"
-          >
-            <ChevronRight className="w-4 h-4" />
+          <button onClick={prev}
+            className="absolute right-3 top-1/2 -translate-y-1/2 z-20 w-9 h-9 rounded-full bg-black/50 hover:bg-red-600 text-white flex items-center justify-center transition-all">
+            <ChevronRight className="w-5 h-5" />
           </button>
-          <button
-            onClick={next}
-            className="absolute left-3 top-1/2 -translate-y-1/2 z-20 w-8 h-8 rounded-full bg-black/50 hover:bg-black/70 text-white flex items-center justify-center transition-all"
-          >
-            <ChevronLeft className="w-4 h-4" />
+          <button onClick={next}
+            className="absolute left-3 top-1/2 -translate-y-1/2 z-20 w-9 h-9 rounded-full bg-black/50 hover:bg-red-600 text-white flex items-center justify-center transition-all">
+            <ChevronLeft className="w-5 h-5" />
           </button>
         </>
       )}
 
       {/* Dots */}
       {ads.length > 1 && (
-        <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-20 flex gap-1.5">
+        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 flex gap-2">
           {ads.map((_, i) => (
-            <button
-              key={i}
-              onClick={() => setCurrent(i)}
-              className={`rounded-full transition-all ${i === current ? 'w-5 h-2 bg-red-500' : 'w-2 h-2 bg-white/40 hover:bg-white/70'}`}
-            />
+            <button key={i} onClick={() => setCurrent(i)}
+              className={`rounded-full transition-all ${i === current ? 'w-6 h-2 bg-red-500' : 'w-2 h-2 bg-white/40 hover:bg-white/70'}`} />
           ))}
         </div>
       )}
 
       {/* Progress bar */}
-      {ads.length > 1 && !paused && (
+      {!paused && (
         <div
           key={`${current}-${ad.duration}`}
-          className="absolute bottom-0 left-0 h-0.5 bg-red-500 z-20"
-          style={{
-            animation: `banner-progress ${ad.duration}s linear forwards`,
-          }}
+          className="absolute bottom-0 left-0 h-1 bg-red-500 z-20"
+          style={{ animation: `banner-progress ${ad.duration}s linear forwards` }}
         />
+      )}
+
+      {/* Ad count badge */}
+      {ads.length > 1 && (
+        <div className="absolute top-3 left-3 z-20 px-2 py-1 bg-black/50 text-white text-xs rounded-full">
+          {current + 1} / {ads.length}
+        </div>
       )}
 
       <style>{`
