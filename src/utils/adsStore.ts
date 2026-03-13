@@ -4,7 +4,7 @@ export type AdStatus = 'pending' | 'approved' | 'rejected';
 
 export interface StoredAd {
   id: string;
-  category: 'car' | 'realestate' | 'service' | 'plate';
+  category: 'car' | 'realestate' | 'service' | 'plate' | 'job_seeker';
   // offer = إعلان عرض، request = طلب شخصي
   intent?: 'offer' | 'request';
   status: AdStatus;
@@ -39,6 +39,13 @@ export interface StoredAd {
   plateNum?: string;
   plateCode?: string;
   plateCat?: string;
+  // job seeker
+  jsTitle?: string;       // المسمى الوظيفي المطلوب
+  jsSector?: string;      // القطاع
+  jsExp?: string;         // سنوات الخبرة
+  jsType?: string;        // نوع الدوام
+  jsNationality?: string; // الجنسية
+  jsCv?: string;          // base64 صورة السيرة الذاتية
   // shared
   location?: string;
 }
@@ -98,15 +105,26 @@ export function deleteAd(id: string): void {
   localStorage.setItem(KEY, JSON.stringify(ads));
 }
 
+export function getAdsByJobSeeker(): StoredAd[] {
+  return getAllAds().filter(a => a.category === 'job_seeker' && a.status === 'approved');
+}
+
 export function getAdLabel(ad: StoredAd): string {
   if (ad.category === 'car') return ad.carTitle || 'سيارة للبيع';
   if (ad.category === 'realestate') return ad.reTitle || 'عقار';
   if (ad.category === 'service') return ad.svcTitle || 'خدمة';
   if (ad.category === 'plate') return `رقم ${ad.plateNum || ''}${ad.plateCode ? ` / ${ad.plateCode}` : ''}`;
+  if (ad.category === 'job_seeker') return ad.jsTitle || 'باحث عن عمل';
   return 'إعلان';
 }
 
 export function getCategoryLabel(cat: StoredAd['category']): string {
-  const map: Record<StoredAd['category'], string> = { car: '🚗 سيارة', realestate: '🏡 عقار', service: '🛠️ خدمة', plate: '🚘 رقم سيارة' };
+  const map: Record<StoredAd['category'], string> = {
+    car: '🚗 سيارة',
+    realestate: '🏡 عقار',
+    service: '🛠️ خدمة',
+    plate: '🚘 رقم سيارة',
+    job_seeker: '👤 باحث عمل',
+  };
   return map[cat];
 }

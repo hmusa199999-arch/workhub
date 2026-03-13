@@ -791,6 +791,7 @@ export default function AdminDashboard() {
                   <option value="realestate">عقارات</option>
                   <option value="service">خدمات</option>
                   <option value="plate">أرقام سيارات</option>
+                  <option value="job_seeker">باحثو العمل</option>
                 </select>
               </div>
 
