@@ -2,7 +2,7 @@ import { createContext, useContext, useState, useEffect, type ReactNode } from '
 import type { User, SeekerProfile, CompanyProfile } from '../types';
 import { registerUserInDB } from '../utils/analytics';
 import {
-  saveUserToDB, updateUserInDB, checkUsernameExists, getUserByUsername,
+  saveUserToDB, updateUserInDB, checkUsernameExists, getUserByUsernameOrEmail,
 } from '../utils/supabaseUsers';
 
 const STORAGE_USER_KEY = 'workhub_user';
@@ -16,7 +16,7 @@ interface AuthContextType {
   user: User | null;
   login: (data: { username: string; password: string }) => Promise<boolean>;
   register: (data: {
-    name: string; username: string; password: string; phone?: string;
+    name: string; username: string; password: string; phone?: string; email?: string;
     role: 'seeker' | 'company'; targetCountry?: string; targetCity?: string; cvFileName?: string;
     gender?: 'male' | 'female';
   }) => Promise<boolean>;
@@ -61,9 +61,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return true;
     }
 
-    // Look up user from Firebase by username
+    // Look up user by username or email
     try {
-      const found = await getUserByUsername(trimmed);
+      const found = await getUserByUsernameOrEmail(trimmed);
       if (!found) { setIsLoading(false); return false; }
 
       // Check if user is banned
@@ -100,7 +100,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   // ── REGISTER ──────────────────────────────────────────────────────────────
   const register = async (data: {
-    name: string; username: string; password: string; phone?: string;
+    name: string; username: string; password: string; phone?: string; email?: string;
     role: 'seeker' | 'company'; targetCountry?: string; targetCity?: string; cvFileName?: string;
     gender?: 'male' | 'female';
   }): Promise<boolean> => {
@@ -121,6 +121,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         username,
         name: data.name || username,
         phone: data.phone || '',
+        email: data.email,
         role: data.role,
         targetCountry: data.targetCountry,
         targetCity: data.targetCity,
@@ -135,7 +136,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       const newUser: User = {
         id, name: data.name || username,
-        email: `${username}@work1m`, role: data.role,
+        email: data.email?.trim() || `${username}@work1m`, role: data.role,
         createdAt: new Date().toISOString().split('T')[0], phone: data.phone,
         gender: data.gender, targetCountry: data.targetCountry, targetCity: data.targetCity,
       };

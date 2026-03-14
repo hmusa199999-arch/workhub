@@ -52,6 +52,7 @@ export default function SeekerDashboard() {
   // Profile form state
   const [form, setForm] = useState({
     name:       seeker.name       || '',
+    email:      seeker.email      || '',
     phone:      seeker.phone      || '',
     title:      seeker.title      || '',
     bio:        seeker.bio        || '',
@@ -67,6 +68,7 @@ export default function SeekerDashboard() {
   const handleSave = () => {
     updateProfile({
       name:       form.name,
+      email:      form.email,
       phone:      form.phone,
       avatar:     form.avatar,
       // seeker-specific fields via type cast
@@ -380,7 +382,7 @@ export default function SeekerDashboard() {
                   <div>
                     <h3 className="text-xl font-bold text-gray-100">{seeker.name}</h3>
                     <p className="text-gray-500 text-sm mt-0.5">{seeker.title || <span className="text-gray-300 italic">أضف مسماك الوظيفي</span>}</p>
-                    <p className="text-gray-400 text-xs mt-1">{seeker.email}</p>
+                    {(form.email || seeker.email) && <p className="text-gray-400 text-xs mt-1" dir="ltr">{form.email || seeker.email}</p>}
                     {seeker.phone && <p className="text-gray-400 text-xs mt-0.5" dir="ltr">{seeker.phone}</p>}
                   </div>
                 )}

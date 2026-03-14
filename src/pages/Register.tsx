@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { Flame, Loader2, CheckCircle, LockKeyhole, User as UserIcon, Eye, EyeOff } from 'lucide-react';
+import { Flame, Loader2, CheckCircle, LockKeyhole, User as UserIcon, Mail, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useLang } from '../context/LanguageContext';
 
@@ -15,6 +15,7 @@ export default function Register() {
   );
   const [name, setName]             = useState('');
   const [username, setUsername]     = useState('');
+  const [email, setEmail]           = useState('');
   const [password, setPassword]     = useState('');
   const [showPass, setShowPass]     = useState(false);
   const [phone, setPhone]           = useState('');
@@ -28,18 +29,23 @@ export default function Register() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    if (!name.trim() || !username.trim() || !password) {
-      setError(t('الاسم واسم المستخدم وكلمة المرور مطلوبة', 'Name, username and password are required'));
+    if (!name.trim() || !username.trim() || !password || !email.trim()) {
+      setError(t('الاسم والبريد الإلكتروني واسم المستخدم وكلمة المرور مطلوبة', 'Name, email, username and password are required'));
       return;
     }
     setSubmitting(true);
-    const ok = await register({ name, username, password, phone: phone || undefined, role, targetCountry, targetCity, cvFileName, gender: gender || undefined });
-    setSubmitting(false);
-    if (!ok) {
-      setError(t('اسم المستخدم مستخدم بالفعل، اختر اسماً آخر', 'Username already taken, please choose another'));
-      return;
+    try {
+      const ok = await register({ name, username, email: email?.trim() || undefined, password, phone: phone || undefined, role, targetCountry, targetCity, cvFileName, gender: gender || undefined });
+      setSubmitting(false);
+      if (!ok) {
+        setError(t('اسم المستخدم مستخدم بالفعل أو خطأ في الحفظ، جرّب اسماً آخر', 'Username taken or save failed, try another username'));
+        return;
+      }
+      navigate(role === 'seeker' ? '/dashboard/seeker' : '/dashboard/company');
+    } catch (err) {
+      setSubmitting(false);
+      setError(t('حدث خطأ في الحفظ. تأكد من اتصال الإنترنت وجرّب مرة أخرى.', 'Save error. Check connection and try again.'));
     }
-    navigate(role === 'seeker' ? '/dashboard/seeker' : '/dashboard/company');
   };
 
   const benefitsAr = {
@@ -142,6 +148,24 @@ export default function Register() {
                     placeholder={role === 'seeker' ? t('محمد أحمد', 'Mohammed Ahmed') : t('شركة الأمل', 'Al Amal Company')}
                     className="flex-1 bg-transparent border-none focus:outline-none text-sm text-white placeholder-gray-500"
                     autoFocus
+                  />
+                </div>
+              </div>
+
+              {/* Email - إجباري */}
+              <div>
+                <label className="block text-sm font-bold text-gray-300 mb-2">
+                  {t('البريد الإلكتروني', 'Email')} *
+                </label>
+                <div className="flex items-center gap-3 px-4 py-3.5 bg-gray-800 border border-gray-700 rounded-2xl focus-within:border-red-500 focus-within:ring-1 focus-within:ring-red-500/20 transition-all">
+                  <Mail className="w-4 h-4 text-gray-500 shrink-0" />
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={e => setEmail(e.target.value)}
+                    placeholder="example@gmail.com"
+                    className="flex-1 bg-transparent border-none focus:outline-none text-sm text-white placeholder-gray-500"
+                    dir="ltr"
                   />
                 </div>
               </div>

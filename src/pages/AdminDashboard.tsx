@@ -159,7 +159,7 @@ export default function AdminDashboard() {
   // Real-time users from Firebase
   useEffect(() => {
     const unsubscribe = subscribeToUsers((cloudUsers) => {
-      const converted: UserRecord[] = cloudUsers.map(u => ({
+      const converted: (UserRecord & { gender?: string; targetCountry?: string; targetCity?: string })[] = cloudUsers.map(u => ({
         id: u.id,
         name: u.name,
         email: u.email || `${u.username}@work1m`,
@@ -173,6 +173,9 @@ export default function AdminDashboard() {
         lastSeen: (u.lastLogin as string) || u.createdAt || new Date().toISOString(),
         pageViews: 0,
         sessionsCount: 0,
+        gender: u.gender,
+        targetCountry: u.targetCountry,
+        targetCity: u.targetCity,
       }));
       setUsersDB(converted);
       setLastSync(new Date());

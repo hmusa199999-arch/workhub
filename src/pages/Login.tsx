@@ -25,7 +25,7 @@ export default function Login() {
     e.preventDefault();
     setError('');
     if (!username.trim() || !password) {
-      setError(t('أدخل اسم المستخدم وكلمة المرور', 'Please enter username and password'));
+      setError(t('أدخل اسم المستخدم أو البريد وكلمة المرور', 'Please enter username/email and password'));
       return;
     }
     setSubmitting(true);
@@ -110,10 +110,10 @@ export default function Login() {
 
             <form onSubmit={handleSubmit} className="space-y-4" autoComplete="off">
 
-              {/* Username */}
+              {/* Username or Email */}
               <div>
                 <label className="block text-sm font-bold text-gray-300 mb-2">
-                  {t('اسم المستخدم', 'Username')}
+                  {t('اسم المستخدم أو البريد الإلكتروني', 'Username or Email')}
                 </label>
                 <div className={`flex items-center gap-3 px-4 py-3.5 bg-gray-800 border border-gray-700 rounded-2xl focus-within:border-red-500 focus-within:ring-1 focus-within:ring-red-500/20 transition-all`}>
                   <UserIcon className="w-4 h-4 text-gray-500 shrink-0" />
@@ -121,7 +121,7 @@ export default function Login() {
                     type="text"
                     value={username}
                     onChange={e => { setUsername(e.target.value); setError(''); }}
-                    placeholder={t('أدخل اسم المستخدم', 'Enter your username')}
+                    placeholder={t('اسم المستخدم أو example@gmail.com', 'Username or example@gmail.com')}
                     className="flex-1 bg-transparent border-none focus:outline-none text-sm text-white placeholder-gray-500"
                     autoFocus
                     autoComplete="username"
