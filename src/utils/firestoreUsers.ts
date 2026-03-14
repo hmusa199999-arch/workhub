@@ -17,6 +17,7 @@ export interface CloudUser {
   sector?: string;
   experience?: string;
   targetCountry?: string;
+  gender?: 'male' | 'female';
   targetCity?: string;
   cvUrl?: string;
   createdAt: string;

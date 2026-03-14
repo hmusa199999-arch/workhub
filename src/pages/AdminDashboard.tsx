@@ -315,15 +315,21 @@ export default function AdminDashboard() {
   };
 
   const exportCustomersCSV = () => {
-    const headers = ['الاسم', 'البريد الإلكتروني', 'رقم الهاتف', 'الدور', 'الحالة', 'تاريخ التسجيل'];
-    const rows = filteredCustomers.map(u => [
-      u.name,
-      u.email,
-      u.phone || '',
-      u.role === 'company' ? 'شركة' : 'باحث عمل',
-      u.status === 'active' ? 'نشط' : 'محظور',
-      new Date(u.registeredAt).toLocaleDateString('ar-AE'),
-    ]);
+    const headers = ['الاسم', 'الجنس', 'رقم الهاتف', 'البريد الإلكتروني', 'الدولة', 'المدينة', 'الدور', 'الحالة', 'تاريخ التسجيل'];
+    const rows = filteredCustomers.map(u => {
+      const cu = u as typeof u & { gender?: string; targetCountry?: string; targetCity?: string };
+      return [
+        u.name,
+        cu.gender === 'male' ? 'ذكر' : cu.gender === 'female' ? 'أنثى' : '',
+        u.phone || '',
+        u.email || '',
+        cu.targetCountry || '',
+        cu.targetCity || '',
+        u.role === 'company' ? 'شركة' : 'باحث عمل',
+        u.status === 'active' ? 'نشط' : 'محظور',
+        new Date(u.registeredAt).toLocaleDateString('ar-AE'),
+      ];
+    });
     const csv = [headers, ...rows].map(r => r.map(c => `"${c}"`).join(',')).join('\n');
     const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
@@ -1064,7 +1070,8 @@ export default function AdminDashboard() {
                         <th className="text-right px-5 py-3 font-medium">العميل</th>
                         <th className="text-right px-5 py-3 font-medium hidden md:table-cell">التواصل</th>
                         <th className="text-right px-5 py-3 font-medium">الدور</th>
-                        <th className="text-right px-5 py-3 font-medium hidden lg:table-cell">طريقة التسجيل</th>
+                        <th className="text-right px-5 py-3 font-medium hidden lg:table-cell">الجنس</th>
+                        <th className="text-right px-5 py-3 font-medium hidden lg:table-cell">الدولة</th>
                         <th className="text-right px-5 py-3 font-medium hidden lg:table-cell">تاريخ الانضمام</th>
                         <th className="text-right px-5 py-3 font-medium">الحالة</th>
                         <th className="text-right px-5 py-3 font-medium">إجراءات</th>
@@ -1096,10 +1103,11 @@ export default function AdminDashboard() {
                               {u.role === 'company' ? '🏢 شركة' : '👤 باحث'}
                             </span>
                           </td>
-                          <td className="px-5 py-4 hidden lg:table-cell">
-                            <span className="flex items-center gap-1.5 text-xs text-gray-400">
-                              {u.loginMethod === 'phone' ? <><Phone className="w-3 h-3" />هاتف</> : u.loginMethod === 'google' ? <>G بريد</> : <><Mail className="w-3 h-3" />بريد</>}
-                            </span>
+                          <td className="px-5 py-4 hidden lg:table-cell text-xs text-gray-400">
+                            {(u as typeof u & { gender?: string }).gender === 'male' ? '👨 ذكر' : (u as typeof u & { gender?: string }).gender === 'female' ? '👩 أنثى' : '—'}
+                          </td>
+                          <td className="px-5 py-4 hidden lg:table-cell text-xs text-gray-400">
+                            {(u as typeof u & { targetCountry?: string }).targetCountry || '—'}
                           </td>
                           <td className="px-5 py-4 hidden lg:table-cell text-xs text-gray-400">
                             {new Date(u.registeredAt).toLocaleDateString('ar-AE')}

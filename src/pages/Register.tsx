@@ -18,6 +18,7 @@ export default function Register() {
   const [password, setPassword]     = useState('');
   const [showPass, setShowPass]     = useState(false);
   const [phone, setPhone]           = useState('');
+  const [gender, setGender]         = useState<'male' | 'female' | ''>('');
   const [targetCountry, setCountry] = useState('');
   const [targetCity, setCity]       = useState('');
   const [cvFileName, setCvFileName] = useState('');
@@ -32,7 +33,7 @@ export default function Register() {
       return;
     }
     setSubmitting(true);
-    const ok = await register({ name, username, password, phone: phone || undefined, role, targetCountry, targetCity, cvFileName });
+    const ok = await register({ name, username, password, phone: phone || undefined, role, targetCountry, targetCity, cvFileName, gender: gender || undefined });
     setSubmitting(false);
     if (!ok) {
       setError(t('اسم المستخدم مستخدم بالفعل، اختر اسماً آخر', 'Username already taken, please choose another'));
@@ -203,6 +204,32 @@ export default function Register() {
                   className="w-full px-4 py-3.5 rounded-2xl bg-gray-800 border border-gray-700 focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500/20 text-white placeholder-gray-600 text-sm transition-all"
                   dir="ltr"
                 />
+              </div>
+
+              {/* Gender */}
+              <div>
+                <label className="block text-sm font-bold text-gray-300 mb-2">
+                  {t('الجنس', 'Gender')}
+                </label>
+                <div className="grid grid-cols-2 gap-3">
+                  {[
+                    { value: 'male',   arLabel: '👨 ذكر',   enLabel: '👨 Male'   },
+                    { value: 'female', arLabel: '👩 أنثى',  enLabel: '👩 Female' },
+                  ].map(g => (
+                    <button
+                      key={g.value}
+                      type="button"
+                      onClick={() => setGender(g.value as 'male' | 'female')}
+                      className={`py-3 rounded-2xl border-2 text-sm font-bold transition-all ${
+                        gender === g.value
+                          ? 'bg-red-600 border-red-500 text-white shadow-lg shadow-red-500/25'
+                          : 'bg-gray-800 border-gray-700 text-gray-400 hover:border-red-500/50 hover:text-gray-200'
+                      }`}
+                    >
+                      {isAr ? g.arLabel : g.enLabel}
+                    </button>
+                  ))}
+                </div>
               </div>
 
               {/* Country & City */}

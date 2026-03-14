@@ -8,6 +8,9 @@ export interface User {
   avatar?: string;
   createdAt: string;
   phone?: string;
+  gender?: 'male' | 'female';
+  targetCountry?: string;
+  targetCity?: string;
 }
 
 export interface SeekerProfile extends User {

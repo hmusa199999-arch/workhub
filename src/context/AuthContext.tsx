@@ -18,6 +18,7 @@ interface AuthContextType {
   register: (data: {
     name: string; username: string; password: string; phone?: string;
     role: 'seeker' | 'company'; targetCountry?: string; targetCity?: string; cvFileName?: string;
+    gender?: 'male' | 'female';
   }) => Promise<boolean>;
   logout: () => void;
   updateProfile: (data: Partial<User> | Partial<SeekerProfile> | Partial<CompanyProfile>) => void;
@@ -101,6 +102,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const register = async (data: {
     name: string; username: string; password: string; phone?: string;
     role: 'seeker' | 'company'; targetCountry?: string; targetCity?: string; cvFileName?: string;
+    gender?: 'male' | 'female';
   }): Promise<boolean> => {
     setIsLoading(true);
     await new Promise(r => setTimeout(r, 300));
@@ -122,8 +124,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         role: data.role,
         targetCountry: data.targetCountry,
         targetCity: data.targetCity,
+        gender: data.gender,
         createdAt: new Date().toISOString(),
-        passwordHash: data.password, // stored in Firebase for cross-device login
+        passwordHash: data.password,
         status: 'active',
       });
 
@@ -134,6 +137,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         id, name: data.name || username,
         email: `${username}@work1m`, role: data.role,
         createdAt: new Date().toISOString().split('T')[0], phone: data.phone,
+        gender: data.gender, targetCountry: data.targetCountry, targetCity: data.targetCity,
       };
       persist(newUser);
 
