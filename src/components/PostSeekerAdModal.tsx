@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react';
 import { X, User, MapPin, FileText, Upload, CheckCircle, Loader2 } from 'lucide-react';
 import { saveAd as saveAdLocal } from '../utils/adsStore';
-import { saveAd as saveAdCloud } from '../utils/firestoreAds';
+import { saveAd as saveAdCloud } from '../utils/supabaseAds';
 import { useAuth } from '../context/AuthContext';
 
 const jobTypes = ['دوام كامل', 'دوام جزئي', 'عن بُعد', 'مستقل', 'تدريب'];

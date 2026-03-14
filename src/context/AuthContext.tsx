@@ -3,7 +3,7 @@ import type { User, SeekerProfile, CompanyProfile } from '../types';
 import { registerUserInDB } from '../utils/analytics';
 import {
   saveUserToDB, updateUserInDB, checkUsernameExists, getUserByUsername,
-} from '../utils/firestoreUsers';
+} from '../utils/supabaseUsers';
 
 const STORAGE_USER_KEY = 'workhub_user';
 
@@ -82,7 +82,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         id: found.id, name: found.name,
         email: found.email || `${found.username}@work1m`,
         role: found.role as 'seeker' | 'company',
-        createdAt: found.createdAt, phone: found.phone,
+        createdAt: found.createdAt || new Date().toISOString().split('T')[0], phone: found.phone,
       };
       persist(loggedUser);
 

@@ -13,7 +13,7 @@ import {
   updateBannerInDB as updateBannerAd, deleteBannerFromDB as deleteBannerAd,
   subscribeToAllBanners,
   type BannerAd,
-} from '../utils/firestoreBanners';
+} from '../utils/supabaseBanners';
 import { useAuth } from '../context/AuthContext';
 import { useApplications } from '../context/ApplicationsContext';
 import { mockJobs } from '../data/mockData';
@@ -21,12 +21,12 @@ import {
   getAnalytics, getUsersDB, saveUsersDB,
   type UserRecord,
 } from '../utils/analytics';
-import { subscribeToUsers, updateUserInDB, deleteUserFromDB } from '../utils/firestoreUsers';
+import { subscribeToUsers, updateUserInDB, deleteUserFromDB } from '../utils/supabaseUsers';
 import {
   getAllAdsAdmin, updateAdStatus, deleteAd, getAdLabel, getCategoryLabel,
   type StoredAd,
 } from '../utils/adsStore';
-import { subscribeToAds, updateAdStatus as updateAdStatusCloud, deleteAd as deleteAdCloud, saveAd as saveAdCloud, type FirestoreAd } from '../utils/firestoreAds';
+import { subscribeToAds, updateAdStatus as updateAdStatusCloud, deleteAd as deleteAdCloud, saveAd as saveAdCloud, type FirestoreAd } from '../utils/supabaseAds';
 import type { ApplicationStatus } from '../types';
 
 // ─── Sidebar Tabs ───────────────────────────────────────────────────────
@@ -167,10 +167,10 @@ export default function AdminDashboard() {
         role: (u.role === 'admin' ? 'seeker' : u.role) as 'seeker' | 'company',
         loginMethod: 'phone' as const,
         status: (u.status || 'active') as 'active' | 'banned',
-        registeredAt: u.createdAt,
-        lastLogin: u.lastLogin || u.createdAt,
-        createdAt: u.createdAt,
-        lastSeen: u.lastLogin || u.createdAt,
+        registeredAt: u.createdAt || new Date().toISOString(),
+        lastLogin: (u.lastLogin as string) || u.createdAt || new Date().toISOString(),
+        createdAt: u.createdAt || new Date().toISOString(),
+        lastSeen: (u.lastLogin as string) || u.createdAt || new Date().toISOString(),
         pageViews: 0,
         sessionsCount: 0,
       }));

@@ -2,7 +2,7 @@ import { useState, useRef } from 'react';
 import { X, Loader2, CheckCircle, DollarSign, ImagePlus, Trash2 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { saveAd as saveAdLocal, type StoredAd } from '../utils/adsStore';
-import { saveAd as saveAdCloud } from '../utils/firestoreAds';
+import { saveAd as saveAdCloud } from '../utils/supabaseAds';
 
 export type AdCategory = 'car' | 'realestate' | 'service' | 'plate';
 

@@ -6,7 +6,7 @@ import PostSeekerAdModal from '../components/PostSeekerAdModal';
 import { mockJobs, sectors } from '../data/mockData';
 import { useAuth } from '../context/AuthContext';
 import { getAdsByJobSeeker, type StoredAd } from '../utils/adsStore';
-import { subscribeToAds, subscribeToAdsByCategory, type FirestoreAd } from '../utils/firestoreAds';
+import { subscribeToAds, subscribeToAdsByCategory, type FirestoreAd } from '../utils/supabaseAds';
 import type { JobType, ExperienceLevel } from '../types';
 
 const typeOptions: { value: JobType | ''; label: string }[] = [

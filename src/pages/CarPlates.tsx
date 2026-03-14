@@ -276,7 +276,7 @@ export default function CarPlates() {
 
   useEffect(() => {
     import('../utils/adsStore').then(m => setUserAds(m.getAdsByCategory('plate')));
-    import('../utils/firestoreAds').then(({ subscribeToAdsByCategory }) => {
+    import('../utils/supabaseAds').then(({ subscribeToAdsByCategory }) => {
       const unsub = subscribeToAdsByCategory('plate', (cloudAds) => {
         setUserAds(cloudAds as import('../utils/adsStore').StoredAd[]);
       });

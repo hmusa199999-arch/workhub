@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { Search, ChevronLeft, Plus, MapPin, Phone } from 'lucide-react';
 import PostAdModal from '../components/PostAdModal';
 import { getAdsByCategory, type StoredAd } from '../utils/adsStore';
-import { subscribeToAdsByCategory } from '../utils/firestoreAds';
+import { subscribeToAdsByCategory } from '../utils/supabaseAds';
 import { useAuth } from '../context/AuthContext';
 
 // لا توجد سيارات افتراضية – تبدأ القائمة فارغة وتُملأ بإعلانات المستخدمين

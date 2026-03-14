@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { ChevronLeft, ChevronRight, ExternalLink } from 'lucide-react';
-import { subscribeToBanners, type BannerAd } from '../utils/firestoreBanners';
+import { subscribeToBanners, type BannerAd } from '../utils/supabaseBanners';
 
 function getYoutubeId(url: string): string | null {
   const patterns = [

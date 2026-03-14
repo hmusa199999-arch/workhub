@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Search, MapPin, ChevronLeft, Plus, BedDouble, Bath, Square, Phone } from 'lucide-react';
 import PostAdModal from '../components/PostAdModal';
 import { getAdsByCategory, type StoredAd } from '../utils/adsStore';
-import { subscribeToAdsByCategory } from '../utils/firestoreAds';
+import { subscribeToAdsByCategory } from '../utils/supabaseAds';
 import { useAuth } from '../context/AuthContext';
 
 // لا توجد عقارات افتراضية – تعتمد الصفحة على إعلانات المستخدمين فقط

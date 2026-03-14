@@ -5,7 +5,7 @@ import JobCard from '../components/JobCard';
 import DirectBannerCarousel from '../components/DirectBannerCarousel';
 import { mockJobs } from '../data/mockData';
 import { useAuth } from '../context/AuthContext';
-import { subscribeToAds, type FirestoreAd } from '../utils/firestoreAds';
+import { subscribeToAds, type FirestoreAd } from '../utils/supabaseAds';
 
 export default function Home() {
   const navigate = useNavigate();
