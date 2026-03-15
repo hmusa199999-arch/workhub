@@ -81,7 +81,7 @@ export default function PostSeekerAdModal({ onClose, onSuccess }: Props) {
     };
     saveAdLocal(adData);
     const { id: _id, ...adWithoutId } = adData;
-    saveAdCloud({ ...adWithoutId }).catch(console.error);
+    saveAdCloud({ ...adWithoutId, status: 'pending' }).catch(console.error);
 
     setLoading(false);
     setSubmitted(true);
@@ -96,8 +96,8 @@ export default function PostSeekerAdModal({ onClose, onSuccess }: Props) {
       <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
         <div className="bg-white rounded-3xl p-10 text-center max-w-sm w-full shadow-2xl">
           <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
-          <h3 className="text-xl font-black text-gray-900 mb-2">تم نشر إعلانك!</h3>
-          <p className="text-gray-500 text-sm">إعلانك الآن مرئي لجميع الزوار</p>
+          <h3 className="text-xl font-black text-gray-900 mb-2">تم إرسال إعلانك!</h3>
+          <p className="text-gray-500 text-sm">سيظهر بعد مراجعة الإدارة والموافقة عليه</p>
         </div>
       </div>
     );
@@ -136,7 +136,7 @@ export default function PostSeekerAdModal({ onClose, onSuccess }: Props) {
               </div>
               <div>
                 <input value={phone} onChange={e => setPhone(e.target.value)}
-                  placeholder="+9715..., +2010..." dir="ltr"
+                  placeholder="ضع رمز الدولة ثم الرقم" dir="ltr"
                   className={`${inp} ${errors.phone ? 'border-red-400' : ''}`} />
                 {errors.phone && <p className="text-red-500 text-xs mt-1">{errors.phone}</p>}
               </div>

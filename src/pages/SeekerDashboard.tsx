@@ -400,7 +400,7 @@ export default function SeekerDashboard() {
                       dir="ltr"
                       onChange={e => setForm(p => ({ ...p, phone: e.target.value }))}
                       className="w-full px-3 py-3 rounded-xl border border-gray-700 focus:outline-none focus:ring-2 focus:ring-red-500 text-sm"
-                      placeholder="+9715..., +2010..., +90..."
+                      placeholder="ضع رمز الدولة ثم الرقم"
                     />
                   ) : (
                     <div className="text-sm font-medium text-gray-800">

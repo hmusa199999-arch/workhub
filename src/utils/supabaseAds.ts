@@ -97,9 +97,9 @@ export async function saveAd(ad: Record<string, any>): Promise<string> {
     .from('ads')
     .insert({
       category: category || 'car',
-      status: status || 'approved',
+      status: status || 'pending',
       created_at: createdAt || created_at || new Date().toISOString(),
-      data: { category, status, createdAt: createdAt || new Date().toISOString(), ...rest },
+      data: { category, status: status || 'pending', createdAt: createdAt || new Date().toISOString(), ...rest },
     })
     .select('id')
     .single();

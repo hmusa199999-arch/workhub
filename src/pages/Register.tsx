@@ -224,7 +224,7 @@ export default function Register() {
                   type="tel"
                   value={phone}
                   onChange={e => setPhone(e.target.value)}
-                  placeholder="+971 54..."
+                  placeholder={t('ضع رمز الدولة ثم الرقم', 'Enter country code then number')}
                   className="w-full px-4 py-3.5 rounded-2xl bg-gray-800 border border-gray-700 focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500/20 text-white placeholder-gray-600 text-sm transition-all"
                   dir="ltr"
                 />

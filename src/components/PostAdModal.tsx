@@ -57,7 +57,7 @@ function Field({ label, children, required }: { label: string; children: React.R
   );
 }
 
-const inputCls = 'w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-red-500 text-sm bg-white text-gray-900 placeholder-gray-400';
+const inputCls = 'w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-red-500 text-sm bg-white text-black placeholder-gray-400';
 const selectCls = `${inputCls} cursor-pointer`;
 
 const MAX_IMAGES = 8;
@@ -274,10 +274,10 @@ export default function PostAdModal({ category, onClose, onSuccess }: PostAdModa
       adData = { ...base, plateEmirate, plateNum, plateCode, plateCat, location: plateEmirate };
     }
 
-    // Save to both local and cloud
+    // Save to both local and cloud (pending - يظهر بعد موافقة الأدمن)
     saveAdLocal(adData);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    saveAdCloud(adData as any).catch(console.error);
+    saveAdCloud({ ...adData, status: 'pending' } as any).catch(console.error);
     onSuccess?.();
     setLoading(false);
     setStep('done');
@@ -310,9 +310,9 @@ export default function PostAdModal({ category, onClose, onSuccess }: PostAdModa
             <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mb-5">
               <CheckCircle className="w-10 h-10 text-green-500" />
             </div>
-            <h3 className="text-2xl font-black text-gray-900 mb-2">تم نشر إعلانك! 🎉</h3>
-            <p className="text-gray-500 text-sm mb-2">إعلانك الآن مرئي لجميع الزوار</p>
-            <p className="text-xs text-green-700 bg-green-50 px-4 py-2 rounded-xl border border-green-200 mb-4">✅ إعلانك نشط الآن ويمكن لأي شخص رؤيته</p>
+            <h3 className="text-2xl font-black text-gray-900 mb-2">تم إرسال إعلانك! 🎉</h3>
+            <p className="text-gray-500 text-sm mb-2">سيظهر بعد مراجعة الإدارة والموافقة عليه في لوحة التحكم</p>
+            <p className="text-xs text-amber-700 bg-amber-50 px-4 py-2 rounded-xl border border-amber-200 mb-4">⏳ إعلانك قيد المراجعة</p>
             {images.length > 1 && (
               <div className="flex gap-2 mb-6">
                 {images.slice(1, 5).map((src, i) => (
@@ -600,9 +600,9 @@ export default function PostAdModal({ category, onClose, onSuccess }: PostAdModa
                     <input
                       value={phone}
                       onChange={e => setPhone(e.target.value)}
-                      placeholder="+9715..., +2010..., +90..."
+                      placeholder="ضع رمز الدولة ثم الرقم"
                       dir="ltr"
-                      className="w-full px-3 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-red-500 text-sm"
+                      className={`${inputCls}`}
                     />
                     {errors.phone && <p className="text-red-500 text-xs mt-1">{errors.phone}</p>}
                   </Field>

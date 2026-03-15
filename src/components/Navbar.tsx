@@ -8,16 +8,12 @@ export default function Navbar() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const { t, isAr } = useLang();
+  const { isAr } = useLang();
   const [menuOpen, setMenuOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
 
   const mainLinks = [
-    { to: '/jobs',        label: t('وظائف', 'Jobs'),          icon: '💼' },
-    { to: '/cars',        label: t('سيارات', 'Cars'),         icon: '🚗' },
-    { to: '/real-estate', label: t('عقارات', 'Real Estate'),  icon: '🏡' },
-    { to: '/services',    label: t('خدمات', 'Services'),      icon: '🛠️' },
-    { to: '/car-plates',  label: t('أرقام', 'Plates'),        icon: '🚘' },
+    { to: '/jobs', label: 'Jobs', icon: '💼' },
   ];
 
   const handleLogout = () => {
@@ -75,7 +71,7 @@ export default function Navbar() {
                     <div className={`${isAr ? 'text-right' : 'text-left'} hidden sm:block`}>
                       <div className="text-sm font-bold text-gray-200 leading-tight">{user.name.split(' ')[0]}</div>
                       <div className="text-[10px] text-red-400 font-semibold">
-                        {user.role === 'admin' ? '🛡️ Admin' : user.role === 'seeker' ? t('باحث عمل', 'Job Seeker') : t('شركة', 'Company')}
+                        {user.role === 'admin' ? '🛡️ Admin' : user.role === 'seeker' ? 'Job Seeker' : 'Company'}
                       </div>
                     </div>
                     {user.avatar ? (
@@ -95,20 +91,20 @@ export default function Navbar() {
                         onClick={() => setProfileOpen(false)}
                         className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-300 hover:text-white hover:bg-red-600/10 transition-colors">
                         <LayoutDashboard className="w-4 h-4 text-red-400" />
-                        {t('لوحة التحكم', 'Dashboard')}
+                        Dashboard
                       </Link>
                       <Link
                         to={user.role === 'seeker' ? '/dashboard/seeker#profile' : user.role === 'company' ? '/dashboard/company#profile' : '/dashboard/admin'}
                         onClick={() => setProfileOpen(false)}
                         className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-300 hover:text-white hover:bg-red-600/10 transition-colors">
                         <User className="w-4 h-4 text-red-400" />
-                        {t('الملف الشخصي', 'Profile')}
+                        Profile
                       </Link>
                       <div className="my-1 h-px bg-red-900/30" />
                       <button onClick={handleLogout}
                         className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-400 hover:text-red-300 hover:bg-red-600/10 transition-colors">
                         <LogOut className="w-4 h-4" />
-                        {t('تسجيل الخروج', 'Sign Out')}
+                        Sign Out
                       </button>
                     </div>
                   )}
@@ -117,10 +113,10 @@ export default function Navbar() {
             ) : (
               <div className="hidden md:flex items-center gap-2">
                 <Link to="/login" className="px-4 py-2 text-sm font-semibold text-gray-400 hover:text-white hover:bg-white/5 rounded-xl transition-colors">
-                  {t('دخول', 'Sign In')}
+                  Sign In
                 </Link>
                 <Link to="/register" className="px-4 py-2 text-sm font-bold text-white bg-gradient-to-l from-red-600 to-red-500 hover:from-red-500 hover:to-red-400 rounded-xl transition-all shadow-lg shadow-red-500/20 hover:shadow-red-500/40">
-                  {t('إنشاء حساب', 'Register')}
+                  Register
                 </Link>
               </div>
             )}
@@ -148,10 +144,10 @@ export default function Navbar() {
             {!user ? (
               <>
                 <Link to="/login" className="block px-4 py-2.5 text-sm font-semibold text-gray-400 hover:text-white hover:bg-white/5 rounded-xl" onClick={() => setMenuOpen(false)}>
-                  {t('تسجيل الدخول', 'Sign In')}
+                  Sign In
                 </Link>
                 <Link to="/register" className="block px-4 py-2.5 text-sm font-bold text-red-400 bg-red-600/10 rounded-xl" onClick={() => setMenuOpen(false)}>
-                  {t('إنشاء حساب', 'Create Account')}
+                  Create Account
                 </Link>
               </>
             ) : (
@@ -159,11 +155,11 @@ export default function Navbar() {
                 <Link to={user.role === 'admin' ? '/dashboard/admin' : user.role === 'seeker' ? '/dashboard/seeker' : '/dashboard/company'}
                   className="flex items-center gap-2.5 px-4 py-2.5 text-sm font-semibold text-gray-400 hover:text-white hover:bg-white/5 rounded-xl"
                   onClick={() => setMenuOpen(false)}>
-                  <LayoutDashboard className="w-4 h-4" /> {t('لوحة التحكم', 'Dashboard')}
+                  <LayoutDashboard className="w-4 h-4" /> Dashboard
                 </Link>
                 <button onClick={() => { handleLogout(); setMenuOpen(false); }}
                   className={`w-full ${isAr ? 'text-right' : 'text-left'} flex items-center gap-2.5 px-4 py-2.5 text-sm font-semibold text-red-400 hover:bg-red-600/10 rounded-xl`}>
-                  <LogOut className="w-4 h-4" /> {t('تسجيل الخروج', 'Sign Out')}
+                  <LogOut className="w-4 h-4" /> Sign Out
                 </button>
               </>
             )}
