@@ -10,27 +10,27 @@ import { subscribeToAds, subscribeToAdsByCategory, type FirestoreAd } from '../u
 import type { JobType, ExperienceLevel } from '../types';
 
 const typeOptions: { value: JobType | ''; label: string }[] = [
-  { value: '', label: 'جميع أنواع العمل' },
-  { value: 'full-time', label: 'دوام كامل' },
-  { value: 'part-time', label: 'دوام جزئي' },
-  { value: 'remote', label: 'عن بُعد' },
-  { value: 'freelance', label: 'مستقل' },
-  { value: 'internship', label: 'تدريب' },
+  { value: '', label: 'All Job Types' },
+  { value: 'full-time', label: 'Full Time' },
+  { value: 'part-time', label: 'Part Time' },
+  { value: 'remote', label: 'Remote' },
+  { value: 'freelance', label: 'Freelance' },
+  { value: 'internship', label: 'Internship' },
 ];
 
 const expOptions: { value: ExperienceLevel | ''; label: string }[] = [
-  { value: '', label: 'جميع المستويات' },
-  { value: 'entry', label: 'مبتدئ' },
-  { value: 'mid', label: 'متوسط' },
-  { value: 'senior', label: 'أول' },
-  { value: 'lead', label: 'قيادي' },
-  { value: 'executive', label: 'تنفيذي' },
+  { value: '', label: 'All Levels' },
+  { value: 'entry', label: 'Entry Level' },
+  { value: 'mid', label: 'Mid Level' },
+  { value: 'senior', label: 'Senior' },
+  { value: 'lead', label: 'Lead' },
+  { value: 'executive', label: 'Executive' },
 ];
 
 const sortOptions = [
-  { value: 'date', label: 'الأحدث' },
-  { value: 'applicants', label: 'الأكثر تقديماً' },
-  { value: 'salary', label: 'الراتب' },
+  { value: 'date', label: 'Newest' },
+  { value: 'applicants', label: 'Most Applied' },
+  { value: 'salary', label: 'Salary' },
 ];
 
 export default function Jobs() {
@@ -131,12 +131,12 @@ export default function Jobs() {
             ? 'bg-red-600 text-white pr-5'
             : 'bg-gradient-to-r from-red-600 to-red-500 text-white'
           }`}
-        aria-label="بحث وفلترة"
+        aria-label="Search & Filter"
       >
         {hasFilters ? (
           <>
             <Search className="w-5 h-5" />
-            <span>فلترة نشطة</span>
+            <span>Active Filters</span>
             <span className="w-5 h-5 bg-white/30 rounded-full flex items-center justify-center text-xs font-black">
               {[query, location, sector, type, exp].filter(Boolean).length}
             </span>
@@ -144,7 +144,7 @@ export default function Jobs() {
         ) : (
           <>
             <Plus className="w-5 h-5" />
-            <span>بحث</span>
+            <span>Search</span>
           </>
         )}
       </button>
@@ -163,7 +163,7 @@ export default function Jobs() {
             <div className="w-10 h-1 bg-gray-700 rounded-full mx-auto mb-5" />
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-white font-black text-base flex items-center gap-2">
-                <Search className="w-4 h-4 text-red-400" /> بحث وفلترة
+                <Search className="w-4 h-4 text-red-400" /> Search & Filter
               </h3>
               <button onClick={() => setShowSearchPanel(false)}
                 className="w-8 h-8 rounded-xl bg-gray-800 flex items-center justify-center hover:bg-gray-700 transition">
@@ -179,7 +179,7 @@ export default function Jobs() {
                   type="text"
                   value={query}
                   onChange={e => setQuery(e.target.value)}
-                  placeholder="المسمى الوظيفي أو المهارة أو الشركة..."
+                  placeholder="Job title, skill or company..."
                   className="flex-1 bg-transparent text-white placeholder-gray-500 outline-none text-sm"
                   autoFocus
                 />
@@ -193,7 +193,7 @@ export default function Jobs() {
                   type="text"
                   value={location}
                   onChange={e => setLocation(e.target.value)}
-                  placeholder="الدولة أو المدينة..."
+                  placeholder="Country or city..."
                   className="flex-1 bg-transparent text-white placeholder-gray-500 outline-none text-sm"
                 />
                 {location && <button type="button" onClick={() => setLocation('')}><X className="w-4 h-4 text-gray-500" /></button>}
@@ -205,17 +205,17 @@ export default function Jobs() {
                 onClick={() => setShowFilters(!showFilters)}
                 className={`w-full flex items-center justify-between px-4 py-3 border rounded-2xl text-sm font-bold transition-colors ${showFilters ? 'bg-red-500/10 border-red-500/40 text-red-400' : 'border-gray-700 text-gray-400 bg-gray-800'}`}
               >
-                <span className="flex items-center gap-2"><SlidersHorizontal className="w-4 h-4" /> فلاتر متقدمة</span>
+                <span className="flex items-center gap-2"><SlidersHorizontal className="w-4 h-4" /> Advanced Filters</span>
                 <ChevronDown className={`w-4 h-4 transition-transform ${showFilters ? 'rotate-180' : ''}`} />
               </button>
 
               {showFilters && (
                 <div className="grid grid-cols-2 gap-3 pt-1">
                   {[
-                    { value: sector, onChange: (v: string) => setSector(v), options: [{ value: '', label: 'جميع القطاعات' }, ...sectors.map(s => ({ value: s.id, label: s.name }))] },
+                    { value: sector, onChange: (v: string) => setSector(v), options: [{ value: '', label: 'All Sectors' }, ...sectors.map(s => ({ value: s.id, label: s.name }))] },
                     { value: type, onChange: (v: string) => setType(v as JobType | ''), options: typeOptions.map(o => ({ value: o.value, label: o.label })) },
                     { value: exp, onChange: (v: string) => setExp(v as ExperienceLevel | ''), options: expOptions.map(o => ({ value: o.value, label: o.label })) },
-                    { value: sort, onChange: (v: string) => setSort(v), options: sortOptions.map(o => ({ value: o.value, label: `ترتيب: ${o.label}` })) },
+                    { value: sort, onChange: (v: string) => setSort(v), options: sortOptions.map(o => ({ value: o.value, label: `Sort: ${o.label}` })) },
                   ].map((sel, i) => (
                     <div key={i} className="relative">
                       <select value={sel.value} onChange={e => sel.onChange(e.target.value)}
@@ -232,12 +232,12 @@ export default function Jobs() {
                 {hasFilters && (
                   <button type="button" onClick={() => { clearFilters(); setShowSearchPanel(false); }}
                     className="flex-1 py-3 border-2 border-gray-700 text-gray-400 font-bold rounded-2xl hover:bg-gray-800 transition text-sm">
-                    مسح الكل
+                    Clear All
                   </button>
                 )}
                 <button type="submit"
                   className="flex-1 py-3 bg-gradient-to-r from-red-600 to-red-500 text-white font-black rounded-2xl hover:from-red-500 hover:to-red-400 transition-all shadow-lg shadow-red-500/20 text-sm">
-                  بحث الآن
+                  Search Now
                 </button>
               </div>
             </form>
@@ -248,7 +248,7 @@ export default function Jobs() {
       {/* Sectors – Card Grid */}
       <div className="bg-gray-900/60 border-b border-red-900/20 px-4 py-6">
         <div className="max-w-7xl mx-auto">
-          <h2 className="text-sm font-black text-gray-400 mb-4 tracking-wide">تصفح حسب القطاع</h2>
+          <h2 className="text-sm font-black text-gray-400 mb-4 tracking-wide">Browse by Sector</h2>
           <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-9 gap-3">
             {/* "All" card */}
             {/* All sectors card */}
@@ -259,7 +259,7 @@ export default function Jobs() {
                   ? 'bg-gradient-to-br from-red-600 to-red-800 border-red-500 text-white shadow-lg shadow-red-500/30'
                   : 'bg-gray-800/80 border-gray-700 text-gray-400 hover:border-red-500/50 hover:bg-gray-800'}`}>
               <span className="text-2xl">🏷️</span>
-              <span className="text-xs font-black">الكل</span>
+              <span className="text-xs font-black">All</span>
               <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${!sector ? 'bg-white/20 text-white' : 'bg-gray-700 text-gray-500'}`}>
                 {mockJobs.length + totalJobAds}
               </span>
@@ -295,12 +295,12 @@ export default function Jobs() {
         <div className="flex items-center justify-between mb-5">
           <div>
             <span className="font-black text-white text-lg">{filtered.length}</span>
-            <span className="text-gray-500 text-sm mr-1">وظيفة متاحة</span>
+            <span className="text-gray-500 text-sm mr-1">jobs available</span>
           </div>
           {hasFilters && (
             <button onClick={clearFilters} className="flex items-center gap-1.5 text-sm text-red-400 hover:text-red-300 transition-colors">
               <X className="w-4 h-4" />
-              مسح الفلاتر
+              Clear Filters
             </button>
           )}
         </div>
@@ -308,10 +308,10 @@ export default function Jobs() {
         {filtered.length === 0 ? (
           <div className="text-center py-20">
             <div className="text-6xl mb-4">🔍</div>
-            <h3 className="text-xl font-black text-gray-400 mb-2">لا توجد نتائج</h3>
-            <p className="text-gray-600 text-sm">حاول تغيير كلمات البحث أو الفلاتر</p>
+            <h3 className="text-xl font-black text-gray-400 mb-2">No results found</h3>
+            <p className="text-gray-600 text-sm">Try changing your search terms or filters</p>
             <button onClick={clearFilters} className="mt-4 px-6 py-2.5 bg-gradient-to-l from-red-600 to-red-500 text-white text-sm font-black rounded-xl hover:from-red-500 hover:to-red-400 transition-all">
-              مسح البحث
+              Clear Search
             </button>
           </div>
         ) : (
@@ -333,10 +333,10 @@ export default function Jobs() {
             <div>
               <h2 className="text-xl font-black text-white flex items-center gap-2">
                 <User className="w-5 h-5 text-red-400" />
-                باحثو العمل
+                Job Seekers
               </h2>
               <p className="text-gray-500 text-sm mt-1">
-                {seekerAds.length > 0 ? `${seekerAds.length} شخص يبحث عن عمل` : 'كن أول من يضيف إعلان بحث عن عمل'}
+                {seekerAds.length > 0 ? `${seekerAds.length} people looking for work` : 'Be the first to post a job seeker ad'}
               </p>
             </div>
             <div className="flex items-center gap-2">
@@ -345,7 +345,7 @@ export default function Jobs() {
                   onClick={() => setShowSeekers(v => !v)}
                   className="px-4 py-2 border border-gray-700 text-gray-400 text-sm font-semibold rounded-xl hover:bg-gray-800 transition-all"
                 >
-                  {showSeekers ? 'إخفاء' : 'عرض الكل'}
+                  {showSeekers ? 'Hide' : 'Show All'}
                 </button>
               )}
               <button
@@ -353,7 +353,7 @@ export default function Jobs() {
                 className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-l from-red-700 to-red-500 text-white text-sm font-bold rounded-xl hover:from-red-600 hover:to-red-400 transition-all shadow-lg shadow-red-900/30"
               >
                 <Plus className="w-4 h-4" />
-                {user ? 'أضف إعلانك' : 'سجّل دخول للإضافة'}
+                {user ? 'Post Your Ad' : 'Login to Post'}
               </button>
             </div>
           </div>
@@ -401,7 +401,7 @@ export default function Jobs() {
 
                   <div className="flex items-center justify-between pt-3 border-t border-gray-800">
                     <span className="text-gray-600 text-xs">
-                      {new Date(ad.createdAt).toLocaleDateString('ar-EG', { month: 'short', day: 'numeric' })}
+                      {new Date(ad.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                     </span>
                     <a
                       href={`tel:${ad.phone}`}
@@ -419,8 +419,8 @@ export default function Jobs() {
           {seekerAds.length === 0 && (
             <div className="text-center py-10 bg-gray-900/50 border border-dashed border-gray-800 rounded-2xl">
               <div className="text-5xl mb-3">👤</div>
-              <p className="text-gray-500 text-sm">لا توجد إعلانات بحث عن عمل حتى الآن</p>
-              <p className="text-gray-600 text-xs mt-1">سجّل دخولك وأضف إعلانك ليشاهده أصحاب العمل</p>
+              <p className="text-gray-500 text-sm">No job seeker ads yet</p>
+              <p className="text-gray-600 text-xs mt-1">Login and post your ad so employers can find you</p>
             </div>
           )}
         </div>

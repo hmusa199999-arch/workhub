@@ -10,10 +10,10 @@ interface LanguageContextValue {
 }
 
 const LanguageContext = createContext<LanguageContextValue>({
-  lang: 'ar',
+  lang: 'en',
   setLang: () => {},
-  t: (ar) => ar,
-  isAr: true,
+  t: (_ar, en) => en,
+  isAr: false,
 });
 
 function applyLang(l: Lang) {
@@ -26,7 +26,9 @@ function applyLang(l: Lang) {
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
   const [lang, setLangState] = useState<Lang>(() => {
-    return (localStorage.getItem('work1m_lang') as Lang) || 'ar';
+    // Force English - clear any old Arabic preference
+    localStorage.setItem('work1m_lang', 'en');
+    return 'en';
   });
 
   const setLang = (l: Lang) => {
